@@ -1,0 +1,716 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
+import CenterLoader from "@/components/loaders/center-loader";
+import DashboardHeader from "@/components/dashboard/dashboard-header";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/ui/use-toast";
+import {
+    useGetAdminHotelChainsQuery,
+    useCreateHotelChainMutation,
+    useUpdateHotelChainMutation,
+    useDeleteHotelChainMutation,
+} from "@/store/api/hotelChainApi";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { HotelChain, HotelChainFormData } from "@/lib/types/hotel";
+
+// Animation variants (same as facilities-admin)
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2,
+        },
+    },
+};
+
+const tableRowVariants = {
+    hidden: {
+        opacity: 0,
+        y: 20,
+        scale: 0.95,
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: {
+            duration: 0.4,
+            ease: [0.25, 0.1, 0.25, 1] as const,
+        },
+    },
+    exit: {
+        opacity: 0,
+        y: -20,
+        scale: 0.95,
+        transition: {
+            duration: 0.3,
+        },
+    },
+};
+
+const dialogVariants = {
+    hidden: {
+        opacity: 0,
+        scale: 0.9,
+        y: 20,
+    },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: {
+            duration: 0.3,
+            ease: [0.25, 0.1, 0.25, 1] as const,
+        },
+    },
+    exit: {
+        opacity: 0,
+        scale: 0.9,
+        y: 20,
+        transition: {
+            duration: 0.2,
+        },
+    },
+};
+
+const pageVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+            ease: [0.25, 0.1, 0.25, 1] as const,
+        },
+    },
+};
+
+export default function HotelChainsAdmin() {
+    const { isSuperuser } = useAuth();
+    const { toast } = useToast();
+    const [isMounted, setIsMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState<string>("all");
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [editingChain, setEditingChain] = useState<HotelChain | null>(null);
+    const [formData, setFormData] = useState<Partial<HotelChainFormData>>({
+        chain_id: 0,
+        name: "",
+        description: "",
+        logo: "",
+        website: "",
+        headquarters_country: "",
+        is_active: true,
+    });
+
+    // Queries and Mutations
+    const { data: hotelChainsResponse, isLoading: isLoadingChains } =
+        useGetAdminHotelChainsQuery(undefined, {
+            skip: !isSuperuser(),
+        });
+    const [createHotelChain] = useCreateHotelChainMutation();
+    const [updateHotelChain] = useUpdateHotelChainMutation();
+    const [deleteHotelChain] = useDeleteHotelChainMutation();
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            if (editingChain) {
+                await updateHotelChain({
+                    id: editingChain.id,
+                    data: formData,
+                }).unwrap();
+                toast({
+                    title: "Success",
+                    description: "Hotel chain updated successfully",
+                });
+            } else {
+                await createHotelChain(formData as HotelChainFormData).unwrap();
+                toast({
+                    title: "Success",
+                    description: "Hotel chain created successfully",
+                });
+            }
+            setIsAddDialogOpen(false);
+            setEditingChain(null);
+            setFormData({
+                chain_id: 0,
+                name: "",
+                description: "",
+                logo: "",
+                website: "",
+                headquarters_country: "",
+                is_active: true,
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to save hotel chain. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleEdit = (chain: HotelChain) => {
+        setEditingChain(chain);
+        setFormData({
+            chain_id: chain.chain_id || 0,
+            name: chain.name,
+            description: chain.description || "",
+            logo: chain.logo || "",
+            website: chain.website || "",
+            headquarters_country: chain.headquarters_country || "",
+            is_active: chain.is_active ?? true,
+        });
+        setIsAddDialogOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        try {
+            await deleteHotelChain(id).unwrap();
+            toast({
+                title: "Success",
+                description: "Hotel chain deleted successfully",
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to delete hotel chain. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const filteredChains = hotelChainsResponse?.data.results?.filter(
+        (chain: HotelChain) => {
+            const matchesSearch =
+                chain.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                chain.description
+                    ?.toLowerCase()
+                    .includes(searchQuery.toLowerCase());
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                (selectedStatus === "active" && chain.is_active) ||
+                (selectedStatus === "inactive" && !chain.is_active);
+
+            return matchesSearch && matchesStatus;
+        }
+    );
+
+    if (!isMounted) {
+        return <CenterLoader />;
+    }
+
+    return (
+        <motion.div
+            className="min-h-screen bg-background"
+            variants={pageVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <DashboardHeader />
+            <SidebarProvider>
+                <AdminSidebar />
+                <SidebarInset className="p-6">
+                    <motion.div
+                        className="p-6 space-y-6"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <div className="flex justify-between items-center">
+                            <h1 className="text-2xl font-semibold">
+                                Hotel Chains
+                            </h1>
+                            <Dialog
+                                open={isAddDialogOpen}
+                                onOpenChange={(open) => {
+                                    setIsAddDialogOpen(open);
+                                    if (!open) {
+                                        setEditingChain(null);
+                                        setFormData({
+                                            chain_id: 0,
+                                            name: "",
+                                            description: "",
+                                            logo: "",
+                                            website: "",
+                                            headquarters_country: "",
+                                            is_active: true,
+                                        });
+                                    }
+                                }}
+                            >
+                                <DialogTrigger asChild>
+                                    <Button>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Hotel Chain
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <motion.div
+                                        variants={dialogVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                    >
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                {editingChain
+                                                    ? "Edit"
+                                                    : "Add New"}{" "}
+                                                Hotel Chain
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                Enter the details for the{" "}
+                                                {editingChain
+                                                    ? "existing"
+                                                    : "new"}{" "}
+                                                hotel chain.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="space-y-4 py-4">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="chain_id">
+                                                            Chain ID
+                                                        </label>
+                                                        <Input
+                                                            id="chain_id"
+                                                            type="number"
+                                                            value={
+                                                                formData.chain_id ||
+                                                                ""
+                                                            }
+                                                            onChange={(e) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    chain_id:
+                                                                        parseInt(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        ) || 0,
+                                                                })
+                                                            }
+                                                            placeholder="Enter chain ID"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="name">
+                                                            Chain Name
+                                                        </label>
+                                                        <Input
+                                                            id="name"
+                                                            value={
+                                                                formData.name
+                                                            }
+                                                            onChange={(e) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    name: e
+                                                                        .target
+                                                                        .value,
+                                                                })
+                                                            }
+                                                            placeholder="Enter chain name"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label htmlFor="description">
+                                                        Description
+                                                    </label>
+                                                    <Textarea
+                                                        id="description"
+                                                        value={
+                                                            formData.description
+                                                        }
+                                                        onChange={(e) =>
+                                                            setFormData({
+                                                                ...formData,
+                                                                description:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                        placeholder="Enter chain description"
+                                                        rows={3}
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="logo">
+                                                            Logo URL
+                                                        </label>
+                                                        <Input
+                                                            id="logo"
+                                                            value={
+                                                                formData.logo
+                                                            }
+                                                            onChange={(e) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    logo: e
+                                                                        .target
+                                                                        .value,
+                                                                })
+                                                            }
+                                                            placeholder="Enter logo URL"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="website">
+                                                            Website
+                                                        </label>
+                                                        <Input
+                                                            id="website"
+                                                            value={
+                                                                formData.website
+                                                            }
+                                                            onChange={(e) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    website:
+                                                                        e.target
+                                                                            .value,
+                                                                })
+                                                            }
+                                                            placeholder="Enter website URL"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label htmlFor="headquarters_country">
+                                                        Headquarters Country
+                                                    </label>
+                                                    <Input
+                                                        id="headquarters_country"
+                                                        value={
+                                                            formData.headquarters_country
+                                                        }
+                                                        onChange={(e) =>
+                                                            setFormData({
+                                                                ...formData,
+                                                                headquarters_country:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                        placeholder="Enter headquarters country"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="is_active"
+                                                        checked={
+                                                            formData.is_active
+                                                        }
+                                                        onChange={(e) =>
+                                                            setFormData({
+                                                                ...formData,
+                                                                is_active:
+                                                                    e.target
+                                                                        .checked,
+                                                            })
+                                                        }
+                                                        className="form-checkbox h-4 w-4"
+                                                    />
+                                                    <label htmlFor="is_active">
+                                                        Active
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button
+                                                    variant="outline"
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setIsAddDialogOpen(
+                                                            false
+                                                        )
+                                                    }
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit">
+                                                    {editingChain
+                                                        ? "Update"
+                                                        : "Save"}{" "}
+                                                    Hotel Chain
+                                                </Button>
+                                            </DialogFooter>
+                                        </form>
+                                    </motion.div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+
+                        <motion.div
+                            className="flex items-center space-x-2"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.4 }}
+                        >
+                            <Input
+                                placeholder="Search hotel chains..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="max-w-sm"
+                            />
+                            <Select
+                                value={selectedStatus}
+                                onValueChange={setSelectedStatus}
+                            >
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Filter by status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">
+                                        All Status
+                                    </SelectItem>
+                                    <SelectItem value="active">
+                                        Active
+                                    </SelectItem>
+                                    <SelectItem value="inactive">
+                                        Inactive
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </motion.div>
+
+                        {isLoadingChains ? (
+                            <CenterLoader />
+                        ) : (
+                            <motion.div
+                                className="border rounded-lg"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4, duration: 0.5 }}
+                            >
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Chain Name</TableHead>
+                                            <TableHead>Description</TableHead>
+                                            <TableHead>Website</TableHead>
+                                            <TableHead className="text-right">
+                                                Hotel Count
+                                            </TableHead>
+                                            <TableHead className="text-center">
+                                                Active
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Actions
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <AnimatePresence mode="popLayout">
+                                            {filteredChains?.map(
+                                                (chain, index) => (
+                                                    <motion.tr
+                                                        key={chain.id}
+                                                        variants={
+                                                            tableRowVariants
+                                                        }
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        layout
+                                                        transition={{
+                                                            delay: index * 0.05,
+                                                            layout: {
+                                                                duration: 0.3,
+                                                            },
+                                                        }}
+                                                        className="border-b transition-colors hover:bg-muted/50"
+                                                    >
+                                                        <TableCell className="font-medium">
+                                                            {chain.name}
+                                                        </TableCell>
+                                                        <TableCell className="max-w-md truncate">
+                                                            {chain.description ||
+                                                                "No description"}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {chain.website ? (
+                                                                <a
+                                                                    href={
+                                                                        chain.website
+                                                                    }
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-1 text-blue-600 hover:underline"
+                                                                >
+                                                                    <ExternalLink
+                                                                        size={
+                                                                            14
+                                                                        }
+                                                                    />
+                                                                    Website
+                                                                </a>
+                                                            ) : (
+                                                                "No website"
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {chain.hotel_count ||
+                                                                0}
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            {chain.is_active
+                                                                ? "✓"
+                                                                : "-"}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <motion.div
+                                                                className="flex justify-end space-x-2"
+                                                                initial={{
+                                                                    opacity: 0,
+                                                                    x: 20,
+                                                                }}
+                                                                animate={{
+                                                                    opacity: 1,
+                                                                    x: 0,
+                                                                }}
+                                                                transition={{
+                                                                    delay:
+                                                                        index *
+                                                                            0.05 +
+                                                                        0.2,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        handleEdit(
+                                                                            chain
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Pencil className="h-4 w-4" />
+                                                                </Button>
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="text-red-600"
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle>
+                                                                                Delete
+                                                                                Hotel
+                                                                                Chain
+                                                                            </AlertDialogTitle>
+                                                                            <AlertDialogDescription>
+                                                                                Are
+                                                                                you
+                                                                                sure
+                                                                                you
+                                                                                want
+                                                                                to
+                                                                                delete
+                                                                                this
+                                                                                hotel
+                                                                                chain?
+                                                                                This
+                                                                                action
+                                                                                cannot
+                                                                                be
+                                                                                undone.
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel>
+                                                                                Cancel
+                                                                            </AlertDialogCancel>
+                                                                            <AlertDialogAction
+                                                                                onClick={() =>
+                                                                                    handleDelete(
+                                                                                        chain.id
+                                                                                    )
+                                                                                }
+                                                                                className="bg-red-600 hover:bg-red-700"
+                                                                            >
+                                                                                Delete
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
+                                                            </motion.div>
+                                                        </TableCell>
+                                                    </motion.tr>
+                                                )
+                                            )}
+                                        </AnimatePresence>
+                                    </TableBody>
+                                </Table>
+                            </motion.div>
+                        )}
+                    </motion.div>
+                </SidebarInset>
+            </SidebarProvider>
+        </motion.div>
+    );
+}
