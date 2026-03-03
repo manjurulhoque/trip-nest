@@ -69,7 +69,7 @@ class SoftDeleteAdminMixin:
 class SoftDeleteModelAdmin(SoftDeleteAdminMixin, BaseModelAdmin):
     """Base admin class for soft delete models"""
     
-    def get_list_filter(self):
+    def get_list_filter(self, request):
         """Add is_deleted to list_filter if not already present"""
         list_filter = list(getattr(self, 'list_filter', []))
         if 'is_deleted' not in list_filter:

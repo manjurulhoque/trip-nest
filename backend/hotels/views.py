@@ -2,7 +2,7 @@ from rest_framework import status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Avg, Count, Sum
+from django.db.models import Q, Avg, Count, F
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from .models import Hotel, HotelImage
@@ -276,7 +276,9 @@ class HotelViewSet(ModelViewSet):
     def form_data(self, request):
         """Get data needed for hotel forms"""
         data = {
-            "cities": City.objects.values("id", "name", "country__name"),
+            "cities": City.objects.annotate(country_name=F("country__name")).values(
+                "id", "name", "country_name"
+            )[:20],
             "chains": HotelChain.objects.values("id", "name"),
             "types": HotelType.objects.values("id", "name"),
             "facilities": Facility.objects.values("id", "name", "category"),
