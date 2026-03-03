@@ -24,7 +24,6 @@ interface SearchFiltersProps {
 }
 
 export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const { data: response, isLoading, error } = useGetFormDataQuery();
 
@@ -35,14 +34,14 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
 
     useEffect(() => {
         // Initialize filters from URL params
-        const price_min = searchParams.get("price_min");
-        const price_max = searchParams.get("price_max");
+        const priceMin = searchParams.get("price_min");
+        const priceMax = searchParams.get("price_max");
         const types = searchParams.get("hotel_types")?.split(",");
         const rating = searchParams.get("rating");
         const facilities = searchParams.get("facilities")?.split(",");
 
-        if (price_min && price_max) {
-            setPriceRange([parseInt(price_min), parseInt(price_max)]);
+        if (priceMin && priceMax) {
+            setPriceRange([parseInt(priceMin), parseInt(priceMax)]);
         }
         if (types) {
             setSelectedTypes(types);
@@ -53,7 +52,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
         if (facilities) {
             setSelectedFacilities(facilities);
         }
-    }, [searchParams]);
+    }, [searchParams.toString()]);
 
     useEffect(() => {
         onFiltersChange({
@@ -88,7 +87,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     }
 
     const filters = response.data;
-    const { hotel_types, facilities } = filters;
+    const { types: hotelTypes, facilities } = filters;
 
     const handleClearAll = () => {
         setPriceRange([0, 1000]);
@@ -128,7 +127,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
                 <div>
                     <h3 className="font-semibold mb-3">Property Type</h3>
                     <div className="space-y-2">
-                        {hotel_types.map(
+                        {hotelTypes.map(
                             (type: { id: string; name: string }) => (
                                 <div
                                     key={type.id}

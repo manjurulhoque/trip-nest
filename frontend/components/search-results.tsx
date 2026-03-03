@@ -117,7 +117,7 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                                             <div className="flex items-center mb-1">
                                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                                                 <span className="font-semibold">
-                                                    {hotel.average_rating.toFixed(
+                                                    {hotel.average_rating?.toFixed(
                                                         1
                                                     )}
                                                 </span>
@@ -186,7 +186,7 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                                 <div className="flex items-end justify-between">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            {hotel.price &&
+                                            {hotel.price && hotel.base_price &&
                                                 hotel.price >
                                                     hotel.base_price && (
                                                     <span className="text-sm text-gray-500 line-through">

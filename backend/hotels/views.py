@@ -267,7 +267,12 @@ class HotelViewSet(ModelViewSet):
 
         return api_response(success=True, data=stats)
 
-    @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        url_path="form-data",
+    )
     def form_data(self, request):
         """Get data needed for hotel forms"""
         data = {
@@ -278,7 +283,12 @@ class HotelViewSet(ModelViewSet):
         }
         return api_response(success=True, data=data)
 
-    @action(detail=True, methods=["post"], permission_classes=[IsHostOrReadOnly])
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsHostOrReadOnly],
+        url_path="toggle-active",
+    )
     def toggle_active(self, request, pk=None):
         """Toggle hotel active status"""
         hotel = self.get_object()

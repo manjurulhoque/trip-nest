@@ -260,7 +260,7 @@ export interface FormLookupData {
         id: string;
         name: string;
     }>;
-    hotel_types: Array<{
+    types: Array<{
         id: string;
         name: string;
     }>;
