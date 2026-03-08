@@ -1,17 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/header";
 import { SearchFilters } from "@/components/search-filters";
 import { SearchResults } from "@/components/search-results";
 import { Button } from "@/components/ui/button";
 import { Map, List } from "lucide-react";
 import CenterLoader from "@/components/loaders/center-loader";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { HotelSearchParams } from "@/lib/types/hotel";
+
+function searchParamsToQueryString(params: HotelSearchParams): string {
+    const q = new URLSearchParams();
+    if (params.city) q.set("city", params.city);
+    if (params.stars != null) q.set("stars", String(params.stars));
+    if (params.minRating != null) q.set("min_rating", String(params.minRating));
+    if (params.priceMin != null) q.set("price_min", String(params.priceMin));
+    if (params.priceMax != null) q.set("price_max", String(params.priceMax));
+    if (params.facilities?.length)
+        q.set("facilities", params.facilities.join(","));
+    if (params.q) q.set("q", params.q);
+    if (params.page != null && params.page > 1) q.set("page", String(params.page));
+    return q.toString();
+}
 
 export default function SearchPage() {
     const [isMounted, setIsMounted] = useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
     const urlSearchParams = useSearchParams();
     const [searchParams, setSearchParams] = useState<HotelSearchParams>(() => {
         const city = urlSearchParams.get("city") || undefined;
@@ -33,29 +49,50 @@ export default function SearchPage() {
                 ? facilitiesParam.split(",").filter(Boolean)
                 : undefined,
             q,
-            page: pageParam ? parseInt(pageParam, 10) : undefined,
+            page: pageParam ? parseInt(pageParam, 10) : 1,
         };
     });
+
+    const handlePageChange = useCallback((page: number) => {
+        setSearchParams((prev) => ({ ...prev, page }));
+    }, []);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const handleFiltersChange = (filters: {
-        priceMin?: number;
-        priceMax?: number;
-        hotelTypes?: string[];
-        rating?: number;
-        facilities?: string[];
-    }) => {
-        setSearchParams((prev) => ({
-            ...prev,
-            priceMin: filters.priceMin,
-            priceMax: filters.priceMax,
-            minRating: filters.rating,
-            facilities: filters.facilities,
-        }));
-    };
+    useEffect(() => {
+        if (!isMounted) return;
+        const query = searchParamsToQueryString(searchParams);
+        const currentSearch =
+            typeof window !== "undefined"
+                ? (window.location.search && window.location.search.slice(1)) || ""
+                : "";
+        if (query !== currentSearch) {
+            const url = query ? `${pathname}?${query}` : pathname;
+            router.replace(url, { scroll: false });
+        }
+    }, [isMounted, pathname, router, searchParams]);
+
+    const handleFiltersChange = useCallback(
+        (filters: {
+            priceMin?: number;
+            priceMax?: number;
+            hotelTypes?: string[];
+            rating?: number;
+            facilities?: string[];
+        }) => {
+            setSearchParams((prev) => ({
+                ...prev,
+                priceMin: filters.priceMin,
+                priceMax: filters.priceMax,
+                minRating: filters.rating,
+                facilities: filters.facilities,
+                page: 1,
+            }));
+        },
+        []
+    );
 
     if (!isMounted) {
         return <CenterLoader />;
@@ -85,7 +122,10 @@ export default function SearchPage() {
                                 </Button>
                             </div>
                         </div>
-                        <SearchResults searchParams={searchParams} />
+                        <SearchResults
+                            searchParams={searchParams}
+                            onPageChange={handlePageChange}
+                        />
                     </main>
                 </div>
             </div>

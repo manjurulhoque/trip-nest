@@ -4,14 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useGetFormDataQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 
 interface SearchFiltersProps {
     onFiltersChange: (filters: {
@@ -31,13 +30,14 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
     const [selectedRating, setSelectedRating] = useState<number | null>(null);
     const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
         // Initialize filters from URL params
         const priceMin = searchParams.get("price_min");
         const priceMax = searchParams.get("price_max");
         const types = searchParams.get("hotel_types")?.split(",");
-        const rating = searchParams.get("rating");
+        const rating = searchParams.get("min_rating");
         const facilities = searchParams.get("facilities")?.split(",");
 
         if (priceMin && priceMax) {
@@ -55,13 +55,32 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     }, [searchParams.toString()]);
 
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        const urlPriceMin = searchParams.get("price_min");
+        const urlPriceMax = searchParams.get("price_max");
+        const urlRating = searchParams.get("min_rating");
+        const urlFacilities = searchParams.get("facilities")?.split(",").filter(Boolean);
+        const urlTypes = searchParams.get("hotel_types")?.split(",").filter(Boolean);
+        const matchesUrl =
+            String(priceRange[0]) === (urlPriceMin ?? "") &&
+            String(priceRange[1]) === (urlPriceMax ?? "") &&
+            (selectedRating === null ? !urlRating : String(selectedRating) === (urlRating ?? "")) &&
+            (selectedFacilities.length === 0
+                ? !urlFacilities?.length
+                : selectedFacilities.join(",") === (urlFacilities ?? []).join(",")) &&
+            (selectedTypes.length === 0
+                ? !urlTypes?.length
+                : selectedTypes.join(",") === (urlTypes ?? []).join(","));
+        if (matchesUrl) return;
         onFiltersChange({
             priceMin: priceRange[0],
             priceMax: priceRange[1],
             hotelTypes: selectedTypes.length > 0 ? selectedTypes : undefined,
             rating: selectedRating || undefined,
-            facilities:
-                selectedFacilities.length > 0 ? selectedFacilities : undefined,
+            facilities: selectedFacilities.length > 0 ? selectedFacilities : undefined,
         });
     }, [
         priceRange,
@@ -69,6 +88,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
         selectedRating,
         selectedFacilities,
         onFiltersChange,
+        searchParams,
     ]);
 
     if (isLoading) {

@@ -11,8 +11,11 @@ import { AlertCircle } from "lucide-react";
 import { Hotel, HotelSearchParams } from "@/lib/types/hotel";
 import { useRouter } from "next/navigation";
 
+const PAGE_SIZE = 20;
+
 interface SearchResultsProps {
     searchParams: HotelSearchParams;
+    onPageChange?: (page: number) => void;
 }
 
 const getAmenityIcon = (amenity: string) => {
@@ -28,13 +31,16 @@ const getAmenityIcon = (amenity: string) => {
     }
 };
 
-export function SearchResults({ searchParams }: SearchResultsProps) {
+export function SearchResults({
+    searchParams,
+    onPageChange,
+}: SearchResultsProps) {
     const router = useRouter();
     const {
         data: response,
         isLoading,
         error,
-    } = useSearchHotelsQuery(searchParams);
+    } = useSearchHotelsQuery({ ...searchParams, page: searchParams.page ?? 1 });
 
     if (isLoading) {
         return <CenterLoader />;
@@ -52,7 +58,15 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
         );
     }
 
-    const hotels = response.data.results;
+    const rawData = response.data;
+    const hotels = rawData?.results ?? [];
+    const totalCount = rawData.count;
+    const currentPage = searchParams.page ?? 1;
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+    const hasNext = currentPage < totalPages;
+    const hasPrev = currentPage > 1;
+    const from = (currentPage - 1) * PAGE_SIZE + 1;
+    const to = Math.min(currentPage * PAGE_SIZE, totalCount);
 
     if (hotels.length === 0) {
         return (
@@ -197,7 +211,7 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                                     </div>
                                     <Button
                                         onClick={() =>
-                                            router.push(`/hotels/${hotel.id}`)
+                                            router.push(`/hotel/${hotel.id}`)
                                         }
                                     >
                                         View Details
@@ -208,6 +222,35 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                     </CardContent>
                 </Card>
             ))}
+
+            {totalCount > PAGE_SIZE && onPageChange && (
+                <div className="flex items-center justify-between border-t pt-6 mt-6">
+                    <p className="text-sm text-muted-foreground">
+                        Showing {from}–{to} of {totalCount} results
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onPageChange(currentPage - 1)}
+                            disabled={!hasPrev}
+                        >
+                            Previous
+                        </Button>
+                        <span className="text-sm px-3">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onPageChange(currentPage + 1)}
+                            disabled={!hasNext}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
