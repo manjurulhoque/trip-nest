@@ -46,14 +46,18 @@ const monthlyData = [
 
 export function HostDashboardContent() {
     const {
-        data: stats,
+        data: statsResponse,
         isLoading: statsLoading,
         error: statsError,
     } = useGetHostDashboardStatsQuery();
-    const { data: hotelsData, isLoading: hotelsLoading } = useGetMyHotelsQuery({
-        page: 1,
-    });
+    const { data: hotelsResponse, isLoading: hotelsLoading } =
+        useGetMyHotelsQuery({ page: 1 });
     const [toggleHotelActive] = useToggleHotelActiveMutation();
+
+    const stats = statsResponse?.data;
+    const hotels = Array.isArray(hotelsResponse?.data)
+        ? hotelsResponse.data
+        : hotelsResponse?.data?.results ?? [];
 
     const handleToggleHotel = async (
         hotelId: string,
@@ -117,15 +121,15 @@ export function HostDashboardContent() {
                             <Skeleton className="h-8 w-16" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                {stats?.total_hotels || 0}
+                                {stats?.totalHotels ?? 0}
                             </div>
                         )}
                         {statsLoading ? (
                             <Skeleton className="h-3 w-24" />
                         ) : (
                             <p className="text-xs text-muted-foreground">
-                                {`${stats?.active_hotels || 0} active, ${
-                                    stats?.inactive_hotels || 0
+                                {`${stats?.activeHotels ?? 0} active, ${
+                                    stats?.inactiveHotels ?? 0
                                 } inactive`}
                             </p>
                         )}
@@ -144,7 +148,7 @@ export function HostDashboardContent() {
                             <Skeleton className="h-8 w-16" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                {stats?.total_rooms || 0}
+                                {stats?.totalRooms ?? 0}
                             </div>
                         )}
                         <p className="text-xs text-muted-foreground">
@@ -165,17 +169,16 @@ export function HostDashboardContent() {
                             <Skeleton className="h-8 w-16" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                {stats?.avg_rating
-                                    ? stats.avg_rating.toFixed(1)
+                                {stats?.avgRating != null
+                                    ? Number(stats.avgRating).toFixed(1)
                                     : "N/A"}
                             </div>
                         )}
-                        
                         {statsLoading ? (
                             <Skeleton className="h-3 w-24" />
                         ) : (
                             <p className="text-xs text-muted-foreground">
-                                {`Based on ${stats?.total_reviews || 0} reviews`}
+                                {`Based on ${stats?.totalReviews ?? 0} reviews`}
                             </p>
                         )}
                         
@@ -194,15 +197,15 @@ export function HostDashboardContent() {
                             <Skeleton className="h-8 w-16" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                {stats?.active_hotels || 0}
+                                {stats?.activeHotels ?? 0}
                             </div>
                         )}
                         {!statsLoading && stats && (
                             <Progress
                                 value={
-                                    stats.total_hotels > 0
-                                        ? (stats.active_hotels /
-                                              stats.total_hotels) *
+                                    (stats.totalHotels ?? 0) > 0
+                                        ? ((stats.activeHotels ?? 0) /
+                                              (stats.totalHotels ?? 1)) *
                                           100
                                         : 0
                                 }
@@ -280,9 +283,9 @@ export function HostDashboardContent() {
                                 </div>
                             ))}
                         </div>
-                    ) : hotelsData?.results?.length ? (
+                    ) : hotels?.length ? (
                         <div className="space-y-4">
-                            {hotelsData.results.map((hotel) => (
+                            {hotels.map((hotel) => (
                                 <div
                                     key={hotel.id}
                                     className="flex items-center justify-between p-4 border rounded-lg"
@@ -314,12 +317,12 @@ export function HostDashboardContent() {
                                                         {hotel.stars} stars
                                                     </span>
                                                 </div>
-                                                {hotel.rating && (
+                                                {hotel.rating != null && (
                                                     <div className="flex items-center">
                                                         <span className="text-sm">
-                                                            {hotel.rating.toFixed(
-                                                                1
-                                                            )}{" "}
+                                                            {Number(
+                                                                hotel.rating
+                                                            ).toFixed(1)}{" "}
                                                             rating
                                                         </span>
                                                     </div>
