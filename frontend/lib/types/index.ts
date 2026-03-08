@@ -63,7 +63,7 @@ export interface FormState<T> {
 export interface SearchFilters {
     query?: string;
     page?: number;
-    page_size?: number;
+    pageSize?: number;
     ordering?: string;
     [key: string]: any;
 }
@@ -108,7 +108,7 @@ export interface Address {
     city: string;
     state?: string;
     country: string;
-    postal_code?: string;
+    postalCode?: string;
     coordinates?: Coordinates;
 }
 
@@ -126,5 +126,5 @@ export interface UploadedFile {
     name: string;
     size: number;
     type: string;
-    uploaded_at: string;
+    uploadedAt: string;
 }

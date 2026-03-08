@@ -144,7 +144,7 @@ export default function FacilitiesAdmin() {
         name: "",
         description: "",
         category_id: "",
-        is_active: true,
+        isActive: true,
     });
 
     // Queries and Mutations
@@ -225,7 +225,7 @@ export default function FacilitiesAdmin() {
                     name: formData.name!,
                     description: formData.description,
                     category_id: categoryId || undefined,
-                    is_active: formData.is_active,
+                    isActive: formData.isActive,
                 }).unwrap();
                 toast({
                     title: "Success",
@@ -238,7 +238,7 @@ export default function FacilitiesAdmin() {
                 name: "",
                 description: "",
                 category_id: "none",
-                is_active: true,
+                isActive: true,
             });
         } catch (error) {
             toast({
@@ -255,7 +255,7 @@ export default function FacilitiesAdmin() {
             name: facility.name,
             description: facility.description || "",
             category_id: getCategoryId(facility.category),
-            is_active: facility.is_active,
+            isActive: facility.isActive,
         });
         setIsAddDialogOpen(true);
     };
@@ -328,7 +328,7 @@ export default function FacilitiesAdmin() {
                                             name: "",
                                             description: "",
                                             category_id: "none",
-                                            is_active: true,
+                                            isActive: true,
                                         });
                                     }
                                 }}
@@ -447,19 +447,19 @@ export default function FacilitiesAdmin() {
                                                     />
                                                 </div>
                                                 <div className="flex items-center space-x-2">
-                                                    <label htmlFor="is_active">
+                                                    <label htmlFor="isActive">
                                                         Active
                                                     </label>
                                                     <input
                                                         type="checkbox"
-                                                        id="is_active"
+                                                        id="isActive"
                                                         checked={
-                                                            formData.is_active
+                                                            formData.isActive
                                                         }
                                                         onChange={(e) =>
                                                             setFormData({
                                                                 ...formData,
-                                                                is_active:
+                                                                isActive:
                                                                     e.target
                                                                         .checked,
                                                             })
@@ -595,7 +595,7 @@ export default function FacilitiesAdmin() {
                                                                 0}
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            {facility.is_active
+                                                            {facility.isActive
                                                                 ? "✓"
                                                                 : "-"}
                                                         </TableCell>

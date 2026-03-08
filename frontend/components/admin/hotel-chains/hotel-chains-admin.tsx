@@ -144,7 +144,7 @@ export default function HotelChainsAdmin() {
         logo: "",
         website: "",
         headquarters_country: "",
-        is_active: true,
+        isActive: true,
     });
 
     // Queries and Mutations
@@ -188,7 +188,7 @@ export default function HotelChainsAdmin() {
                 logo: "",
                 website: "",
                 headquarters_country: "",
-                is_active: true,
+                isActive: true,
             });
         } catch (error) {
             toast({
@@ -208,7 +208,7 @@ export default function HotelChainsAdmin() {
             logo: chain.logo || "",
             website: chain.website || "",
             headquarters_country: chain.headquarters_country || "",
-            is_active: chain.is_active ?? true,
+            isActive: chain.isActive ?? true,
         });
         setIsAddDialogOpen(true);
     };
@@ -239,8 +239,8 @@ export default function HotelChainsAdmin() {
 
             const matchesStatus =
                 selectedStatus === "all" ||
-                (selectedStatus === "active" && chain.is_active) ||
-                (selectedStatus === "inactive" && !chain.is_active);
+                (selectedStatus === "active" && chain.isActive) ||
+                (selectedStatus === "inactive" && !chain.isActive);
 
             return matchesSearch && matchesStatus;
         }
@@ -284,7 +284,7 @@ export default function HotelChainsAdmin() {
                                             logo: "",
                                             website: "",
                                             headquarters_country: "",
-                                            is_active: true,
+                                            isActive: true,
                                         });
                                     }
                                 }}
@@ -454,21 +454,21 @@ export default function HotelChainsAdmin() {
                                                 <div className="flex items-center space-x-2">
                                                     <input
                                                         type="checkbox"
-                                                        id="is_active"
+                                                        id="isActive"
                                                         checked={
-                                                            formData.is_active
+                                                            formData.isActive
                                                         }
                                                         onChange={(e) =>
                                                             setFormData({
                                                                 ...formData,
-                                                                is_active:
+                                                                isActive:
                                                                     e.target
                                                                         .checked,
                                                             })
                                                         }
                                                         className="form-checkbox h-4 w-4"
                                                     />
-                                                    <label htmlFor="is_active">
+                                                    <label htmlFor="isActive">
                                                         Active
                                                     </label>
                                                 </div>
@@ -611,7 +611,7 @@ export default function HotelChainsAdmin() {
                                                                 0}
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            {chain.is_active
+                                                            {chain.isActive
                                                                 ? "✓"
                                                                 : "-"}
                                                         </TableCell>

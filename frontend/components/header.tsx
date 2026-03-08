@@ -98,11 +98,11 @@ export function Header() {
                                         <Avatar className="h-6 w-6">
                                             <AvatarImage src={user?.avatar} />
                                             <AvatarFallback>
-                                                {user?.first_name &&
-                                                user?.last_name ? (
+                                                {user?.firstName &&
+                                                user?.lastName ? (
                                                     getInitials(
-                                                        user.first_name,
-                                                        user.last_name
+                                                        user.firstName,
+                                                        user.lastName
                                                     )
                                                 ) : (
                                                     <User className="h-4 w-4" />
@@ -117,7 +117,7 @@ export function Header() {
                                 >
                                     {/* User Info */}
                                     <div className="px-2 py-1.5 text-sm font-medium">
-                                        {user?.first_name} {user?.last_name}
+                                        {user?.firstName} {user?.lastName}
                                     </div>
                                     <div className="px-2 py-1.5 text-xs text-muted-foreground">
                                         {user?.email}

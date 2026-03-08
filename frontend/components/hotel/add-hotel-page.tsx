@@ -31,18 +31,18 @@ interface HotelFormData {
     name: string;
     address: string;
     city: string;
-    address_suburb?: string;
+    addressSuburb?: string;
     stars: number;
     latitude?: number;
     longitude?: number;
     rating?: number;
     chain?: string;
-    hotel_type?: string;
+    hotelType?: string;
     price?: number;
-    facility_ids: string[];
-    main_photo?: string;
+    facilityIds: string[];
+    mainPhoto?: string;
     thumbnail?: string;
-    is_active: boolean;
+    isActive: boolean;
 }
 
 export default function AddHotelPage() {
@@ -55,18 +55,18 @@ export default function AddHotelPage() {
         name: "",
         address: "",
         city: "",
-        address_suburb: "",
+        addressSuburb: "",
         stars: 1,
         latitude: undefined,
         longitude: undefined,
         rating: undefined,
         chain: "none",
-        hotel_type: "none",
+        hotelType: "none",
         price: undefined,
-        facility_ids: [],
-        main_photo: "",
+        facilityIds: [],
+        mainPhoto: "",
         thumbnail: "",
-        is_active: true,
+        isActive: true,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -81,9 +81,9 @@ export default function AddHotelPage() {
     const handleFacilityToggle = (facilityId: string) => {
         setFormValues((prev) => ({
             ...prev,
-            facility_ids: prev.facility_ids.includes(facilityId)
-                ? prev.facility_ids.filter((id) => id !== facilityId)
-                : [...prev.facility_ids, facilityId],
+            facilityIds: prev.facilityIds.includes(facilityId)
+                ? prev.facilityIds.filter((id) => id !== facilityId)
+                : [...prev.facilityIds, facilityId],
         }));
     };
 
@@ -128,15 +128,15 @@ export default function AddHotelPage() {
                     formValues.chain && formValues.chain !== "none"
                         ? formValues.chain
                         : undefined,
-                hotel_type:
-                    formValues.hotel_type && formValues.hotel_type !== "none"
-                        ? formValues.hotel_type
+                hotelType:
+                    formValues.hotelType && formValues.hotelType !== "none"
+                        ? formValues.hotelType
                         : undefined,
                 price: formValues.price || undefined,
                 latitude: formValues.latitude || undefined,
                 longitude: formValues.longitude || undefined,
                 rating: formValues.rating || undefined,
-                main_photo: formValues.main_photo || undefined,
+                main_photo: formValues.mainPhoto || undefined,
                 thumbnail: formValues.thumbnail || undefined,
             };
 
@@ -301,17 +301,17 @@ export default function AddHotelPage() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="address_suburb">
+                                            <Label htmlFor="addressSuburb">
                                                 Suburb
                                             </Label>
                                             <Input
-                                                id="address_suburb"
+                                                id="addressSuburb"
                                                 value={
-                                                    formValues.address_suburb
+                                                    formValues.addressSuburb
                                                 }
                                                 onChange={(e) =>
                                                     handleInputChange(
-                                                        "address_suburb",
+                                                        "addressSuburb",
                                                         e.target.value
                                                     )
                                                 }
@@ -486,14 +486,14 @@ export default function AddHotelPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="hotel_type">
+                                        <Label htmlFor="hotelType">
                                             Hotel Type
                                         </Label>
                                         <Select
-                                            value={formValues.hotel_type}
+                                            value={formValues.hotelType}
                                             onValueChange={(value) =>
                                                 handleInputChange(
-                                                    "hotel_type",
+                                                    "hotelType",
                                                     value
                                                 )
                                             }
@@ -505,7 +505,7 @@ export default function AddHotelPage() {
                                                 <SelectItem value="none">
                                                     No Type
                                                 </SelectItem>
-                                                {formData?.data?.hotel_types?.map(
+                                                {formData?.data?.types?.map(
                                                     (type) => (
                                                         <SelectItem
                                                             key={type.id}
@@ -553,15 +553,15 @@ export default function AddHotelPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="main_photo">
+                                        <Label htmlFor="mainPhoto">
                                             Main Photo URL
                                         </Label>
                                         <Input
-                                            id="main_photo"
-                                            value={formValues.main_photo}
+                                            id="mainPhoto"
+                                            value={formValues.mainPhoto}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "main_photo",
+                                                    "mainPhoto",
                                                     e.target.value
                                                 )
                                             }
@@ -603,7 +603,7 @@ export default function AddHotelPage() {
                                                 >
                                                     <Checkbox
                                                         id={facility.id}
-                                                        checked={formValues.facility_ids.includes(
+                                                        checked={formValues.facilityIds.includes(
                                                             facility.id
                                                         )}
                                                         onCheckedChange={() =>

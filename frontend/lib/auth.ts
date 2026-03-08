@@ -9,7 +9,7 @@ export const isHost = (user?: UserDetail | null): boolean =>
 export const isGuest = (user?: UserDetail | null): boolean =>
     user?.role === "guest";
 export const isVerifiedHost = (user?: UserDetail | null): boolean =>
-    user?.is_verified_host || false;
+    user?.isVerifiedHost || false;
 export const canListProperties = (user?: UserDetail | null): boolean =>
     user?.can_list_properties || false;
 export const canBookProperties = (user?: UserDetail | null): boolean =>

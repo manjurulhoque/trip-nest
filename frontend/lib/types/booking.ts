@@ -6,35 +6,35 @@ import { User } from "./user";
 export interface Room {
     id: string;
     hotel: string; // Hotel ID
-    room_type: string;
+    roomType: string;
     name: string;
     description?: string;
-    max_occupancy: number;
-    base_price: number;
-    size_sqm?: number;
-    bed_type: string;
-    bed_count: number;
-    bathroom_type: string;
-    has_balcony: boolean;
-    has_sea_view: boolean;
-    has_city_view: boolean;
-    has_mountain_view: boolean;
+    maxOccupancy: number;
+    basePrice: number;
+    sizeSqm?: number;
+    bedType: string;
+    bedCount: number;
+    bathroomType: string;
+    hasBalcony: boolean;
+    hasSeaView: boolean;
+    hasCityView: boolean;
+    hasMountainView: boolean;
     amenities: string[];
     images: RoomImage[];
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface RoomImage {
     id: string;
     room: string; // Room ID
     url: string;
-    url_hd?: string;
-    thumbnail_url?: string;
+    urlHd?: string;
+    thumbnailUrl?: string;
     caption?: string;
     order: number;
-    is_primary: boolean;
+    isPrimary: boolean;
 }
 
 export interface RoomType {
@@ -42,35 +42,35 @@ export interface RoomType {
     name: string;
     description?: string;
     icon?: string;
-    is_active: boolean;
+    isActive: boolean;
 }
 
 // Booking types
 export interface Booking {
     id: string;
-    booking_reference: string;
+    bookingReference: string;
     user: User;
     hotel: Hotel;
     room: Room;
-    check_in_date: string;
-    check_out_date: string;
-    guests_count: number;
-    adults_count: number;
-    children_count: number;
-    total_nights: number;
-    room_rate: number;
+    checkInDate: string;
+    checkOutDate: string;
+    guestsCount: number;
+    adultsCount: number;
+    childrenCount: number;
+    totalNights: number;
+    roomRate: number;
     taxes: number;
     fees: number;
-    total_amount: number;
+    totalAmount: number;
     currency: string;
     status: BookingStatus;
-    payment_status: PaymentStatus;
-    special_requests?: string;
-    guest_details: GuestDetails[];
-    created_at: string;
-    updated_at: string;
-    cancelled_at?: string;
-    cancellation_reason?: string;
+    paymentStatus: PaymentStatus;
+    specialRequests?: string;
+    guestDetails: GuestDetails[];
+    createdAt: string;
+    updatedAt: string;
+    cancelledAt?: string;
+    cancellationReason?: string;
 }
 
 export type BookingStatus =
@@ -91,21 +91,21 @@ export type PaymentStatus =
 export interface GuestDetails {
     id: string;
     booking: string; // Booking ID
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     email?: string;
     phone?: string;
-    date_of_birth?: string;
+    dateOfBirth?: string;
     nationality?: string;
-    passport_number?: string;
-    is_primary: boolean;
+    passportNumber?: string;
+    isPrimary: boolean;
 }
 
 // Booking creation and search types
 export interface BookingSearchParams {
     destination?: string;
-    check_in: string;
-    check_out: string;
+    checkIn: string;
+    checkOut: string;
     guests: number;
     adults: number;
     children: number;
@@ -113,22 +113,22 @@ export interface BookingSearchParams {
 }
 
 export interface CreateBookingData {
-    hotel_id: string;
-    room_id: string;
-    check_in_date: string;
-    check_out_date: string;
-    guests_count: number;
-    adults_count: number;
-    children_count: number;
-    special_requests?: string;
-    guest_details: Omit<GuestDetails, "id" | "booking">[];
+    hotelId: string;
+    roomId: string;
+    checkInDate: string;
+    checkOutDate: string;
+    guestsCount: number;
+    adultsCount: number;
+    childrenCount: number;
+    specialRequests?: string;
+    guestDetails: Omit<GuestDetails, "id" | "booking">[];
 }
 
 export interface BookingAvailability {
-    room_id: string;
+    roomId: string;
     available: boolean;
-    price_per_night: number;
-    total_price: number;
+    pricePerNight: number;
+    totalPrice: number;
     currency: string;
     restrictions?: string[];
 }
@@ -139,13 +139,13 @@ export interface Payment {
     booking: string; // Booking ID
     amount: number;
     currency: string;
-    payment_method: PaymentMethod;
-    payment_provider: string;
-    transaction_id?: string;
+    paymentMethod: PaymentMethod;
+    paymentProvider: string;
+    transactionId?: string;
     status: PaymentStatus;
-    processed_at?: string;
-    created_at: string;
-    updated_at: string;
+    processedAt?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export type PaymentMethod =
@@ -157,10 +157,10 @@ export type PaymentMethod =
 
 export interface PaymentIntent {
     id: string;
-    booking_id: string;
+    bookingId: string;
     amount: number;
     currency: string;
-    client_secret: string;
+    clientSecret: string;
     status: string;
 }
 
@@ -170,16 +170,16 @@ export interface CancellationPolicy {
     hotel: string; // Hotel ID
     name: string;
     description: string;
-    free_cancellation_hours: number;
-    cancellation_fee_percentage: number;
-    no_show_fee_percentage: number;
-    is_active: boolean;
+    freeCancellationHours: number;
+    cancellationFeePercentage: number;
+    noShowFeePercentage: number;
+    isActive: boolean;
 }
 
 export interface CancellationRequest {
-    booking_id: string;
+    bookingId: string;
     reason: string;
-    requested_refund_amount?: number;
+    requestedRefundAmount?: number;
 }
 
 // Review types for bookings
@@ -189,18 +189,18 @@ export interface BookingReview {
     hotel: string; // Hotel ID
     room: string; // Room ID
     user: string; // User ID
-    overall_rating: number;
-    cleanliness_rating: number;
-    comfort_rating: number;
-    location_rating: number;
-    service_rating: number;
-    value_rating: number;
+    overallRating: number;
+    cleanlinessRating: number;
+    comfortRating: number;
+    locationRating: number;
+    serviceRating: number;
+    valueRating: number;
     comment?: string;
     pros?: string;
     cons?: string;
-    would_recommend: boolean;
-    created_at: string;
-    updated_at: string;
+    wouldRecommend: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // API response types
@@ -219,8 +219,8 @@ export interface RoomListResponse {
 }
 
 export interface AvailabilityResponse {
-    hotel_id: string;
-    check_in: string;
-    check_out: string;
-    available_rooms: BookingAvailability[];
+    hotelId: string;
+    checkIn: string;
+    checkOut: string;
+    availableRooms: BookingAvailability[];
 }

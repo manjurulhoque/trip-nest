@@ -45,7 +45,7 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
 
     const hotel = response.data;
     const nearbyAttractions: NearbyAttraction[] =
-        hotel.nearby_attractions || [];
+        hotel.nearbyAttractions || [];
     const transportation: Transportation[] = hotel.transportation || [];
 
     return (
@@ -145,7 +145,7 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
                             <h3 className="font-semibold">Hotel Address</h3>
                             <p className="text-gray-600">
                                 {hotel.address}, {hotel.city.name},{" "}
-                                {hotel.city.country_name}
+                                {hotel.city.countryName}
                             </p>
                         </div>
                     </div>

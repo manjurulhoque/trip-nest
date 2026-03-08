@@ -91,7 +91,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                                                 <h3 className="text-xl font-semibold">
                                                     {room.name}
                                                 </h3>
-                                                {room.is_popular && (
+                                                {room.isPopular && (
                                                     <Badge className="bg-primary">
                                                         Most Popular
                                                     </Badge>
@@ -105,7 +105,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                                                 <div className="flex items-center gap-1">
                                                     <Users className="h-4 w-4" />
                                                     <span>
-                                                        Up to {room.max_guests}{" "}
+                                                        Up to {room.maxGuests}{" "}
                                                         guests
                                                     </span>
                                                 </div>
@@ -150,8 +150,8 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                                             </div>
 
                                             <p className="text-sm text-gray-500">
-                                                {room.available_rooms} room
-                                                {room.available_rooms !== 1
+                                                {room.availableRooms} room
+                                                {room.availableRooms !== 1
                                                     ? "s"
                                                     : ""}{" "}
                                                 left at this price
@@ -160,9 +160,9 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
 
                                         <div className="text-right ml-6">
                                             <div className="mb-2">
-                                                {room.original_price && (
+                                                {room.originalPrice && (
                                                     <span className="text-sm text-gray-500 line-through block">
-                                                        ${room.original_price}
+                                                        ${room.originalPrice}
                                                     </span>
                                                 )}
                                                 <span className="text-2xl font-bold text-primary">

@@ -288,9 +288,9 @@ export function HostDashboardContent() {
                                     className="flex items-center justify-between p-4 border rounded-lg"
                                 >
                                     <div className="flex items-center space-x-4">
-                                        {hotel.main_photo ? (
+                                        {hotel.mainPhoto ? (
                                             <img
-                                                src={hotel.main_photo}
+                                                src={hotel.mainPhoto}
                                                 alt={hotel.name}
                                                 className="w-16 h-16 object-cover rounded-lg"
                                             />
@@ -325,7 +325,7 @@ export function HostDashboardContent() {
                                                     </div>
                                                 )}
                                                 <div className="text-sm text-gray-500">
-                                                    {hotel.room_count} rooms
+                                                    {hotel.roomCount} rooms
                                                 </div>
                                             </div>
                                         </div>
@@ -333,12 +333,12 @@ export function HostDashboardContent() {
                                     <div className="flex items-center space-x-2">
                                         <Badge
                                             variant={
-                                                hotel.is_active
+                                                hotel.isActive
                                                     ? "default"
                                                     : "secondary"
                                             }
                                         >
-                                            {hotel.is_active
+                                            {hotel.isActive
                                                 ? "Active"
                                                 : "Inactive"}
                                         </Badge>
@@ -367,11 +367,11 @@ export function HostDashboardContent() {
                                                 onClick={() =>
                                                     handleToggleHotel(
                                                         hotel.id,
-                                                        hotel.is_active
+                                                        hotel.isActive
                                                     )
                                                 }
                                             >
-                                                {hotel.is_active ? (
+                                                {hotel.isActive ? (
                                                     <ToggleRight className="h-4 w-4 text-green-600" />
                                                 ) : (
                                                     <ToggleLeft className="h-4 w-4 text-gray-400" />

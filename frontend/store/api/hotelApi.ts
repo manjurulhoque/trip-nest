@@ -106,21 +106,27 @@ export const hotelApi = createApi({
             query: () => API_ENDPOINTS.HOTELS.FORM_DATA,
         }),
 
-        // Search hotels
+        // Search hotels (map camelCase to snake_case for backend)
         searchHotels: builder.query<
             PaginatedApiResponse<Hotel>,
             HotelSearchParams
         >({
             query: (params) => {
+                const toSnake: Record<string, string> = {
+                    minRating: "min_rating",
+                    priceMin: "price_min",
+                    priceMax: "price_max",
+                };
                 const searchParams = new URLSearchParams();
                 Object.entries(params).forEach(([key, value]) => {
                     if (value !== undefined && value !== null) {
+                        const paramKey = toSnake[key] ?? key;
                         if (Array.isArray(value)) {
                             value.forEach((v) =>
-                                searchParams.append(`${key}[]`, v)
+                                searchParams.append(`${paramKey}[]`, v)
                             );
                         } else {
-                            searchParams.append(key, value.toString());
+                            searchParams.append(paramKey, value.toString());
                         }
                     }
                 });

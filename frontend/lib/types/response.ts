@@ -4,7 +4,7 @@ export interface APIResponse<T = any> {
     message?: string;
     data: T;
     errors?: Record<string, string[]> | string;
-    status_code?: number;
+    statusCode?: number;
 }
 
 // For paginated responses

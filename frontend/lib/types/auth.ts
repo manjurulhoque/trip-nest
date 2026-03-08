@@ -9,16 +9,16 @@ export interface UserProfile {
     user: string;
     bio?: string;
     website?: string;
-    travel_preferences: Record<string, any>;
-    loyalty_programs: Record<string, any>;
-    hosting_experience?: string;
-    property_types: string[];
-    instant_booking: boolean;
-    profile_public: boolean;
-    show_reviews: boolean;
-    show_contact_info: boolean;
-    created_at: string;
-    updated_at: string;
+    travelPreferences: Record<string, any>;
+    loyaltyPrograms: Record<string, any>;
+    hostingExperience?: string;
+    propertyTypes: string[];
+    instantBooking: boolean;
+    profilePublic: boolean;
+    showReviews: boolean;
+    showContactInfo: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // Base User Interface
@@ -26,34 +26,34 @@ export interface User {
     id: string;
     username: string;
     email: string;
-    first_name: string;
-    last_name: string;
-    full_name: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
     phone?: string;
-    date_of_birth?: string;
+    dateOfBirth?: string;
     country?: string;
     city?: string;
     avatar?: string;
     role: UserRole;
-    role_display: string;
-    date_joined: string;
-    is_verified_host: boolean;
+    roleDisplay: string;
+    dateJoined: string;
+    isVerifiedHost: boolean;
 }
 
 // Detailed User Interface (for authenticated user)
 export interface UserDetail extends User {
-    preferred_currency: string;
-    preferred_language: string;
-    email_verified: boolean;
-    host_approval_status?: HostApprovalStatus;
-    business_name?: string;
-    business_license?: string;
-    tax_id?: string;
+    preferredCurrency: string;
+    preferredLanguage: string;
+    emailVerified: boolean;
+    hostApprovalStatus?: HostApprovalStatus;
+    businessName?: string;
+    businessLicense?: string;
+    taxId?: string;
     profile?: UserProfile;
-    can_list_properties: boolean;
-    can_book_properties: boolean;
-    is_staff?: boolean;
-    is_superuser?: boolean;
+    canListProperties: boolean;
+    canBookProperties: boolean;
+    isStaff?: boolean;
+    isSuperuser?: boolean;
 }
 
 // Authentication Request Types
@@ -65,17 +65,17 @@ export interface LoginRequest {
 export interface RegisterRequest {
     email: string;
     username: string;
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     phone?: string;
-    date_of_birth?: string;
+    dateOfBirth?: string;
     country?: string;
     city?: string;
-    preferred_currency?: string;
-    preferred_language?: string;
+    preferredCurrency?: string;
+    preferredLanguage?: string;
     role?: UserRole;
     password: string;
-    password_confirm: string;
+    passwordConfirm: string;
 }
 
 // Authentication Response Types
@@ -93,9 +93,9 @@ export interface RegisterResponse {
 
 // Password Management Types
 export interface PasswordChangeRequest {
-    old_password: string;
-    new_password: string;
-    new_password_confirm: string;
+    oldPassword: string;
+    newPassword: string;
+    newPasswordConfirm: string;
 }
 
 export interface PasswordResetRequest {
@@ -105,7 +105,7 @@ export interface PasswordResetRequest {
 export interface PasswordResetConfirmRequest {
     token: string;
     password: string;
-    password_confirm: string;
+    passwordConfirm: string;
 }
 
 // Email Verification Types
@@ -123,38 +123,38 @@ export interface AuthState {
 export interface UserActivity {
     id: string;
     user: User;
-    activity_type: string;
+    activityType: string;
     description: string;
     metadata: Record<string, any>;
-    ip_address?: string;
-    user_agent?: string;
-    created_at: string;
-    updated_at: string;
+    ipAddress?: string;
+    userAgent?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // Profile Update Types
 export interface ProfileUpdateData {
-    first_name?: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     phone?: string;
-    date_of_birth?: string;
+    dateOfBirth?: string;
     country?: string;
     city?: string;
     avatar?: string;
-    preferred_currency?: string;
-    preferred_language?: string;
-    business_name?: string;
-    business_license?: string;
-    tax_id?: string;
+    preferredCurrency?: string;
+    preferredLanguage?: string;
+    businessName?: string;
+    businessLicense?: string;
+    taxId?: string;
 }
 
 // Host Switch Types
 export interface SwitchToHostRequest {
-    business_name?: string;
-    business_license?: string;
-    tax_id?: string;
-    hosting_experience?: string;
-    property_types?: string[];
+    businessName?: string;
+    businessLicense?: string;
+    taxId?: string;
+    hostingExperience?: string;
+    propertyTypes?: string[];
 }
 
 // Next-Auth Types

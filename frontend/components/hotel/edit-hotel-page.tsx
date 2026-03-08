@@ -33,18 +33,18 @@ interface HotelFormData {
     name: string;
     address: string;
     city: string;
-    address_suburb?: string;
+    addressSuburb?: string;
     stars: number;
     latitude?: number;
     longitude?: number;
     rating?: number;
     chain?: string;
-    hotel_type?: string;
+    hotelType?: string;
     price?: number;
-    facility_ids: string[];
-    main_photo?: string;
+    facilityIds: string[];
+    mainPhoto?: string;
     thumbnail?: string;
-    is_active: boolean;
+    isActive: boolean;
 }
 
 interface EditHotelPageProps {
@@ -67,18 +67,18 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
         name: "",
         address: "",
         city: "",
-        address_suburb: "",
+        addressSuburb: "",
         stars: 1,
         latitude: undefined,
         longitude: undefined,
         rating: undefined,
         chain: "none",
-        hotel_type: "none",
+        hotelType: "none",
         price: undefined,
-        facility_ids: [],
-        main_photo: "",
+        facilityIds: [],
+        mainPhoto: "",
         thumbnail: "",
-        is_active: true,
+        isActive: true,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -95,18 +95,18 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                 name: hotel.name || "",
                 address: hotel.address || "",
                 city: hotel.city?.id || "",
-                address_suburb: hotel.address_suburb || "",
+                addressSuburb: hotel.addressSuburb || "",
                 stars: hotel.stars || 1,
                 latitude: hotel.latitude || undefined,
                 longitude: hotel.longitude || undefined,
                 rating: hotel.rating || undefined,
                 chain: hotel.chain?.id || "none",
-                hotel_type: hotel.hotel_type?.id || "none",
+                hotelType: hotel.hotelType?.id || "none",
                 price: hotel.price || undefined,
-                facility_ids: hotel.facilities?.map((f) => f.id) || [],
-                main_photo: hotel.main_photo || "",
+                facilityIds: hotel.facilities?.map((f) => f.id) || [],
+                mainPhoto: hotel.mainPhoto || "",
                 thumbnail: hotel.thumbnail || "",
-                is_active: hotel.is_active,
+                isActive: hotel.isActive,
             });
         }
     }, [hotelResponse]);
@@ -121,9 +121,9 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
     const handleFacilityToggle = (facilityId: string) => {
         setFormValues((prev) => ({
             ...prev,
-            facility_ids: prev.facility_ids.includes(facilityId)
-                ? prev.facility_ids.filter((id) => id !== facilityId)
-                : [...prev.facility_ids, facilityId],
+            facilityIds: prev.facilityIds.includes(facilityId)
+                ? prev.facilityIds.filter((id) => id !== facilityId)
+                : [...prev.facilityIds, facilityId],
         }));
     };
 
@@ -168,15 +168,15 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                     formValues.chain && formValues.chain !== "none"
                         ? formValues.chain
                         : undefined,
-                hotel_type:
-                    formValues.hotel_type && formValues.hotel_type !== "none"
-                        ? formValues.hotel_type
+                hotelType:
+                    formValues.hotelType && formValues.hotelType !== "none"
+                        ? formValues.hotelType
                         : undefined,
                 price: formValues.price || undefined,
                 latitude: formValues.latitude || undefined,
                 longitude: formValues.longitude || undefined,
                 rating: formValues.rating || undefined,
-                main_photo: formValues.main_photo || undefined,
+                mainPhoto: formValues.mainPhoto || undefined,
                 thumbnail: formValues.thumbnail || undefined,
             };
 
@@ -357,13 +357,13 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                                 Suburb
                                             </Label>
                                             <Input
-                                                id="address_suburb"
+                                                id="addressSuburb"
                                                 value={
                                                     formValues.address_suburb
                                                 }
                                                 onChange={(e) =>
                                                     handleInputChange(
-                                                        "address_suburb",
+                                                        "addressSuburb",
                                                         e.target.value
                                                     )
                                                 }
@@ -542,10 +542,10 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                             Hotel Type
                                         </Label>
                                         <Select
-                                            value={formValues.hotel_type}
+                                            value={formValues.hotelType}
                                             onValueChange={(value) =>
                                                 handleInputChange(
-                                                    "hotel_type",
+                                                    "hotelType",
                                                     value
                                                 )
                                             }
@@ -557,7 +557,7 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                                 <SelectItem value="none">
                                                     No Type
                                                 </SelectItem>
-                                                {formData?.data?.hotel_types?.map(
+                                                {formData?.data?.types?.map(
                                                     (type) => (
                                                         <SelectItem
                                                             key={type.id}
@@ -597,16 +597,16 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                         <Label>Status</Label>
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
-                                                id="is_active"
-                                                checked={formValues.is_active}
+                                                id="isActive"
+                                                checked={formValues.isActive}
                                                 onCheckedChange={(checked) =>
                                                     handleInputChange(
-                                                        "is_active",
+                                                        "isActive",
                                                         checked
                                                     )
                                                 }
                                             />
-                                            <Label htmlFor="is_active">
+                                            <Label htmlFor="isActive">
                                                 Hotel is active
                                             </Label>
                                         </div>
@@ -628,11 +628,11 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                             Main Photo URL
                                         </Label>
                                         <Input
-                                            id="main_photo"
-                                            value={formValues.main_photo}
+                                            id="mainPhoto"
+                                            value={formValues.mainPhoto}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "main_photo",
+                                                    "mainPhoto",
                                                     e.target.value
                                                 )
                                             }
@@ -674,7 +674,7 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                                 >
                                                     <Checkbox
                                                         id={facility.id}
-                                                        checked={formValues.facility_ids.includes(
+                                                        checked={formValues.facilityIds.includes(
                                                             facility.id
                                                         )}
                                                         onCheckedChange={() =>

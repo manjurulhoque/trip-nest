@@ -165,7 +165,7 @@ export default function UsersAdmin() {
     }, []);
 
     const getStatusBadge = (user: User) => {
-        if (!user.is_active) {
+        if (!user.isActive) {
             return <Badge variant="destructive">Inactive</Badge>;
         }
         if (user.role === "host") {
@@ -209,7 +209,7 @@ export default function UsersAdmin() {
     const handleEdit = (user: User) => {
         toast({
             title: "Edit User",
-            description: `Edit functionality for ${user.first_name} ${user.last_name} - Coming soon!`,
+            description: `Edit functionality for ${user.firstName} ${user.lastName} - Coming soon!`,
         });
     };
 
@@ -218,8 +218,8 @@ export default function UsersAdmin() {
             await toggleUserStatus(user.id).unwrap();
             toast({
                 title: "Success",
-                description: `${user.first_name} ${user.last_name} has been ${
-                    user.is_active ? "deactivated" : "activated"
+                description: `${user.firstName} ${user.lastName} has been ${
+                    user.isActive ? "deactivated" : "activated"
                 }.`,
             });
         } catch (error) {
@@ -236,7 +236,7 @@ export default function UsersAdmin() {
             await approveHost({ id: user.id, approved: true }).unwrap();
             toast({
                 title: "Success",
-                description: `${user.first_name} ${user.last_name} has been approved as a host.`,
+                description: `${user.firstName} ${user.lastName} has been approved as a host.`,
             });
         } catch (error) {
             toast({
@@ -250,7 +250,7 @@ export default function UsersAdmin() {
     const handleViewDetails = (user: User) => {
         toast({
             title: "View Details",
-            description: `Viewing details for ${user.first_name} ${user.last_name} - Coming soon!`,
+            description: `Viewing details for ${user.firstName} ${user.lastName} - Coming soon!`,
         });
     };
 
@@ -372,8 +372,8 @@ export default function UsersAdmin() {
                                                 <TableCell className="font-medium">
                                                     <div className="flex flex-col">
                                                         <span>
-                                                            {user.first_name}{" "}
-                                                            {user.last_name}
+                                                            {user.firstName}{" "}
+                                                            {user.lastName}
                                                         </span>
                                                         <span className="text-sm text-muted-foreground">
                                                             @{user.username}
@@ -383,7 +383,7 @@ export default function UsersAdmin() {
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         {user.email}
-                                                        {user.email_verified && (
+                                                        {user.emailVerified && (
                                                             <ShieldCheck
                                                                 size={14}
                                                                 className="text-green-500"
@@ -404,7 +404,7 @@ export default function UsersAdmin() {
                                                 </TableCell>
                                                 <TableCell>
                                                     {new Date(
-                                                        user.date_joined
+                                                        user.dateJoined
                                                     ).toLocaleDateString()}
                                                 </TableCell>
                                                 <TableCell className="text-right">
@@ -469,12 +469,12 @@ export default function UsersAdmin() {
                                                                 )
                                                             }
                                                             className={
-                                                                user.is_active
+                                                                user.isActive
                                                                     ? "text-red-600"
                                                                     : "text-green-600"
                                                             }
                                                         >
-                                                            {user.is_active ? (
+                                                            {user.isActive ? (
                                                                 <UserX className="h-4 w-4" />
                                                             ) : (
                                                                 <UserCheck className="h-4 w-4" />

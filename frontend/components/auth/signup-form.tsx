@@ -43,10 +43,10 @@ export function SignupForm() {
     const [formData, setFormData] = useState<RegisterRequest>({
         email: "",
         username: "",
-        first_name: "",
-        last_name: "",
+        firstName: "",
+        lastName: "",
         password: "",
-        password_confirm: "",
+        passwordConfirm: "",
         role: "guest",
     });
 
@@ -63,7 +63,7 @@ export function SignupForm() {
         setError(null);
 
         // Basic validation
-        if (formData.password !== formData.password_confirm) {
+        if (formData.password !== formData.passwordConfirm) {
             setError("Passwords don't match");
             toast({
                 variant: "destructive",
@@ -129,13 +129,13 @@ export function SignupForm() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="first_name">First Name</Label>
+                            <Label htmlFor="firstName">First Name</Label>
                             <div className="relative">
                                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
-                                    id="first_name"
+                                    id="firstName"
                                     placeholder="First name"
-                                    value={formData.first_name}
+                                    value={formData.firstName}
                                     onChange={(e) =>
                                         handleChange(
                                             "first_name",
@@ -149,16 +149,16 @@ export function SignupForm() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="last_name">Last Name</Label>
+                            <Label htmlFor="lastName">Last Name</Label>
                             <div className="relative">
                                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
-                                    id="last_name"
+                                    id="lastName"
                                     placeholder="Last name"
-                                    value={formData.last_name}
+                                    value={formData.lastName}
                                     onChange={(e) =>
                                         handleChange(
-                                            "last_name",
+                                            "lastName",
                                             e.target.value
                                         )
                                     }
@@ -264,19 +264,19 @@ export function SignupForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password_confirm">
+                        <Label htmlFor="passwordConfirm">
                             Confirm Password
                         </Label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
-                                id="password_confirm"
+                                id="passwordConfirm"
                                 type="password"
                                 placeholder="Confirm your password"
-                                value={formData.password_confirm}
+                                value={formData.passwordConfirm}
                                 onChange={(e) =>
                                     handleChange(
-                                        "password_confirm",
+                                        "passwordConfirm",
                                         e.target.value
                                     )
                                 }

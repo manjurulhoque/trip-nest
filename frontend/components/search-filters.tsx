@@ -15,9 +15,9 @@ import { useState, useEffect } from "react";
 
 interface SearchFiltersProps {
     onFiltersChange: (filters: {
-        price_min?: number;
-        price_max?: number;
-        hotel_types?: string[];
+        priceMin?: number;
+        priceMax?: number;
+        hotelTypes?: string[];
         rating?: number;
         facilities?: string[];
     }) => void;
@@ -56,9 +56,9 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
 
     useEffect(() => {
         onFiltersChange({
-            price_min: priceRange[0],
-            price_max: priceRange[1],
-            hotel_types: selectedTypes.length > 0 ? selectedTypes : undefined,
+            priceMin: priceRange[0],
+            priceMax: priceRange[1],
+            hotelTypes: selectedTypes.length > 0 ? selectedTypes : undefined,
             rating: selectedRating || undefined,
             facilities:
                 selectedFacilities.length > 0 ? selectedFacilities : undefined,
@@ -263,9 +263,9 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
                         className="flex-1"
                         onClick={() =>
                             onFiltersChange({
-                                price_min: priceRange[0],
-                                price_max: priceRange[1],
-                                hotel_types:
+                                priceMin: priceRange[0],
+                                priceMax: priceRange[1],
+                                hotelTypes:
                                     selectedTypes.length > 0
                                         ? selectedTypes
                                         : undefined,

@@ -8,20 +8,11 @@ import { useSearchHotelsQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Hotel } from "@/lib/types/hotel";
+import { Hotel, HotelSearchParams } from "@/lib/types/hotel";
 import { useRouter } from "next/navigation";
 
 interface SearchResultsProps {
-    searchParams: {
-        city?: string;
-        stars?: number;
-        min_rating?: number;
-        price_min?: number;
-        price_max?: number;
-        facilities?: string[];
-        q?: string;
-        page?: number;
-    };
+    searchParams: HotelSearchParams;
 }
 
 const getAmenityIcon = (amenity: string) => {
@@ -85,7 +76,7 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                         <div className="flex gap-4 p-4">
                             <div className="relative flex-shrink-0">
                                 <img
-                                    src={hotel.main_photo || "/placeholder.svg"}
+                                    src={hotel.mainPhoto || "/placeholder.svg"}
                                     alt={hotel.name}
                                     className="w-64 h-48 object-cover rounded-lg"
                                 />
@@ -117,19 +108,19 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                                             <div className="flex items-center mb-1">
                                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                                                 <span className="font-semibold">
-                                                    {hotel.average_rating?.toFixed(
+                                                    {hotel.averageRating?.toFixed(
                                                         1
                                                     )}
                                                 </span>
                                                 <span className="text-sm text-gray-500 ml-1">
-                                                    ({hotel.total_reviews})
+                                                    ({hotel.totalReviews ?? hotel.reviewsCount})
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="flex flex-wrap gap-2 mb-3">
-                                        {hotel.best_seller && (
+                                        {hotel.bestSeller && (
                                             <Badge
                                                 variant="secondary"
                                                 className="text-xs"
@@ -186,15 +177,15 @@ export function SearchResults({ searchParams }: SearchResultsProps) {
                                 <div className="flex items-end justify-between">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            {hotel.price && hotel.base_price &&
+                                            {hotel.price && hotel.basePrice &&
                                                 hotel.price >
-                                                    hotel.base_price && (
+                                                    hotel.basePrice && (
                                                     <span className="text-sm text-gray-500 line-through">
                                                         ${hotel.price}
                                                     </span>
                                                 )}
                                             <span className="text-2xl font-bold">
-                                                ${hotel.base_price}
+                                                ${hotel.basePrice ?? hotel.minPrice ?? hotel.price}
                                             </span>
                                             <span className="text-gray-600">
                                                 per night

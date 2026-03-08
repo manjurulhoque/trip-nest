@@ -188,8 +188,8 @@ export default function HostHotelsManagement() {
 
         const matchesStatus =
             selectedStatus === "all" ||
-            (selectedStatus === "active" && hotel.is_active) ||
-            (selectedStatus === "inactive" && !hotel.is_active);
+            (selectedStatus === "active" && hotel.isActive) ||
+            (selectedStatus === "inactive" && !hotel.isActive);
 
         return matchesSearch && matchesStatus;
     });
@@ -226,7 +226,7 @@ export default function HostHotelsManagement() {
             await toggleHotelActive(hotel.id).unwrap();
             toast({
                 title: "Success",
-                description: `${hotel.name} has been ${hotel.is_active ? "deactivated" : "activated"
+                description: `${hotel.name} has been ${hotel.isActive ? "deactivated" : "activated"
                     }.`,
             });
         } catch (error) {
@@ -306,7 +306,7 @@ export default function HostHotelsManagement() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {stats.total_hotels || 0}
+                                                {stats.totalHotels || 0}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -322,7 +322,7 @@ export default function HostHotelsManagement() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {stats.active_hotels || 0}
+                                                {stats.activeHotels || 0}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -338,7 +338,7 @@ export default function HostHotelsManagement() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {stats.total_rooms || 0}
+                                                {stats.totalRooms || 0}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -354,10 +354,10 @@ export default function HostHotelsManagement() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {stats.avg_rating
-                                                    ? stats.avg_rating.toFixed(
-                                                        1
-                                                    )
+                                                {stats.avgRating != null
+                                                    ? Number(
+                                                          stats.avgRating
+                                                      ).toFixed(1)
                                                     : "N/A"}
                                             </div>
                                         </CardContent>
@@ -441,10 +441,10 @@ export default function HostHotelsManagement() {
                                                 >
                                                     <TableCell className="font-medium">
                                                         <div className="flex items-center gap-3">
-                                                            {hotel.main_photo && (
+                                                            {hotel.mainPhoto && (
                                                                 <img
                                                                     src={
-                                                                        hotel.main_photo
+                                                                        hotel.mainPhoto
                                                                     }
                                                                     alt={
                                                                         hotel.name
@@ -485,7 +485,7 @@ export default function HostHotelsManagement() {
                                                             </span>
                                                             <span className="text-gray-500 text-sm">
                                                                 (
-                                                                {hotel.reviews_count ||
+                                                                {hotel.reviewsCount ||
                                                                     0}
                                                                 )
                                                             </span>
@@ -504,17 +504,17 @@ export default function HostHotelsManagement() {
                                                     <TableCell>
                                                         <Badge
                                                             variant={
-                                                                hotel.is_active
+                                                                hotel.isActive
                                                                     ? "default"
                                                                     : "secondary"
                                                             }
                                                             className={
-                                                                hotel.is_active
+                                                                hotel.isActive
                                                                     ? "bg-green-100 text-green-800"
                                                                     : "bg-gray-100 text-gray-800"
                                                             }
                                                         >
-                                                            {hotel.is_active
+                                                            {hotel.isActive
                                                                 ? "Active"
                                                                 : "Inactive"}
                                                         </Badge>
@@ -566,12 +566,12 @@ export default function HostHotelsManagement() {
                                                                     )
                                                                 }
                                                                 className={
-                                                                    hotel.is_active
+                                                                    hotel.isActive
                                                                         ? "text-red-600"
                                                                         : "text-green-600"
                                                                 }
                                                             >
-                                                                {hotel.is_active ? (
+                                                                {hotel.isActive ? (
                                                                     <PowerOff className="h-4 w-4" />
                                                                 ) : (
                                                                     <Power className="h-4 w-4" />

@@ -70,16 +70,16 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                         <div className="flex items-center">
                             <Star className="h-6 w-6 fill-yellow-400 text-yellow-400 mr-2" />
                             <span className="text-2xl font-bold">
-                                {hotel.average_rating.toFixed(1)}
+                                {(hotel.averageRating ?? hotel.rating)?.toFixed(1)}
                             </span>
                             <span className="text-gray-600 ml-2">
-                                ({hotel.total_reviews} reviews)
+                                ({hotel.totalReviews ?? hotel.reviewsCount} reviews)
                             </span>
                         </div>
                         <Badge className="bg-primary">
-                            {hotel.average_rating >= 4.5
+                            {(hotel.averageRating ?? hotel.rating) >= 4.5
                                 ? "Excellent"
-                                : hotel.average_rating >= 4
+                                : (hotel.averageRating ?? hotel.rating) >= 4
                                 ? "Very Good"
                                 : "Good"}
                         </Badge>
@@ -158,19 +158,19 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                             }
                                         />
                                         <AvatarFallback>
-                                            {review.user_name[0]}
+                                            {review.userName[0]}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between mb-2">
                                             <div>
                                                 <h4 className="font-semibold">
-                                                    {review.user_name}
+                                                    {review.userName}
                                                 </h4>
                                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                                     <span>
                                                         {new Date(
-                                                            review.created_at
+                                                            review.createdAt
                                                         ).toLocaleDateString(
                                                             "en-US",
                                                             {
@@ -179,12 +179,12 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                                             }
                                                         )}
                                                     </span>
-                                                    {review.room_type && (
+                                                    {review.roomType && (
                                                         <>
                                                             <span>•</span>
                                                             <span>
                                                                 {
-                                                                    review.room_type
+                                                                    review.roomType
                                                                 }
                                                             </span>
                                                         </>
@@ -233,7 +233,7 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                             className="p-0 h-auto text-gray-600"
                                         >
                                             <ThumbsUp className="h-3 w-3 mr-1" />
-                                            Helpful ({review.helpful_count})
+                                            Helpful ({review.helpfulCount})
                                         </Button>
                                     </div>
                                 </div>

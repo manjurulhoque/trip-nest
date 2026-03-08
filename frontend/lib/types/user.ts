@@ -4,47 +4,47 @@ export interface User {
     id: string;
     username: string;
     email: string;
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     role: "guest" | "host" | "admin";
-    is_active: boolean;
-    email_verified: boolean;
-    date_joined: string;
-    last_login?: string;
+    isActive: boolean;
+    emailVerified: boolean;
+    dateJoined: string;
+    lastLogin?: string;
     avatar?: string;
     phone?: string;
     country?: string;
     city?: string;
-    date_of_birth?: string;
-    preferred_currency?: string;
-    preferred_language?: string;
-    is_verified_host?: boolean;
-    host_approval_status?: "pending" | "approved" | "rejected";
-    business_name?: string;
-    business_license?: string;
-    tax_id?: string;
-    can_list_properties?: boolean;
-    can_book_properties?: boolean;
-    can_manage_properties?: boolean;
-    can_manage_bookings?: boolean;
-    can_manage_users?: boolean;
-    is_superuser?: boolean;
-    is_staff?: boolean;
+    dateOfBirth?: string;
+    preferredCurrency?: string;
+    preferredLanguage?: string;
+    isVerifiedHost?: boolean;
+    hostApprovalStatus?: "pending" | "approved" | "rejected";
+    businessName?: string;
+    businessLicense?: string;
+    taxId?: string;
+    canListProperties?: boolean;
+    canBookProperties?: boolean;
+    canManageProperties?: boolean;
+    canManageBookings?: boolean;
+    canManageUsers?: boolean;
+    isSuperuser?: boolean;
+    isStaff?: boolean;
 }
 
 export interface UserProfile {
     id: string;
     user: User;
-    phone_number?: string;
-    date_of_birth?: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
     gender?: "M" | "F" | "O";
     nationality?: string;
-    profile_picture?: string;
+    profilePicture?: string;
     bio?: string;
     address?: string;
     city?: string;
     country?: string;
-    postal_code?: string;
+    postalCode?: string;
     preferences?: {
         currency?: string;
         language?: string;
@@ -54,8 +54,8 @@ export interface UserProfile {
             push: boolean;
         };
     };
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // Authentication types
@@ -67,9 +67,9 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
     email: string;
     password: string;
-    password_confirm: string;
-    first_name: string;
-    last_name: string;
+    passwordConfirm: string;
+    firstName: string;
+    lastName: string;
     role?: "guest" | "host";
 }
 
@@ -119,26 +119,26 @@ export interface Permission {
 }
 
 export interface UserPermissions {
-    user_permissions: Permission[];
-    group_permissions: Permission[];
-    is_superuser: boolean;
-    is_staff: boolean;
+    userPermissions: Permission[];
+    groupPermissions: Permission[];
+    isSuperuser: boolean;
+    isStaff: boolean;
 }
 
 // Profile update types
 export interface ProfileUpdateData {
-    first_name?: string;
-    last_name?: string;
-    phone_number?: string;
-    date_of_birth?: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
     gender?: "M" | "F" | "O";
     nationality?: string;
-    profile_picture?: string;
+    profilePicture?: string;
     bio?: string;
     address?: string;
     city?: string;
     country?: string;
-    postal_code?: string;
+    postalCode?: string;
     preferences?: {
         currency?: string;
         language?: string;
@@ -151,9 +151,9 @@ export interface ProfileUpdateData {
 }
 
 export interface PasswordChangeData {
-    old_password: string;
-    new_password: string;
-    new_password_confirm: string;
+    oldPassword: string;
+    newPassword: string;
+    newPasswordConfirm: string;
 }
 
 // Additional auth types for the API
@@ -164,7 +164,7 @@ export interface PasswordResetRequest {
 export interface PasswordResetConfirmRequest {
     token: string;
     password: string;
-    password_confirm: string;
+    passwordConfirm: string;
 }
 
 export interface EmailVerificationRequest {
@@ -172,23 +172,23 @@ export interface EmailVerificationRequest {
 }
 
 export interface SwitchToHostRequest {
-    business_name?: string;
-    business_address?: string;
-    business_phone?: string;
-    tax_id?: string;
-    bank_account?: string;
-    terms_accepted: boolean;
+    businessName?: string;
+    businessAddress?: string;
+    businessPhone?: string;
+    taxId?: string;
+    bankAccount?: string;
+    termsAccepted: boolean;
 }
 
 export interface UserActivity {
     id: string;
     user: string;
-    activity_type: string;
+    activityType: string;
     description: string;
     metadata?: Record<string, any>;
-    ip_address?: string;
-    user_agent?: string;
-    created_at: string;
+    ipAddress?: string;
+    userAgent?: string;
+    createdAt: string;
 }
 
 // API response types
@@ -206,12 +206,12 @@ export interface ProfileResponse {
 
 // Admin user management types
 export interface AdminUserStats {
-    total_users: number;
-    active_users: number;
-    pending_hosts: number;
-    approved_hosts: number;
-    new_registrations_today: number;
-    new_registrations_this_month: number;
+    totalUsers: number;
+    activeUsers: number;
+    pendingHosts: number;
+    approvedHosts: number;
+    newRegistrationsToday: number;
+    newRegistrationsThisMonth: number;
 }
 
 export interface UserFilters {
@@ -219,20 +219,20 @@ export interface UserFilters {
     role?: "guest" | "host" | "all";
     status?: "active" | "inactive" | "verified" | "unverified" | "all";
     page?: number;
-    page_size?: number;
+    pageSize?: number;
 }
 
 export interface AdminUserFormData {
     username?: string;
     email?: string;
-    first_name?: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     role?: "guest" | "host";
-    is_active?: boolean;
-    email_verified?: boolean;
+    isActive?: boolean;
+    emailVerified?: boolean;
     phone?: string;
     country?: string;
     city?: string;
-    host_approval_status?: "pending" | "approved" | "rejected";
-    business_name?: string;
+    hostApprovalStatus?: "pending" | "approved" | "rejected";
+    businessName?: string;
 }

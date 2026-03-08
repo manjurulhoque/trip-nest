@@ -8,20 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Map, List } from "lucide-react";
 import CenterLoader from "@/components/loaders/center-loader";
 import { useSearchParams } from "next/navigation";
+import { HotelSearchParams } from "@/lib/types/hotel";
 
 export default function SearchPage() {
     const [isMounted, setIsMounted] = useState(false);
     const urlSearchParams = useSearchParams();
-    const [searchParams, setSearchParams] = useState<{
-        city?: string;
-        stars?: number;
-        min_rating?: number;
-        price_min?: number;
-        price_max?: number;
-        facilities?: string[];
-        q?: string;
-        page?: number;
-    }>(() => {
+    const [searchParams, setSearchParams] = useState<HotelSearchParams>(() => {
         const city = urlSearchParams.get("city") || undefined;
         const starsParam = urlSearchParams.get("stars");
         const minRatingParam = urlSearchParams.get("min_rating");
@@ -34,9 +26,9 @@ export default function SearchPage() {
         return {
             city,
             stars: starsParam ? parseInt(starsParam, 10) : undefined,
-            min_rating: minRatingParam ? parseInt(minRatingParam, 10) : undefined,
-            price_min: priceMinParam ? parseInt(priceMinParam, 10) : undefined,
-            price_max: priceMaxParam ? parseInt(priceMaxParam, 10) : undefined,
+            minRating: minRatingParam ? parseInt(minRatingParam, 10) : undefined,
+            priceMin: priceMinParam ? parseInt(priceMinParam, 10) : undefined,
+            priceMax: priceMaxParam ? parseInt(priceMaxParam, 10) : undefined,
             facilities: facilitiesParam
                 ? facilitiesParam.split(",").filter(Boolean)
                 : undefined,
@@ -44,25 +36,25 @@ export default function SearchPage() {
             page: pageParam ? parseInt(pageParam, 10) : undefined,
         };
     });
-    
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
     const handleFiltersChange = (filters: {
-        price_min?: number;
-        price_max?: number;
-        hotel_types?: string[];
+        priceMin?: number;
+        priceMax?: number;
+        hotelTypes?: string[];
         rating?: number;
         facilities?: string[];
     }) => {
-        // setSearchParams((prev) => ({
-        //     ...prev,
-        //     price_min: filters.price_min,
-        //     price_max: filters.price_max,
-        //     min_rating: filters.rating,
-        //     facilities: filters.facilities,
-        // }));
+        setSearchParams((prev) => ({
+            ...prev,
+            priceMin: filters.priceMin,
+            priceMax: filters.priceMax,
+            minRating: filters.rating,
+            facilities: filters.facilities,
+        }));
     };
 
     if (!isMounted) {

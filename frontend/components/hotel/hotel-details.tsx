@@ -50,7 +50,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                                     {hotelData.average_rating.toFixed(1)}
                                 </span>
                                 <span className="text-gray-600 ml-1">
-                                    ({hotelData.total_reviews} reviews)
+                                    ({hotelData.totalReviews ?? hotelData.reviewsCount} reviews)
                                 </span>
                             </div>
                             <div className="flex items-center text-gray-600">
@@ -70,7 +70,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                     <div className="text-right">
                         <p className="text-sm text-gray-600">Starting from</p>
                         <p className="text-3xl font-bold text-primary">
-                            ${hotelData.base_price}
+                            ${hotelData.basePrice ?? hotelData.minPrice}
                         </p>
                         <p className="text-sm text-gray-600">per night</p>
                     </div>

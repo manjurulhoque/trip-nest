@@ -2,7 +2,7 @@
 export interface ApiError {
     message?: string;
     detail?: string;
-    non_field_errors?: string[];
+    nonFieldErrors?: string[];
     [key: string]: any;
 }
 

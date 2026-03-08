@@ -60,7 +60,7 @@ export default function CategoriesAdmin() {
         name: "",
         description: "",
         icon: "",
-        is_active: true,
+        isActive: true,
     });
 
     const { user } = useAuth();
@@ -121,7 +121,7 @@ export default function CategoriesAdmin() {
             name: "",
             description: "",
             icon: "",
-            is_active: true,
+            isActive: true,
         });
         setEditingCategory(null);
     };
@@ -218,7 +218,7 @@ export default function CategoriesAdmin() {
             name: category.name,
             description: category.description || "",
             icon: category.icon || "",
-            is_active: category.is_active,
+            isActive: category.isActive,
         });
         setIsEditDialogOpen(true);
     };
@@ -348,19 +348,19 @@ export default function CategoriesAdmin() {
                                         <div className="flex items-center space-x-2">
                                             <input
                                                 type="checkbox"
-                                                id="is_active"
-                                                checked={formData.is_active}
+                                                id="isActive"
+                                                checked={formData.isActive}
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
-                                                        is_active:
+                                                        isActive:
                                                             e.target.checked,
                                                     })
                                                 }
                                                 className="rounded"
                                             />
                                             <label
-                                                htmlFor="is_active"
+                                                htmlFor="isActive"
                                                 className="text-sm font-medium"
                                             >
                                                 Active
@@ -481,12 +481,12 @@ export default function CategoriesAdmin() {
                                                 <TableCell className="text-center">
                                                     <Badge
                                                         variant={
-                                                            category.is_active
+                                                            category.isActive
                                                                 ? "default"
                                                                 : "secondary"
                                                         }
                                                     >
-                                                        {category.is_active
+                                                        {category.isActive
                                                             ? "Active"
                                                             : "Inactive"}
                                                     </Badge>
@@ -652,18 +652,18 @@ export default function CategoriesAdmin() {
                                     <div className="flex items-center space-x-2">
                                         <input
                                             type="checkbox"
-                                            id="edit-is_active"
-                                            checked={formData.is_active}
+                                            id="edit-isActive"
+                                            checked={formData.isActive}
                                             onChange={(e) =>
                                                 setFormData({
                                                     ...formData,
-                                                    is_active: e.target.checked,
+                                                    isActive: e.target.checked,
                                                 })
                                             }
                                             className="rounded"
                                         />
                                         <label
-                                            htmlFor="edit-is_active"
+                                            htmlFor="edit-isActive"
                                             className="text-sm font-medium"
                                         >
                                             Active

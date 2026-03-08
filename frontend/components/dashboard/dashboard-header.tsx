@@ -352,11 +352,11 @@ const DashboardHeader = () => {
                                     <Avatar className="h-8 w-8 border-2 border-muted">
                                         <AvatarImage src={user?.avatar} />
                                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                                            {user?.first_name &&
-                                            user?.last_name ? (
+                                            {user?.firstName &&
+                                            user?.lastName ? (
                                                 getInitials(
-                                                    user.first_name,
-                                                    user.last_name
+                                                    user.firstName,
+                                                    user.lastName
                                                 )
                                             ) : (
                                                 <User className="h-4 w-4" />
@@ -365,7 +365,7 @@ const DashboardHeader = () => {
                                     </Avatar>
                                     <div className="hidden md:block text-left">
                                         <div className="text-sm font-medium">
-                                            {user?.first_name} {user?.last_name}
+                                            {user?.firstName} {user?.lastName}
                                         </div>
                                         <div className="text-xs text-muted-foreground">
                                             {user?.role === "host"
@@ -379,7 +379,7 @@ const DashboardHeader = () => {
                             <DropdownMenuContent align="end" className="w-64">
                                 <div className="px-3 py-2 border-b">
                                     <div className="text-sm font-medium">
-                                        {user?.first_name} {user?.last_name}
+                                        {user?.firstName} {user?.lastName}
                                     </div>
                                     <div className="text-xs text-muted-foreground mt-0.5">
                                         {user?.email}

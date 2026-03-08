@@ -3,38 +3,38 @@
 export interface City {
     id: string;
     name: string;
-    country_name: string;
+    countryName: string;
 }
 
 export interface HotelChain {
     id: string;
-    chain_id?: number;
+    chainId?: number;
     name: string;
     description?: string;
     logo?: string;
     website?: string;
-    headquarters_country?: string;
-    headquarters_country_name?: string;
-    is_active?: boolean;
-    hotel_count?: number;
-    created_at?: string;
-    updated_at?: string;
-    is_deleted?: boolean;
-    deleted_at?: string;
+    headquartersCountry?: string;
+    headquartersCountryName?: string;
+    isActive?: boolean;
+    hotelCount?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    isDeleted?: boolean;
+    deletedAt?: string;
 }
 
 export interface HotelType {
     id: string;
-    type_id?: number;
+    typeId?: number;
     name: string;
     description?: string;
     icon?: string;
-    is_active?: boolean;
-    hotel_count?: number;
-    created_at?: string;
-    updated_at?: string;
-    is_deleted?: boolean;
-    deleted_at?: string;
+    isActive?: boolean;
+    hotelCount?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    isDeleted?: boolean;
+    deletedAt?: string;
 }
 
 export interface Facility {
@@ -48,11 +48,11 @@ export interface Facility {
 export interface HotelImage {
     id: string;
     url: string;
-    url_hd?: string;
-    thumbnail_url?: string;
+    urlHd?: string;
+    thumbnailUrl?: string;
     caption?: string;
     order: number;
-    default_image: boolean;
+    defaultImage: boolean;
 }
 
 export interface QuickFact {
@@ -65,15 +65,18 @@ export interface HotelRoom {
     name: string;
     description: string;
     price: number;
-    original_price?: number;
-    max_guests: number;
-    bed_type: string;
+    originalPrice?: number;
+    maxGuests: number;
+    bedType: string;
     size: number;
     amenities: Facility[];
     image: string;
-    available_rooms: number;
-    is_popular: boolean;
+    availableRooms: number;
+    isPopular: boolean;
 }
+
+/** Alias for HotelRoom for use in room listing components */
+export type Room = HotelRoom;
 
 export interface NearbyAttraction {
     name: string;
@@ -89,15 +92,15 @@ export interface Transportation {
 
 export interface HotelReview {
     id: string;
-    user_name: string;
-    user_avatar?: string;
-    created_at: string;
+    userName: string;
+    userAvatar?: string;
+    createdAt: string;
     rating: number;
     title?: string;
     comment: string;
-    helpful_count: number;
-    room_type?: string;
-    stay_type?: string;
+    helpfulCount: number;
+    roomType?: string;
+    stayType?: string;
 }
 
 export interface RatingBreakdown {
@@ -114,149 +117,149 @@ export interface CategoryRating {
 export interface Hotel {
     id: string;
     name: string;
-    main_photo?: string;
+    mainPhoto?: string;
     thumbnail?: string;
     latitude?: number;
     longitude?: number;
     address: string;
     city: City;
-    address_suburb?: string;
+    addressSuburb?: string;
     stars: number;
     rating?: number;
     ranking: number;
-    reviews_count: number;
-    best_seller: boolean;
+    reviewsCount: number;
+    bestSeller: boolean;
     chain?: HotelChain;
-    hotel_type?: HotelType;
+    hotelType?: HotelType;
     price?: number;
     facilities: Facility[];
     images: HotelImage[];
-    is_active: boolean;
-    room_count: number;
-    min_price?: number;
-    created_at: string;
-    updated_at?: string;
+    isActive: boolean;
+    roomCount: number;
+    minPrice?: number;
+    createdAt: string;
+    updatedAt?: string;
     owner?: {
         id: string;
         username: string;
         email: string;
-        first_name: string;
-        last_name: string;
+        firstName: string;
+        lastName: string;
         role: string;
     };
-    main_image?: HotelImage;
+    mainImage?: HotelImage;
 
     // Optional fields that may not be present in all responses
     description?: string;
-    additional_info?: string;
+    additionalInfo?: string;
     location?: string;
-    average_rating?: number;
-    total_reviews?: number;
-    base_price?: number;
+    averageRating?: number;
+    totalReviews?: number;
+    basePrice?: number;
     type?: string;
     tags?: string[];
-    quick_facts?: QuickFact[];
+    quickFacts?: QuickFact[];
     rooms?: HotelRoom[];
-    nearby_attractions?: NearbyAttraction[];
+    nearbyAttractions?: NearbyAttraction[];
     transportation?: Transportation[];
     reviews?: HotelReview[];
-    rating_breakdown?: RatingBreakdown[];
-    category_ratings?: CategoryRating[];
+    ratingBreakdown?: RatingBreakdown[];
+    categoryRatings?: CategoryRating[];
 }
 
 export interface HotelStats {
-    total_hotels: number;
-    active_hotels: number;
-    inactive_hotels: number;
-    total_rooms: number;
-    avg_rating: number;
-    total_reviews: number;
-    recent_hotels: Hotel[];
+    totalHotels: number;
+    activeHotels: number;
+    inactiveHotels: number;
+    totalRooms: number;
+    avgRating: number;
+    totalReviews: number;
+    recentHotels: Hotel[];
 }
 
 // Hotel Chain form data types
 export interface HotelChainFormData {
-    chain_id: number;
+    chainId: number;
     name: string;
     description?: string;
     logo?: string;
     website?: string;
-    headquarters_country?: string;
-    is_active: boolean;
+    headquartersCountry?: string;
+    isActive: boolean;
 }
 
 // Hotel Chain statistics for admin dashboard
 export interface HotelChainStats {
-    total_chains: number;
-    active_chains: number;
-    inactive_chains: number;
-    deleted_chains: number;
-    chains_with_hotels: Array<{
+    totalChains: number;
+    activeChains: number;
+    inactiveChains: number;
+    deletedChains: number;
+    chainsWithHotels: Array<{
         id: string;
         name: string;
-        hotel_count: number;
-        is_active: boolean;
+        hotelCount: number;
+        isActive: boolean;
     }>;
-    recent_chains: HotelChain[];
+    recentChains: HotelChain[];
 }
 
 // Hotel Type form data types
 export interface HotelTypeFormData {
-    type_id: number;
+    typeId: number;
     name: string;
     description?: string;
     icon?: string;
-    is_active: boolean;
+    isActive: boolean;
 }
 
 // Hotel Type statistics for admin dashboard
 export interface HotelTypeStats {
-    total_types: number;
-    active_types: number;
-    inactive_types: number;
-    deleted_types: number;
-    types_with_hotels: Array<{
+    totalTypes: number;
+    activeTypes: number;
+    inactiveTypes: number;
+    deletedTypes: number;
+    typesWithHotels: Array<{
         id: string;
         name: string;
-        hotel_count: number;
-        is_active: boolean;
+        hotelCount: number;
+        isActive: boolean;
     }>;
-    recent_types: HotelType[];
+    recentTypes: HotelType[];
 }
 
 export interface HotelFormData {
     name: string;
-    main_photo?: string;
+    mainPhoto?: string;
     thumbnail?: string;
     latitude?: number;
     longitude?: number;
     address: string;
     city: string;
-    address_suburb?: string;
+    addressSuburb?: string;
     stars: number;
     rating?: number;
     chain?: string;
-    hotel_type?: string;
+    hotelType?: string;
     price?: number;
-    facility_ids?: string[];
+    facilityIds?: string[];
     images?: Array<{
         url: string;
-        url_hd?: string;
-        thumbnail_url?: string;
+        urlHd?: string;
+        thumbnailUrl?: string;
         caption?: string;
         order: number;
-        default_image: boolean;
+        defaultImage: boolean;
     }>;
-    is_active: boolean;
+    isActive: boolean;
 }
 
 export interface FormLookupData {
     cities: Array<{
         id: string;
         name: string;
-        country__name: string;
+        countryName: string;
     }>;
-    hotel_chains: Array<{
+    hotelChains: Array<{
         id: string;
         name: string;
     }>;
@@ -275,9 +278,9 @@ export interface FormLookupData {
 export interface HotelSearchParams {
     city?: string;
     stars?: number;
-    min_rating?: number;
-    price_min?: number;
-    price_max?: number;
+    minRating?: number;
+    priceMin?: number;
+    priceMax?: number;
     facilities?: string[];
     q?: string;
     page?: number;
@@ -289,18 +292,18 @@ export interface HotelFilters {
     rating?: [number, number];
     price?: [number, number];
     facilities?: string[];
-    hotel_types?: string[];
+    hotelTypes?: string[];
     chains?: string[];
 }
 
 // Hotel booking related types
 export interface HotelAvailability {
-    hotel_id: string;
-    check_in: string;
-    check_out: string;
-    available_rooms: number;
-    min_price: number;
-    max_price: number;
+    hotelId: string;
+    checkIn: string;
+    checkOut: string;
+    availableRooms: number;
+    minPrice: number;
+    maxPrice: number;
 }
 
 // Response types for API calls
@@ -313,5 +316,5 @@ export interface HotelListResponse {
 
 export interface ToggleHotelActiveResponse {
     message: string;
-    is_active: boolean;
+    isActive: boolean;
 }
