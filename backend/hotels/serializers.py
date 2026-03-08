@@ -77,6 +77,20 @@ class HotelListSerializer(serializers.ModelSerializer):
     main_image = serializers.SerializerMethodField()
     room_count = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
+    rating = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        allow_null=True,
+        required=False,
+        coerce_to_string=False,
+    )
+    price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        allow_null=True,
+        required=False,
+        coerce_to_string=False,
+    )
 
     class Meta:
         model = Hotel
@@ -122,9 +136,10 @@ class HotelListSerializer(serializers.ModelSerializer):
         return obj.rooms.filter(is_active=True).count()
 
     def get_min_price(self, obj):
-        """Get minimum room price"""
-        # This would typically come from room prices or booking data
-        return obj.price  # Placeholder
+        """Get minimum room price (return as number for JSON)."""
+        if obj.price is None:
+            return None
+        return float(obj.price)
 
 
 class HotelDetailSerializer(serializers.ModelSerializer):
@@ -137,6 +152,20 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     facilities = FacilitySerializer(many=True, read_only=True)
     images = HotelImageSerializer(many=True, read_only=True)
     rooms = serializers.SerializerMethodField()
+    rating = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        allow_null=True,
+        required=False,
+        coerce_to_string=False,
+    )
+    price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        allow_null=True,
+        required=False,
+        coerce_to_string=False,
+    )
 
     class Meta:
         model = Hotel

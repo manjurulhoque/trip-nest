@@ -231,12 +231,20 @@ class HotelViewSet(ModelViewSet):
         permission_classes=[IsVerifiedHost],
     )
     def my_hotels(self, request):
-        """Get current user's hotels"""
+        """Get current user's hotels (paginated shape for frontend)."""
         hotels = Hotel.objects.filter(owner=request.user)
         serializer = HotelListSerializer(
             hotels, many=True, context={"request": request}
         )
-        return api_response(success=True, data=serializer.data)
+        return api_response(
+            success=True,
+            data={
+                "results": serializer.data,
+                "count": hotels.count(),
+                "next": None,
+                "previous": None,
+            },
+        )
 
     @action(
         detail=False,
@@ -253,11 +261,12 @@ class HotelViewSet(ModelViewSet):
         for hotel in hotels:
             total_rooms += hotel.rooms.filter(is_active=True).count()
 
+        avg_rating = hotels.aggregate(avg=Avg("rating"))["avg"]
         stats = {
             "total_hotels": hotels.count(),
             "active_hotels": hotels.filter(is_active=True).count(),
             "total_rooms": total_rooms,
-            "avg_rating": hotels.aggregate(avg=Avg("rating"))["avg"],
+            "avg_rating": float(avg_rating) if avg_rating is not None else None,
             "recent_hotels": HotelListSerializer(
                 hotels.order_by("-created_at")[:5],
                 many=True,

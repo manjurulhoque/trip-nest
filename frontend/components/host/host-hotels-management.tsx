@@ -153,8 +153,14 @@ export default function HostHotelsManagement() {
     const [toggleHotelActive] = useToggleHotelActiveMutation();
     const [deleteHotel] = useDeleteHotelMutation();
 
-    const hotels = hotelsResponse?.data?.results || [];
-    const totalHotels = hotelsResponse?.data?.count || 0;
+    const rawData = hotelsResponse?.data;
+    const hotels = Array.isArray(rawData)
+        ? rawData
+        : (rawData?.results ?? []);
+    const totalHotels =
+        typeof rawData?.count === "number"
+            ? rawData.count
+            : (Array.isArray(rawData) ? rawData.length : 0);
     const stats = statsResponse?.data;
 
     // Reset page when filters change
@@ -220,9 +226,8 @@ export default function HostHotelsManagement() {
             await toggleHotelActive(hotel.id).unwrap();
             toast({
                 title: "Success",
-                description: `${hotel.name} has been ${
-                    hotel.is_active ? "deactivated" : "activated"
-                }.`,
+                description: `${hotel.name} has been ${hotel.is_active ? "deactivated" : "activated"
+                    }.`,
             });
         } catch (error) {
             toast({
@@ -351,8 +356,8 @@ export default function HostHotelsManagement() {
                                             <div className="text-2xl font-bold">
                                                 {stats.avg_rating
                                                     ? stats.avg_rating.toFixed(
-                                                          1
-                                                      )
+                                                        1
+                                                    )
                                                     : "N/A"}
                                             </div>
                                         </CardContent>
@@ -528,7 +533,7 @@ export default function HostHotelsManagement() {
                                                             transition={{
                                                                 delay:
                                                                     index *
-                                                                        0.05 +
+                                                                    0.05 +
                                                                     0.2,
                                                             }}
                                                         >
