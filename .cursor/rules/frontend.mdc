@@ -1,0 +1,187 @@
+---
+alwaysApply: true
+---
+# .cursorrules - Trip-nest frontend Project Rules
+
+## Project Context
+This is a Next.js 15 dashboard built from the Kiranism ShadCN template for Trip-Nest - a booking platform.
+
+## Architecture & Stack
+- **Framework**: Next.js 15 with App Router
+- **UI Library**: ShadCN/UI components + Tailwind CSS
+- **API & State**: RTK Query (Redux Toolkit Query) for all backend API calls; Redux store in `store/` with API slices + optional slices (e.g. authSlice)
+- **Auth**: NextAuth.js (from template); JWT sent via RTK Query `prepareHeaders` from session
+- **Icons**: Lucide React
+- **Forms**: React Hook Form + Zod validation
+
+## Coding Standards
+
+### TypeScript
+- Use strict TypeScript with proper typing
+- Prefer interfaces over types for object shapes
+- Export types from dedicated types/ folders
+- Use generic types for reusable components
+- Always define props interfaces for components
+
+### React Patterns
+- Use functional components with hooks only
+- Prefer server components when possible (App Router)
+- Use 'use client' directive only when necessary
+- Follow the existing component structure from template
+- Keep components single-responsibility
+
+### File Organization
+- Follow the existing template structure:
+  ```
+  frontend/
+  ├── app/                    # App Router pages
+  ├── components/             # Shared components
+  │   ├── ui/                 # ShadCN components (don't modify)
+  │   ├── charts/             # Chart components
+  │   └── dashboard/          # Dashboard-specific components
+  ├── lib/                    # Utilities and shared config
+  │   ├── api.ts              # Base query, API_ENDPOINTS, baseQueryWithRetry
+  │   └── types/              # Shared TypeScript types (camelCase, match backend)
+  ├── hooks/                  # Custom hooks
+  └── store/                  # Redux store
+      ├── store.ts            # configureStore, API reducers + middleware
+      ├── api/                # RTK Query API slices (authApi, hotelApi, etc.)
+      └── slices/             # Other slices (e.g. authSlice)
+  ```
+
+### Component Patterns
+- Use the existing ShadCN components from the template
+- Follow the established patterns for cards, forms, tables
+- Maintain the existing design system and spacing
+- Use the template's responsive patterns
+- Keep the same navigation and layout structure
+
+## ShadCN/UI Usage Rules
+- ALWAYS use existing ShadCN components before creating custom ones
+- Import from "@/components/ui/" for base components
+- Use cn() utility for conditional classes
+- Follow the template's variant patterns
+- Maintain accessibility standards from existing components
+
+## Styling Guidelines
+- Use Tailwind CSS classes only
+- Follow the existing color scheme and spacing
+- Use the template's responsive breakpoints
+- Maintain the existing dark/light theme support
+- Use semantic color variables (hsl(var(--primary)))
+
+## API & Data Fetching (store/api)
+All backend API calls go through RTK Query slices in `store/api/`. Do not add ad-hoc fetch/axios calls; use or extend existing API slices.
+
+### Setup (lib/api.ts)
+- **baseUrl**: `process.env.NEXT_PUBLIC_API_URL` (default `http://localhost:8001/api/`)
+- **baseQuery**: `fetchBaseQuery` with `prepareHeaders` that attach `Authorization: Bearer <session.accessToken>` from NextAuth `getSession()`
+- **baseQueryWithRetry**: Wraps baseQuery; on 401 calls `signOut()` and redirects to `/auth/login`; normalizes success to `{ success: true, data }` and errors to `{ success: false, errors }` so components see a consistent shape
+- **API_ENDPOINTS**: Single source of path strings (e.g. `API_ENDPOINTS.HOTELS.BASE`, `API_ENDPOINTS.HOTELS.DETAIL(id)`). Add new endpoints here, then use in API slices
+
+### API slices (store/api/*.ts)
+- Use `createApi` from `@reduxjs/toolkit/query/react` with `baseQuery: baseQueryWithRetry`
+- Set `reducerPath` (e.g. `"hotelApi"`) and `tagTypes` for cache invalidation
+- Define endpoints with `builder.query` (GET) or `builder.mutation` (POST/PATCH/DELETE)
+- Type responses as `ApiResponse<T>` or `PaginatedApiResponse<T>` from `@/lib/types` or `@/lib/types/http`; backend returns camelCase (Django camelCase renderer)
+- For query params the backend expects in snake_case (e.g. search), build `URLSearchParams` in the `query` fn and map camelCase → snake_case (e.g. `minRating` → `min_rating`)
+- Use `providesTags` and `invalidatesTags` so list/detail caches stay in sync after mutations
+- Export generated hooks (e.g. `useGetHotelQuery`, `useUpdateHotelMutation`) from each slice
+- Register each slice in `store/store.ts`: add reducer and middleware for every API slice
+
+### Using in components
+- Prefer `useXxxQuery` / `useXxxMutation` hooks; use `skip` or conditional args to avoid unnecessary requests
+- Handle `isLoading`, `isError`, `error`, `data`; for success, use `data?.data` when the backend wraps in `{ success, data }` (baseQueryWithRetry keeps that shape)
+- For paginated lists, use `data?.results`, `data?.count`, `data?.next`/`previous` from `PaginatedApiResponse<T>`
+
+### Types
+- Keep request/response types in `lib/types/` (hotel, user, auth, facility, http, etc.) in camelCase to match backend
+- Use `ApiResponse<T>`, `PaginatedApiResponse<T>`, and `ApiError` from `lib/types` or `lib/types/http`
+
+## Data Patterns
+- All server data from the Django backend is fetched via `store/api` RTK Query slices (see API & Data Fetching above)
+- Use proper loading states (`isLoading`, `isFetching`) and error handling (`isError`, `error`) from RTK Query hooks
+- Use proper TypeScript types from `lib/types/` for all API data (camelCase)
+- Rely on RTK Query caching and tag invalidation; avoid duplicate requests (e.g. skip initial effect runs that re-push same params)
+
+## Charts & Visualizations
+- Use Recharts library (already configured in template)
+- Follow existing chart component patterns
+- Make all charts responsive and accessible
+- Use consistent color schemes across charts
+- Include proper tooltips and legends
+
+## API Route Patterns
+- App data is served by the Django backend; the frontend calls it via RTK Query in `store/api` using `API_ENDPOINTS` and `baseQueryWithRetry` (see API & Data Fetching)
+- For any Next.js API routes (e.g. auth callbacks, webhooks), follow App Router API route structure, proper HTTP methods, and consistent response formats
+
+## Business Logic - Trip-Nest Specific
+<!-- - Focus on FinOps metrics: costs, usage, budgets, alerts
+- Include carbon footprint calculations and visualizations
+- Support multiple cloud providers (OpenAI, AWS, GCP, Azure)
+- Implement budget tracking and threshold alerting
+- Provide cost optimization recommendations -->
+
+## Performance Rules
+- Use React.memo() for expensive components
+- Implement proper loading states
+- Lazy load heavy components
+- Optimize chart rendering with proper keys
+- Use proper image optimization
+
+## Security Considerations
+- Never expose API keys in client-side code
+- Use environment variables properly
+- Implement proper input validation
+- Follow the template's auth patterns
+- Encrypt sensitive data storage
+
+## Testing Approach
+- Write tests for utility functions
+- Test component rendering and interactions
+- Mock API calls in tests
+- Test both mock and real data scenarios
+
+## Git Commit Convention
+- Use conventional commits format
+- Be descriptive about changes made
+- Commit frequently with working code
+- Include issue references when applicable
+
+## Code Comments
+- Document complex business logic
+- Explain carbon footprint calculations
+- Comment on data transformation logic
+- Document environment variable usage
+
+## Error Handling
+- Use error boundaries for component errors
+- Implement proper API error responses
+- Show user-friendly error messages
+- Log errors appropriately for debugging
+
+## Accessibility
+- Maintain ARIA labels from template components
+- Ensure keyboard navigation works
+- Use semantic HTML elements
+- Follow WCAG guidelines
+- Test with screen readers
+
+## When Suggesting Code Changes
+1. Always analyze the existing template patterns first
+2. Maintain consistency with the established architecture
+3. Use existing components and utilities when possible
+4. Follow the same naming conventions
+5. Include proper TypeScript types
+6. Maintain responsive design patterns
+7. Consider both light and dark theme support
+8. Test suggestions against the existing codebase structure
+
+## Development Workflow
+- Start with mock data implementation
+- Build UI components first, then integrate APIs
+- Test each feature thoroughly before moving to next
+- Maintain the existing development server setup
+- Use the established build and deployment patterns
+
+Remember: The goal is to extend the existing template efficiently while maintaining its quality, patterns, and user experience standards for the specific use case of Trip-Nest dashboard.

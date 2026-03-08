@@ -1,0 +1,108 @@
+---
+alwaysApply: true
+---
+# .cursorrules - Trip-nest Backend Project Rules
+
+## Project Context
+Django REST API for Trip-Nest — a hotel booking platform. The frontend (Next.js) consumes this API; responses use camelCase for JSON (djangorestframework-camel-case).
+
+## Architecture & Stack
+- **Framework**: Django 5.2+ with Django REST Framework
+- **Auth**: JWT via djangorestframework-simplejwt (access + refresh, token blacklist)
+- **API docs**: drf-spectacular (OpenAPI, Swagger at `/api/docs/`, ReDoc at `/api/redoc/`)
+- **Filtering**: django-filter (DjangoFilterBackend)
+- **CORS**: django-cors-headers
+- **JSON**: CamelCase renderer/parser (frontend receives camelCase; request body can be camelCase)
+- **Database**: SQLite (dev); use env for production DB (e.g. PostgreSQL via psycopg2-binary)
+- **Media**: Pillow for images; media served in DEBUG via `settings.MEDIA_URL` / `MEDIA_ROOT`
+
+## Coding Standards
+
+### Python & Django
+- Use Python 3.x; follow PEP 8 and existing project style
+- Prefer class-based views and ViewSets over function-based views for API endpoints
+- Use `get_queryset()`, `get_serializer_class()`, `get_permissions()` for action-based behavior
+- Keep views thin; put business logic in models, serializers, or service modules
+
+### Serializers
+- Use `rest_framework.serializers`; prefer `ModelSerializer` for CRUD
+- For numeric API fields (e.g. price, rating) use `DecimalField(..., coerce_to_string=False)` when frontend expects numbers
+- Use nested serializers (e.g. `CitySerializer`, `FacilitySerializer`) for read-only relations; keep write payloads flat where appropriate
+- Document with docstrings; use `extend_schema` / `extend_schema_view` for OpenAPI
+
+### Models
+- Inherit from `core.models.BaseModel` (UUID pk, `created_at`, `updated_at`) or `core.models.SoftDeleteModel` when soft delete is needed
+- Use `SoftDeleteManager` and `all_objects` / `with_deleted()` where soft delete is used
+- Use meaningful `related_name` and indexes for foreign keys and frequently filtered fields
+
+## File Organization
+- Follow the existing app-based structure:
+  ```
+  backend/
+  ├── backend/           # Project config
+  │   ├── settings.py
+  │   ├── urls.py
+  │   ├── wsgi.py
+  │   └── asgi.py
+  ├── core/              # Shared models (Country, City, HotelType, HotelChain), management commands
+  ├── hotels/            # Hotels, hotel images, search, admin viewset
+  ├── rooms/             # Rooms, room amenities
+  ├── facilities/        # Facilities
+  ├── reviews/           # Reviews (integrate when ready)
+  ├── users/             # User model, auth, permissions, host/guest roles
+  ├── utils/             # Shared helpers (api_response, form_errors)
+  └── manage.py
+  ```
+- Each app: `models.py`, `views.py`, `serializers.py`, `urls.py`, `admin.py`; add `permissions.py` when needed (e.g. users)
+
+## API Conventions
+
+### URL structure
+- Base path: `/api/`
+- Use DRF routers and `path('', include(router.urls))`; mount under `api/` in `backend/urls.py`
+- Custom actions: use `@action(detail=..., url_path="...")` and set `url_path` so frontend paths match (e.g. `form-data`, `toggle-active`, `search`)
+
+### Response format
+- Use `utils.response.api_response(success, data=None, errors=None, status_code)` for consistent JSON:
+  - `{ "success": true, "data": ... }` or `{ "success": false, "errors": ... }`
+- For list/detail from ViewSets, DRF’s default response is used; for custom actions (e.g. search, form-data), return `api_response(True, data=...)` with paginated data as `{ "results", "count", "next", "previous" }` when applicable
+
+### Pagination
+- Use DRF’s `PageNumberPagination` (PAGE_SIZE from settings); return `results` + `count` (and `next`/`previous`) in list/search responses so the frontend can paginate
+
+### Permissions
+- Default: `IsAuthenticated`; override per viewset/action (e.g. `AllowAny` for list/retrieve, `IsVerifiedHost` for create, `IsHostOrReadOnly` for update/delete)
+- Use custom permission classes in `users.permissions` (e.g. `IsHostOrReadOnly`, `IsSuperAdmin`, `IsVerifiedHost`)
+
+## Security Considerations
+- Never commit `SECRET_KEY` or production credentials; use python-decouple or env vars
+- Use JWT with blacklist and sensible access/refresh lifetimes (see `SIMPLE_JWT` in settings)
+- Validate and sanitize input in serializers; use `readable_form_errors` (utils) for validation error shape if needed
+- Restrict CORS and `ALLOWED_HOSTS` in production
+
+## Error Handling
+- Return appropriate HTTP status codes (4xx/5xx) and consistent `errors` shape for the frontend
+- Use `api_response(success=False, errors=..., status_code=...)` for business-logic errors
+- Log server errors; avoid exposing internal details in responses
+
+## Testing
+- Prefer tests per app (`hotels/tests.py`, `users/tests.py`, etc.)
+- Test API endpoints (permissions, filtering, search, pagination), serializers, and critical model logic
+- Use DRF’s `APITestCase` and client for authenticated requests
+
+## Code Comments
+- Document non-obvious business rules, permission logic, and custom actions
+- Use docstrings for ViewSets, custom actions, and serializers
+
+## When Suggesting Code Changes
+1. Match existing patterns: ViewSets, `api_response`, camelCase-friendly serializers
+2. Use `core.models` base classes and existing serializers (e.g. `CitySerializer`, `FacilitySerializer`) where applicable
+3. Add or extend `extend_schema` for new endpoints so API docs stay accurate
+4. Keep URL names and response shapes aligned with the frontend (e.g. list vs detail, pagination fields)
+
+## Development Workflow
+- Run migrations after model changes; use `core.management.commands` (e.g. `seed_data`, `import_cities`) for data
+- Test endpoints via `/api/docs/` or the frontend before committing
+- Keep backend and frontend types in sync (camelCase in API; frontend types in `lib/types`)
+
+Remember: The backend serves the Trip-Nest frontend; maintain consistent response formats, auth, and URL structure so the dashboard and booking flows work correctly.
