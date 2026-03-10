@@ -121,6 +121,56 @@ class HotelViewSet(ModelViewSet):
         """Set owner when creating hotel"""
         serializer.save(owner=self.request.user)
 
+    def retrieve(self, request, *args, **kwargs):
+        """Return single hotel in api_response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        """Return paginated list in api_response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Create hotel and return in api_response format."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return api_response(
+            success=True, data=serializer.data, status_code=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update hotel and return in api_response format."""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return api_response(success=True, data=serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Partial update hotel and return in api_response format."""
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Soft delete hotel and return in api_response format."""
+        instance = self.get_object()
+        instance.delete()
+        return api_response(
+            success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
+        )
+
     @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def search(self, request):
         """Advanced hotel search with filters"""
@@ -166,7 +216,8 @@ class HotelViewSet(ModelViewSet):
             serializer = HotelListSerializer(
                 page, many=True, context={"request": request}
             )
-            return self.get_paginated_response(serializer.data)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
 
         serializer = HotelListSerializer(
             queryset, many=True, context={"request": request}
@@ -373,6 +424,55 @@ class HotelImageViewSet(ModelViewSet):
 
         serializer.save(hotel=hotel)
 
+    def retrieve(self, request, *args, **kwargs):
+        """Return single image in api_response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        """Return list in api_response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Create image and return in api_response format."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = self.perform_create(serializer)
+        if result is not None:
+            return result
+        return api_response(
+            success=True,
+            data=serializer.data,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update image and return in api_response format."""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return api_response(success=True, data=serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Partial update image and return in api_response format."""
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete image and return in api_response format."""
+        instance = self.get_object()
+        instance.delete()
+        return api_response(
+            success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
+        )
+
 
 # Admin-specific views
 @extend_schema_view(
@@ -422,6 +522,56 @@ class AdminHotelViewSet(ModelViewSet):
     search_fields = ["name", "address", "city__name", "owner__email"]
     ordering_fields = ["name", "rating", "created_at", "stars"]
     ordering = ["-created_at"]
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return single hotel in api_response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        """Return paginated list in api_response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Create hotel and return in api_response format."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return api_response(
+            success=True, data=serializer.data, status_code=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update hotel and return in api_response format."""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return api_response(success=True, data=serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Partial update hotel and return in api_response format."""
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete hotel and return in api_response format."""
+        instance = self.get_object()
+        instance.delete()
+        return api_response(
+            success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
+        )
 
     @action(detail=False, methods=["get"])
     def stats(self, request):

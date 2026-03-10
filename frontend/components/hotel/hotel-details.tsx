@@ -26,7 +26,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                    {response?.errors?.detail || "Failed to load hotel details"}
+                    Failed to load hotel details
                 </AlertDescription>
             </Alert>
         );
@@ -36,9 +36,9 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
     const hotelData: Hotel = hotel;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full min-w-0">
             <div>
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">
                             {hotelData.name}
@@ -47,7 +47,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                             <div className="flex items-center">
                                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 mr-1" />
                                 <span className="font-semibold">
-                                    {hotelData.average_rating.toFixed(1)}
+                                    {hotelData.averageRating?.toFixed(1)}
                                 </span>
                                 <span className="text-gray-600 ml-1">
                                     ({hotelData.totalReviews ?? hotelData.reviewsCount} reviews)
@@ -67,7 +67,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                             ))}
                         </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right shrink-0">
                         <p className="text-sm text-gray-600">Starting from</p>
                         <p className="text-3xl font-bold text-primary">
                             ${hotelData.basePrice ?? hotelData.minPrice}
@@ -84,9 +84,9 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                 <p className="text-gray-700 leading-relaxed mb-4">
                     {hotelData.description}
                 </p>
-                {hotelData.additional_info && (
+                {hotelData.additionalInfo && (
                     <p className="text-gray-700 leading-relaxed">
-                        {hotelData.additional_info}
+                        {hotelData.additionalInfo}
                     </p>
                 )}
             </div>
@@ -95,8 +95,8 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
 
             <div>
                 <h2 className="text-xl font-semibold mb-4">Quick Facts</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {hotelData.quick_facts?.map(
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {hotelData.quickFacts?.map(
                         (fact: { icon: string; text: string }) => (
                             <div
                                 key={fact.text}

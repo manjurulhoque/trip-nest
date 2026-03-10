@@ -32,7 +32,7 @@ export function HotelGallery({ hotelId }: HotelGalleryProps) {
     }
 
     const hotel = response.data;
-    const images = hotel.images.map((img) => img.url_hd || img.url);
+    const images = hotel.images.map((img) => img.urlHd || img.url);
 
     const nextImage = () => {
         setCurrentImage((prev) => (prev + 1) % images.length);
@@ -44,8 +44,8 @@ export function HotelGallery({ hotelId }: HotelGalleryProps) {
 
     if (images.length === 0) {
         return (
-            <div className="relative">
-                <div className="grid grid-cols-4 gap-2 h-96">
+            <div className="relative w-full min-w-0">
+                <div className="grid grid-cols-4 gap-2 h-80 sm:h-96">
                     <div className="col-span-4">
                         <img
                             src="/placeholder.svg"
@@ -59,8 +59,8 @@ export function HotelGallery({ hotelId }: HotelGalleryProps) {
     }
 
     return (
-        <div className="relative">
-            <div className="grid grid-cols-4 gap-2 h-96">
+        <div className="relative w-full min-w-0">
+            <div className="grid grid-cols-4 gap-2 h-80 sm:h-96">
                 <div className="col-span-2 relative">
                     <img
                         src={images[currentImage] || "/placeholder.svg"}

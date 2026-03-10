@@ -25,7 +25,7 @@ export const hotelApi = createApi({
 
         // Get host's hotels
         getMyHotels: builder.query<
-            PaginatedApiResponse<Hotel>,
+            ApiResponse<PaginatedApiResponse<Hotel>>,
             { page?: number }
         >({
             query: ({ page = 1 }) =>
@@ -35,7 +35,7 @@ export const hotelApi = createApi({
 
         // Get all hotels (public)
         getHotels: builder.query<
-            PaginatedApiResponse<Hotel>,
+            ApiResponse<PaginatedApiResponse<Hotel>>,
             { page?: number; search?: string }
         >({
             query: ({ page = 1, search = "" }) =>
@@ -108,7 +108,7 @@ export const hotelApi = createApi({
 
         // Search hotels (map camelCase to snake_case for backend)
         searchHotels: builder.query<
-            PaginatedApiResponse<Hotel>,
+            ApiResponse<PaginatedApiResponse<Hotel>>,
             HotelSearchParams
         >({
             query: (params) => {
