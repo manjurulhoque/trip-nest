@@ -81,9 +81,9 @@ export function SearchResults({
 
     return (
         <div className="space-y-4">
-            {hotels.map((hotel: Hotel) => (
+            {hotels.map((hotel: Hotel, index: number) => (
                 <Card
-                    key={hotel.id}
+                    key={`hotel-${index}-${hotel.id}`}
                     className="overflow-hidden hover:shadow-lg transition-shadow"
                 >
                     <CardContent className="p-0">
@@ -193,7 +193,7 @@ export function SearchResults({
                                         <div className="flex items-center gap-2">
                                             {hotel.price && hotel.basePrice &&
                                                 hotel.price >
-                                                    hotel.basePrice && (
+                                                hotel.basePrice && (
                                                     <span className="text-sm text-gray-500 line-through">
                                                         ${hotel.price}
                                                     </span>

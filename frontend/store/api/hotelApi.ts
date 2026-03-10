@@ -108,7 +108,7 @@ export const hotelApi = createApi({
 
         // Search hotels (map camelCase to snake_case for backend)
         searchHotels: builder.query<
-            ApiResponse<PaginatedApiResponse<Hotel>>,
+            PaginatedApiResponse<Hotel>,
             HotelSearchParams
         >({
             query: (params) => {

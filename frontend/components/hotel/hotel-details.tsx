@@ -70,7 +70,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                     <div className="text-left sm:text-right shrink-0">
                         <p className="text-sm text-gray-600">Starting from</p>
                         <p className="text-3xl font-bold text-primary">
-                            ${hotelData.basePrice ?? hotelData.minPrice}
+                            ${hotelData.price?.toFixed(2)}
                         </p>
                         <p className="text-sm text-gray-600">per night</p>
                     </div>
@@ -112,7 +112,6 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
         </div>
     );
 }
-
 function getIcon(name: string) {
     switch (name) {
         case "wifi":
@@ -125,3 +124,4 @@ function getIcon(name: string) {
             return <Star className="h-5 w-5 text-primary" />;
     }
 }
+

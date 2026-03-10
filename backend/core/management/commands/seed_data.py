@@ -5,13 +5,14 @@ room amenities, bed types, and images. Raises if no countries or cities exist.
 """
 import random
 from decimal import Decimal
+import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 
-from core.models import City, Country, HotelChain, HotelType
+from core.models import City, Country
 from facilities.models import Category, Facility
-from hotels.models import Hotel, HotelImage
+from hotels.models import Hotel, HotelImage, HotelType, HotelChain
 from rooms.models import BedType, Room, RoomAmenity, RoomBedType, RoomImage
 
 
@@ -122,6 +123,14 @@ ROOM_NAMES = [
     "Family Room",
     "Ocean View Double",
     "Garden View Room",
+]
+
+HOTEL_DESCRIPTION_TEMPLATES = [
+    "{} offers a comfortable stay in the heart of {}. Modern amenities and friendly service for business and leisure travelers.",
+    "Welcome to {} in {}. A peaceful retreat with well-appointed rooms and convenient access to local attractions.",
+    "{} combines comfort and style in {}. Enjoy a relaxing stay with quality service and thoughtful amenities.",
+    "Experience {} in {}. Ideal for both short getaways and extended stays, with attentive staff and a welcoming atmosphere.",
+    "{} is your home away from home in {}. Relax in our cozy rooms and make the most of your visit.",
 ]
 
 
@@ -285,37 +294,43 @@ class Command(BaseCommand):
         cities = list(City.objects.select_related("country").all())
         if not cities:
             raise CommandError("No cities available for hotels.")
-        names_used = set()
+        names_used_in_city = set()  # (name, city_id) to avoid duplicate name per city
         hotels_created = 0
         for idx, host in enumerate(hosts):
-            city = cities[idx % len(cities)]
             for j in range(5):
-                name = SAMPLE_HOTEL_NAMES[(idx * 2 + j) % len(SAMPLE_HOTEL_NAMES)]
+                city = cities[(idx * 5 + j) % len(cities)]
+                name = SAMPLE_HOTEL_NAMES[(idx * 5 + j) % len(SAMPLE_HOTEL_NAMES)]
                 candidate = name
                 k = 0
-                while candidate in names_used:
+                key = (candidate, city.id)
+                while key in names_used_in_city:
                     k += 1
                     candidate = f"{name} {k}"
-                names_used.add(candidate)
+                    key = (candidate, city.id)
+                names_used_in_city.add(key)
+                if Hotel.objects.filter(name=candidate, city=city).exists():
+                    continue
                 if Hotel.objects.filter(owner=host, name=candidate).exists():
                     continue
                 stars = min(3 + (idx + j) % 3, 5)
                 rating = Decimal(str(round(7.0 + random.uniform(0, 2.5), 1)))
-                price = Decimal(str(round(random.uniform(80, 350), 2)))
                 lat = city.latitude or Decimal(str(round(random.uniform(-90, 90), 6)))
                 lon = city.longitude or Decimal(str(round(random.uniform(-180, 180), 6)))
                 hotel_type = hotel_types[(idx + j) % len(hotel_types)]
                 chain = chains[(idx + j) % len(chains)] if chains else None
                 hotel_facilities = random.sample(facilities, min(random.randint(3, 7), len(facilities)))
+                desc_tpl = HOTEL_DESCRIPTION_TEMPLATES[(idx + j) % len(HOTEL_DESCRIPTION_TEMPLATES)]
+                description = desc_tpl.format(candidate, city.name)
                 hotel = Hotel.objects.create(
                     name=candidate,
+                    description=description,
                     owner=host,
                     city=city,
                     address=f"Sample address for {candidate}, {city.name}, {city.country.name}",
                     address_suburb=city.name,
                     stars=stars,
                     rating=rating,
-                    ranking=idx * 2 + j,
+                    ranking=idx * 5 + j,
                     reviews_count=random.randint(10, 500),
                     best_seller=random.choice([True, False]),
                     latitude=lat,
@@ -324,7 +339,6 @@ class Command(BaseCommand):
                     thumbnail=PLACEHOLDER_IMAGE,
                     hotel_type=hotel_type,
                     chain=chain,
-                    price=price,
                     is_active=True,
                 )
                 hotel.facilities.set(hotel_facilities)
@@ -344,6 +358,7 @@ class Command(BaseCommand):
                     adults = random.randint(2, 4)
                     children = random.randint(0, 2)
                     occupancy = adults + children
+                    room_price = Decimal(str(round(random.uniform(80, 350), 2)))
                     room = Room.objects.create(
                         hotel=hotel,
                         name=room_name,
@@ -353,6 +368,7 @@ class Command(BaseCommand):
                         adults=adults,
                         children=children,
                         occupancy=occupancy,
+                        price=room_price,
                         is_active=True,
                     )
                     room.amenities.set(random.sample(room_amenities, min(3, len(room_amenities))))
@@ -370,6 +386,7 @@ class Command(BaseCommand):
                             main_photo=(rn == 0),
                         )
                 hotels_created += 1
+                time.sleep(1)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Created {hotels_created} hotels with rooms, amenities, bed types, and images."

@@ -283,7 +283,6 @@ export interface HotelFormData {
     rating?: number;
     chain?: string;
     hotelType?: string;
-    price?: number;
     facilityIds?: string[];
     images?: Array<{
         url: string;

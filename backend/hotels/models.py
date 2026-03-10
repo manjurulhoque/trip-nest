@@ -2,7 +2,51 @@ import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from facilities.models import Facility
-from core.models import City, HotelChain, HotelType, SoftDeleteModel, BaseModel
+from core.models import City, Country, SoftDeleteModel, BaseModel
+
+
+class HotelChain(SoftDeleteModel):
+    """
+    Hotel chain model
+    This model is used to store information group hotels that are owned by the same company.
+    For example, Hilton, Marriott, etc. Display brand name in the UI.
+    """
+
+    chain_id = models.IntegerField(unique=True, help_text="External chain ID")
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    logo = models.URLField(max_length=500, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    headquarters_country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Hotel Chain"
+        verbose_name_plural = "Hotel Chains"
+
+    def __str__(self):
+        return self.name
+
+
+class HotelType(SoftDeleteModel):
+    """Hotel type model (e.g., Resort, Business Hotel, etc.)"""
+
+    type_id = models.IntegerField(unique=True, help_text="External type ID")
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    icon = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Hotel Type"
+        verbose_name_plural = "Hotel Types"
+
+    def __str__(self):
+        return self.name
 
 
 class Hotel(SoftDeleteModel):
@@ -11,6 +55,7 @@ class Hotel(SoftDeleteModel):
     name = models.CharField(max_length=255)
     main_photo = models.URLField(max_length=500, blank=True, null=True)
     thumbnail = models.URLField(max_length=500, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     # Owner information
     owner = models.ForeignKey(
@@ -64,8 +109,6 @@ class Hotel(SoftDeleteModel):
         null=True,
         related_name="hotels",
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
     # Relations
     facilities = models.ManyToManyField(Facility, blank=True, related_name="hotels")
 

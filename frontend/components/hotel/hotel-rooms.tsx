@@ -111,7 +111,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <Bed className="h-4 w-4" />
-                                                    <span>{room.bed_type}</span>
+                                                    <span>{room.bedType}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <Maximize className="h-4 w-4" />

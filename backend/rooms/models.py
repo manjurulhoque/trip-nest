@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.core.validators import MinValueValidator
 from core.models import SoftDeleteModel, BaseModel
@@ -40,6 +41,15 @@ class Room(SoftDeleteModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     
+    # Price (per night)
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+        blank=True,
+        null=True,
+        help_text="Price per night for this room",
+    )
     # Room specifications
     size = models.IntegerField(validators=[MinValueValidator(1)], help_text="Room size in square meters/feet")
     unit = models.CharField(max_length=10, default='m2', help_text="Unit of measurement (m2, ft2)")

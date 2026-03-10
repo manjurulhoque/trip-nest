@@ -38,7 +38,6 @@ interface HotelFormData {
     rating?: number;
     chain?: string;
     hotelType?: string;
-    price?: number;
     facilityIds: string[];
     mainPhoto?: string;
     thumbnail?: string;
@@ -62,7 +61,6 @@ export default function AddHotelPage() {
         rating: undefined,
         chain: "none",
         hotelType: "none",
-        price: undefined,
         facilityIds: [],
         mainPhoto: "",
         thumbnail: "",
@@ -132,7 +130,6 @@ export default function AddHotelPage() {
                     formValues.hotelType && formValues.hotelType !== "none"
                         ? formValues.hotelType
                         : undefined,
-                price: formValues.price || undefined,
                 latitude: formValues.latitude || undefined,
                 longitude: formValues.longitude || undefined,
                 rating: formValues.rating || undefined,
@@ -517,28 +514,6 @@ export default function AddHotelPage() {
                                                 )}
                                             </SelectContent>
                                         </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price">
-                                            Price per Night
-                                        </Label>
-                                        <Input
-                                            id="price"
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={formValues.price || ""}
-                                            onChange={(e) =>
-                                                handleInputChange(
-                                                    "price",
-                                                    parseFloat(
-                                                        e.target.value
-                                                    ) || undefined
-                                                )
-                                            }
-                                            placeholder="Enter price"
-                                        />
                                     </div>
                                 </CardContent>
                             </Card>

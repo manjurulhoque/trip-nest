@@ -40,7 +40,6 @@ interface HotelFormData {
     rating?: number;
     chain?: string;
     hotelType?: string;
-    price?: number;
     facilityIds: string[];
     mainPhoto?: string;
     thumbnail?: string;
@@ -74,7 +73,6 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
         rating: undefined,
         chain: "none",
         hotelType: "none",
-        price: undefined,
         facilityIds: [],
         mainPhoto: "",
         thumbnail: "",
@@ -102,7 +100,6 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                 rating: hotel.rating || undefined,
                 chain: hotel.chain?.id || "none",
                 hotelType: hotel.hotelType?.id || "none",
-                price: hotel.price || undefined,
                 facilityIds: hotel.facilities?.map((f) => f.id) || [],
                 mainPhoto: hotel.mainPhoto || "",
                 thumbnail: hotel.thumbnail || "",
@@ -172,7 +169,6 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                     formValues.hotelType && formValues.hotelType !== "none"
                         ? formValues.hotelType
                         : undefined,
-                price: formValues.price || undefined,
                 latitude: formValues.latitude || undefined,
                 longitude: formValues.longitude || undefined,
                 rating: formValues.rating || undefined,
@@ -353,13 +349,13 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="address_suburb">
+                                            <Label htmlFor="addressSuburb">
                                                 Suburb
                                             </Label>
                                             <Input
                                                 id="addressSuburb"
                                                 value={
-                                                    formValues.address_suburb
+                                                    formValues.addressSuburb
                                                 }
                                                 onChange={(e) =>
                                                     handleInputChange(
@@ -569,28 +565,6 @@ export default function EditHotelPage({ hotelId }: EditHotelPageProps) {
                                                 )}
                                             </SelectContent>
                                         </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price">
-                                            Price per Night
-                                        </Label>
-                                        <Input
-                                            id="price"
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={formValues.price || ""}
-                                            onChange={(e) =>
-                                                handleInputChange(
-                                                    "price",
-                                                    parseFloat(
-                                                        e.target.value
-                                                    ) || undefined
-                                                )
-                                            }
-                                            placeholder="Enter price"
-                                        />
                                     </div>
 
                                     <div className="space-y-2">

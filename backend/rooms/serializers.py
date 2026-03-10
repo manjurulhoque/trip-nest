@@ -56,6 +56,7 @@ class RoomListSerializer(serializers.ModelSerializer):
             "hotel_name",
             "name",
             "description",
+            "price",
             "size",
             "unit",
             "adults",

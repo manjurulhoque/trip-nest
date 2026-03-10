@@ -47,8 +47,8 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
 
     const hotel = response.data;
     const reviews: HotelReview[] = hotel.reviews || [];
-    const ratingBreakdown: RatingBreakdown[] = hotel.rating_breakdown || [];
-    const categoryRatings: CategoryRating[] = hotel.category_ratings || [];
+    const ratingBreakdown: RatingBreakdown[] = hotel.ratingBreakdown || [];
+    const categoryRatings: CategoryRating[] = hotel.categoryRatings || [];
 
     if (reviews.length === 0) {
         return (
@@ -77,11 +77,11 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                             </span>
                         </div>
                         <Badge className="bg-primary">
-                            {(hotel.averageRating ?? hotel.rating) >= 4.5
+                            {(hotel.averageRating ?? hotel.rating ?? 0) >= 4.5
                                 ? "Excellent"
-                                : (hotel.averageRating ?? hotel.rating) >= 4
-                                ? "Very Good"
-                                : "Good"}
+                                : (hotel.averageRating ?? hotel.rating ?? 0) >= 4
+                                    ? "Very Good"
+                                    : "Good"}
                         </Badge>
                     </div>
                 </div>
@@ -153,7 +153,7 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                     <Avatar className="h-12 w-12">
                                         <AvatarImage
                                             src={
-                                                review.user_avatar ||
+                                                review.userAvatar ||
                                                 "/placeholder.svg"
                                             }
                                         />
@@ -189,7 +189,7 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                                             </span>
                                                         </>
                                                     )}
-                                                    {review.stay_type && (
+                                                    {review.stayType && (
                                                         <>
                                                             <span>•</span>
                                                             <Badge
@@ -197,7 +197,7 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                                                 className="text-xs"
                                                             >
                                                                 {
-                                                                    review.stay_type
+                                                                    review.stayType
                                                                 }
                                                             </Badge>
                                                         </>

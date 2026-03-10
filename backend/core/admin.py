@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Country, City, HotelChain, HotelType
+from .models import Country, City
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -147,43 +147,5 @@ class CityAdmin(SoftDeleteModelAdmin):
         }),
         ('Status', {
             'fields': ('is_popular', 'is_active')
-        }),
-    )
-
-
-@admin.register(HotelChain)
-class HotelChainAdmin(SoftDeleteModelAdmin):
-    list_display = ['name', 'chain_id', 'headquarters_country', 'is_active', 'deleted_status', 'created_at']
-    list_filter = ['headquarters_country', 'is_active', 'is_deleted']
-    search_fields = ['name', 'chain_id']
-    ordering = ['name']
-    raw_id_fields = ['headquarters_country']
-    
-    fieldsets = (
-        (None, {
-            'fields': ('chain_id', 'name', 'description')
-        }),
-        ('Details', {
-            'fields': ('logo', 'website', 'headquarters_country')
-        }),
-        ('Status', {
-            'fields': ('is_active',)
-        }),
-    )
-
-
-@admin.register(HotelType)
-class HotelTypeAdmin(SoftDeleteModelAdmin):
-    list_display = ['name', 'type_id', 'is_active', 'deleted_status', 'created_at']
-    list_filter = ['is_active', 'is_deleted']
-    search_fields = ['name', 'type_id']
-    ordering = ['name']
-    
-    fieldsets = (
-        (None, {
-            'fields': ('type_id', 'name', 'description', 'icon')
-        }),
-        ('Status', {
-            'fields': ('is_active',)
         }),
     )

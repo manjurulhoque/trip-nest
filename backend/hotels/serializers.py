@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import Hotel, HotelImage
+from .models import Hotel, HotelImage, HotelChain, HotelType
 from facilities.models import Facility
-from rooms.models import Room
-from core.models import City, HotelChain, HotelType
+from core.models import City
 from users.serializers import UserSerializer
 
 
@@ -65,8 +64,8 @@ class HotelImageSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class HotelListSerializer(serializers.ModelSerializer):
-    """Hotel list serializer for browsing"""
+class BaseHotelSerializer(serializers.ModelSerializer):
+    """Base hotel serializer with shared nested fields and decimal fields."""
 
     owner = UserSerializer(read_only=True)
     city = CitySerializer(read_only=True)
@@ -74,19 +73,9 @@ class HotelListSerializer(serializers.ModelSerializer):
     hotel_type = HotelTypeSerializer(read_only=True)
     facilities = FacilitySerializer(many=True, read_only=True)
     images = HotelImageSerializer(many=True, read_only=True)
-    main_image = serializers.SerializerMethodField()
-    room_count = serializers.SerializerMethodField()
-    min_price = serializers.SerializerMethodField()
     rating = serializers.DecimalField(
         max_digits=3,
         decimal_places=1,
-        allow_null=True,
-        required=False,
-        coerce_to_string=False,
-    )
-    price = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
         allow_null=True,
         required=False,
         coerce_to_string=False,
@@ -97,9 +86,9 @@ class HotelListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "main_photo",
             "thumbnail",
-            "main_image",
             "latitude",
             "longitude",
             "address",
@@ -112,13 +101,23 @@ class HotelListSerializer(serializers.ModelSerializer):
             "best_seller",
             "chain",
             "hotel_type",
-            "price",
             "facilities",
             "images",
             "is_active",
             "owner",
+        ]
+
+
+class HotelListSerializer(BaseHotelSerializer):
+    """Hotel list serializer for browsing"""
+
+    main_image = serializers.SerializerMethodField()
+    room_count = serializers.SerializerMethodField()
+
+    class Meta(BaseHotelSerializer.Meta):
+        fields = BaseHotelSerializer.Meta.fields + [
+            "main_image",
             "room_count",
-            "min_price",
             "created_at",
         ]
 
@@ -135,62 +134,13 @@ class HotelListSerializer(serializers.ModelSerializer):
         """Get the number of rooms"""
         return obj.rooms.filter(is_active=True).count()
 
-    def get_min_price(self, obj):
-        """Get minimum room price (return as number for JSON)."""
-        if obj.price is None:
-            return None
-        return float(obj.price)
-
-
-class HotelDetailSerializer(serializers.ModelSerializer):
+class HotelDetailSerializer(BaseHotelSerializer):
     """Hotel detail serializer"""
 
-    owner = UserSerializer(read_only=True)
-    city = CitySerializer(read_only=True)
-    chain = HotelChainSerializer(read_only=True)
-    hotel_type = HotelTypeSerializer(read_only=True)
-    facilities = FacilitySerializer(many=True, read_only=True)
-    images = HotelImageSerializer(many=True, read_only=True)
     rooms = serializers.SerializerMethodField()
-    rating = serializers.DecimalField(
-        max_digits=3,
-        decimal_places=1,
-        allow_null=True,
-        required=False,
-        coerce_to_string=False,
-    )
-    price = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        allow_null=True,
-        required=False,
-        coerce_to_string=False,
-    )
 
-    class Meta:
-        model = Hotel
-        fields = [
-            "id",
-            "name",
-            "main_photo",
-            "thumbnail",
-            "latitude",
-            "longitude",
-            "address",
-            "city",
-            "address_suburb",
-            "stars",
-            "rating",
-            "ranking",
-            "reviews_count",
-            "best_seller",
-            "chain",
-            "hotel_type",
-            "price",
-            "facilities",
-            "images",
-            "is_active",
-            "owner",
+    class Meta(BaseHotelSerializer.Meta):
+        fields = BaseHotelSerializer.Meta.fields + [
             "rooms",
             "created_at",
             "updated_at",
@@ -216,6 +166,7 @@ class HotelCreateUpdateSerializer(serializers.ModelSerializer):
         model = Hotel
         fields = [
             "name",
+            "description",
             "main_photo",
             "thumbnail",
             "latitude",
@@ -230,7 +181,6 @@ class HotelCreateUpdateSerializer(serializers.ModelSerializer):
             "best_seller",
             "chain",
             "hotel_type",
-            "price",
             "facility_ids",
             "images",
             "is_active",
@@ -329,19 +279,12 @@ class HotelStatsSerializer(serializers.ModelSerializer):
 
 
 # Admin-specific serializers
-class AdminHotelSerializer(serializers.ModelSerializer):
+class AdminHotelSerializer(BaseHotelSerializer):
     """Admin hotel serializer with all fields"""
 
-    owner = UserSerializer(read_only=True)
-    city = CitySerializer(read_only=True)
-    chain = HotelChainSerializer(read_only=True)
-    hotel_type = HotelTypeSerializer(read_only=True)
-    facilities = FacilitySerializer(many=True, read_only=True)
-    images = HotelImageSerializer(many=True, read_only=True)
     rooms = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Hotel
+    class Meta(BaseHotelSerializer.Meta):
         fields = "__all__"
 
     def get_rooms(self, obj):
@@ -350,3 +293,100 @@ class AdminHotelSerializer(serializers.ModelSerializer):
         return AdminRoomSerializer(
             obj.rooms.all(), many=True, context=self.context
         ).data
+
+
+class HotelChainSerializer(serializers.ModelSerializer):
+    """Basic hotel chain serializer"""
+
+    class Meta:
+        model = HotelChain
+        fields = [
+            "id",
+            "chain_id",
+            "name",
+            "description",
+            "logo",
+            "website",
+            "is_active",
+        ]
+        read_only_fields = ["id"]
+
+
+class HotelChainCreateUpdateSerializer(serializers.ModelSerializer):
+    """Hotel chain create/update serializer for admins"""
+
+    class Meta:
+        model = HotelChain
+        fields = [
+            "chain_id",
+            "name",
+            "description",
+            "logo",
+            "website",
+            "headquarters_country",
+            "is_active",
+        ]
+
+    def validate_chain_id(self, value):
+        """Validate that chain_id is unique"""
+        if self.instance and self.instance.chain_id == value:
+            return value
+        if HotelChain.objects.filter(chain_id=value).exists():
+            raise serializers.ValidationError("Chain ID already exists.")
+        return value
+
+
+class AdminHotelChainSerializer(serializers.ModelSerializer):
+    """Admin hotel chain serializer with all fields"""
+
+    hotel_count = serializers.SerializerMethodField()
+    headquarters_country_name = serializers.CharField(
+        source="headquarters_country.name", read_only=True
+    )
+
+    class Meta:
+        model = HotelChain
+        fields = "__all__"
+
+    def get_hotel_count(self, obj):
+        """Get count of hotels in this chain"""
+        return obj.hotels.filter(is_active=True).count()
+
+
+class HotelTypeSerializer(serializers.ModelSerializer):
+    """Basic hotel type serializer"""
+
+    class Meta:
+        model = HotelType
+        fields = ["id", "type_id", "name", "description", "icon", "is_active"]
+        read_only_fields = ["id"]
+
+
+class HotelTypeCreateUpdateSerializer(serializers.ModelSerializer):
+    """Hotel type create/update serializer for admins"""
+
+    class Meta:
+        model = HotelType
+        fields = ["type_id", "name", "description", "icon", "is_active"]
+
+    def validate_type_id(self, value):
+        """Validate that type_id is unique"""
+        if self.instance and self.instance.type_id == value:
+            return value
+        if HotelType.objects.filter(type_id=value).exists():
+            raise serializers.ValidationError("Type ID already exists.")
+        return value
+
+
+class AdminHotelTypeSerializer(serializers.ModelSerializer):
+    """Admin hotel type serializer with all fields"""
+
+    hotel_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HotelType
+        fields = "__all__"
+
+    def get_hotel_count(self, obj):
+        """Get count of hotels of this type"""
+        return obj.hotels.filter(is_active=True).count()
