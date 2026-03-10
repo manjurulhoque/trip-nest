@@ -1,49 +1,7 @@
 // Booking and room related types
 
-import { Hotel } from "./hotel";
+import { Hotel, Room } from "./hotel";
 import { User } from "./user";
-
-export interface Room {
-    id: string;
-    hotel: string; // Hotel ID
-    roomType: string;
-    name: string;
-    description?: string;
-    maxOccupancy: number;
-    basePrice: number;
-    sizeSqm?: number;
-    bedType: string;
-    bedCount: number;
-    bathroomType: string;
-    hasBalcony: boolean;
-    hasSeaView: boolean;
-    hasCityView: boolean;
-    hasMountainView: boolean;
-    amenities: string[];
-    images: RoomImage[];
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface RoomImage {
-    id: string;
-    room: string; // Room ID
-    url: string;
-    urlHd?: string;
-    thumbnailUrl?: string;
-    caption?: string;
-    order: number;
-    isPrimary: boolean;
-}
-
-export interface RoomType {
-    id: string;
-    name: string;
-    description?: string;
-    icon?: string;
-    isActive: boolean;
-}
 
 // Booking types
 export interface Booking {

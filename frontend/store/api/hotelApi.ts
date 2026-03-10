@@ -6,7 +6,7 @@ import {
     HotelFormData,
     FormLookupData,
     HotelSearchParams,
-    HotelListResponse,
+    PopularDestination,
     ToggleHotelActiveResponse,
     ApiResponse,
     PaginatedApiResponse,
@@ -35,7 +35,7 @@ export const hotelApi = createApi({
 
         // Get all hotels (public)
         getHotels: builder.query<
-            ApiResponse<PaginatedApiResponse<Hotel>>,
+            PaginatedApiResponse<Hotel>,
             { page?: number; search?: string }
         >({
             query: ({ page = 1, search = "" }) =>
@@ -142,6 +142,15 @@ export const hotelApi = createApi({
             query: () => API_ENDPOINTS.HOTELS.FEATURED,
             providesTags: ["Hotel"],
         }),
+
+        // Get popular destinations (cities with hotel counts)
+        getPopularDestinations: builder.query<
+            ApiResponse<PopularDestination[]>,
+            void
+        >({
+            query: () => API_ENDPOINTS.HOTELS.POPULAR_DESTINATIONS,
+            providesTags: ["Hotel"],
+        }),
     }),
 });
 
@@ -157,4 +166,5 @@ export const {
     useGetFormDataQuery,
     useSearchHotelsQuery,
     useGetFeaturedHotelsQuery,
+    useGetPopularDestinationsQuery,
 } = hotelApi;

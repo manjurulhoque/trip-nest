@@ -60,6 +60,26 @@ export interface QuickFact {
     text: string;
 }
 
+export interface RoomImage {
+    id: string;
+    room: string; // Room ID
+    url: string;
+    urlHd?: string;
+    thumbnailUrl?: string;
+    caption?: string;
+    order: number;
+    isPrimary: boolean;
+}
+
+export interface RoomType {
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+    isActive: boolean;
+}
+
+
 export interface HotelRoom {
     id: string;
     name: string;
@@ -73,6 +93,21 @@ export interface HotelRoom {
     image: string;
     availableRooms: number;
     isPopular: boolean;
+    hotel: string; // Hotel ID
+    roomType: string;
+    maxOccupancy: number;
+    basePrice: number;
+    sizeSqm?: number;
+    bedCount: number;
+    bathroomType: string;
+    hasBalcony: boolean;
+    hasSeaView: boolean;
+    hasCityView: boolean;
+    hasMountainView: boolean;
+    images: RoomImage[];
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /** Alias for HotelRoom for use in room listing components */
@@ -165,6 +200,14 @@ export interface Hotel {
     reviews?: HotelReview[];
     ratingBreakdown?: RatingBreakdown[];
     categoryRatings?: CategoryRating[];
+}
+
+export interface PopularDestination {
+    cityId: string;
+    cityName: string;
+    cityCountryName: string;
+    hotelCount: number;
+    avgRating: number | null;
 }
 
 export interface HotelStats {

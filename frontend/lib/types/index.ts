@@ -16,7 +16,7 @@ export interface PaginatedApiResponse<T>
         count: number;
         next: string | null;
         previous: string | null;
-    }> {}
+    }> { }
 
 export interface ApiError {
     success: false;

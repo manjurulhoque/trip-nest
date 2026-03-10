@@ -234,16 +234,33 @@ class HotelViewSet(ModelViewSet):
         )
         return api_response(success=True, data=serializer.data)
 
-    @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        url_path="popular-destinations",
+    )
     def popular_destinations(self, request):
-        """Get popular hotel destinations"""
-        destinations = (
+        """Get popular hotel destinations. Returns snake_case keys for renderer."""
+        destinations_qs = (
             Hotel.objects.filter(is_active=True)
             .values("city__name", "city__country__name", "city__id")
-            .annotate(hotel_count=Count("id"), avg_rating=Avg("rating"))
+            .annotate(
+                hotel_count=Count("id"),
+                avg_rating=Avg("rating"),
+            )
             .order_by("-hotel_count")[:20]
         )
-
+        destinations = [
+            {
+                "city_id": str(row["city__id"]),
+                "city_name": row["city__name"] or "",
+                "city_country_name": row["city__country__name"] or "",
+                "hotel_count": row["hotel_count"],
+                "avg_rating": float(row["avg_rating"]) if row["avg_rating"] is not None else None,
+            }
+            for row in destinations_qs
+        ]
         return api_response(success=True, data=destinations)
 
     @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])

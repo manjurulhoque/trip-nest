@@ -93,6 +93,7 @@ export const API_ENDPOINTS = {
         FORM_DATA: "hotels/form-data/",
         SEARCH: "hotels/search/",
         FEATURED: "hotels/featured/",
+        POPULAR_DESTINATIONS: "hotels/popular-destinations/",
         DASHBOARD_STATS: "hotels/dashboard-stats/",
     },
     FACILITIES: {

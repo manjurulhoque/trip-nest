@@ -1,24 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useGetFeaturedHotelsQuery } from "@/store/api/hotelApi";
+import { MapPin, Star } from "lucide-react";
+import { useGetHotelsQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export function FeaturedListings() {
-    const { data: response, isLoading, error } = useGetFeaturedHotelsQuery();
+export function RecentArticles() {
+    const { data: response, isLoading, error } = useGetHotelsQuery({
+        page: 1,
+    });
 
     if (isLoading) {
         return (
             <section className="py-16 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-12">
-                        Featured Hotels
+                        Explore Hotels
                     </h2>
                     <CenterLoader />
                 </div>
@@ -31,13 +33,12 @@ export function FeaturedListings() {
             <section className="py-16 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-12">
-                        Featured Hotels
+                        Explore Hotels
                     </h2>
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>
-                            {response?.errors?.detail ||
-                                "Failed to load featured hotels"}
+                            Failed to load hotels. Please try again later.
                         </AlertDescription>
                     </Alert>
                 </div>
@@ -45,18 +46,18 @@ export function FeaturedListings() {
         );
     }
 
-    const hotels = response.data;
-    const displayHotels = hotels.length > 0 ? hotels.slice(0, 4) : [];
+    const hotels = response.data?.results ?? [];
+    const displayHotels = hotels.slice(0, 3);
 
     if (displayHotels.length === 0) {
         return (
             <section className="py-16 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-12">
-                        Featured Hotels
+                        Explore Hotels
                     </h2>
                     <p className="text-center text-gray-600">
-                        No featured hotels at the moment. Check back soon!
+                        No hotels available yet. Check back soon!
                     </p>
                 </div>
             </section>
@@ -67,71 +68,54 @@ export function FeaturedListings() {
         <section className="py-16 bg-gray-50">
             <div className="container mx-auto px-4">
                 <h2 className="text-3xl font-bold text-center mb-12">
-                    Featured Hotels
+                    Explore Hotels
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {displayHotels.map((hotel) => {
                         const imageUrl =
                             hotel.images?.[0]?.urlHd ||
                             hotel.images?.[0]?.url ||
                             hotel.mainPhoto ||
-                            "/placeholder.svg?height=300&width=400";
+                            "/placeholder.svg?height=200&width=300";
                         const location = hotel.city
                             ? `${hotel.city.name}${hotel.city.countryName ? `, ${hotel.city.countryName}` : ""}`
                             : hotel.location || "—";
+                        const rating =
+                            hotel.averageRating ?? hotel.rating ?? 0;
                         const price =
                             hotel.basePrice ??
                             hotel.minPrice ??
                             hotel.price ??
                             0;
-                        const rating =
-                            hotel.averageRating ??
-                            hotel.rating ??
-                            0;
-                        const reviews =
-                            hotel.totalReviews ??
-                            hotel.reviewsCount ??
-                            0;
-                        const badge = hotel.bestSeller ? "Superhost" : "Popular";
+                        const typeName =
+                            hotel.hotelType?.name ?? hotel.type ?? "Hotel";
 
                         return (
                             <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
-                                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                                    <div className="relative">
-                                        <img
-                                            src={imageUrl}
-                                            alt={hotel.name}
-                                            className="w-full h-48 object-cover"
-                                        />
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                                            onClick={(e) => e.preventDefault()}
-                                        >
-                                            <Heart className="h-4 w-4" />
-                                        </Button>
-                                        <Badge className="absolute top-2 left-2 bg-white text-black">
-                                            {badge}
-                                        </Badge>
-                                    </div>
-                                    <CardContent className="p-4">
+                                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+                                    <img
+                                        src={imageUrl}
+                                        alt={hotel.name}
+                                        className="w-full h-48 object-cover"
+                                    />
+                                    <CardHeader>
                                         <div className="flex items-center justify-between mb-2">
-                                            <h3 className="font-semibold text-lg truncate">
-                                                {hotel.name}
-                                            </h3>
-                                            <div className="flex items-center shrink-0">
-                                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                <span className="text-sm ml-1">
-                                                    {rating.toFixed(1)}
-                                                </span>
-                                            </div>
+                                            <Badge variant="secondary">
+                                                {typeName}
+                                            </Badge>
+                                            <span className="text-xs text-gray-500 flex items-center">
+                                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-0.5" />
+                                                {rating.toFixed(1)}
+                                            </span>
                                         </div>
-                                        <p className="text-gray-600 text-sm mb-2">
+                                        <CardTitle className="text-lg">
+                                            {hotel.name}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-gray-600 text-sm mb-4 flex items-center">
+                                            <MapPin className="h-3 w-3 mr-1 shrink-0" />
                                             {location}
-                                        </p>
-                                        <p className="text-sm text-gray-500 mb-3">
-                                            {reviews} reviews
                                         </p>
                                         <div className="flex items-center justify-between">
                                             <span className="text-lg font-bold">
@@ -146,6 +130,11 @@ export function FeaturedListings() {
                             </Link>
                         );
                     })}
+                </div>
+                <div className="text-center mt-8">
+                    <Button asChild variant="outline" size="lg">
+                        <Link href="/search">View all hotels</Link>
+                    </Button>
                 </div>
             </div>
         </section>
