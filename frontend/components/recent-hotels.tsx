@@ -78,17 +78,20 @@ export function RecentArticles() {
                             hotel.mainPhoto ||
                             "/placeholder.svg?height=200&width=300";
                         const location = hotel.city
-                            ? `${hotel.city.name}${hotel.city.countryName ? `, ${hotel.city.countryName}` : ""}`
-                            : hotel.location || "—";
-                        const rating =
-                            hotel.averageRating ?? hotel.rating ?? 0;
-                        const price =
-                            hotel.basePrice ??
-                            hotel.minPrice ??
-                            hotel.price ??
-                            0;
-                        const typeName =
-                            hotel.hotelType?.name ?? hotel.type ?? "Hotel";
+                            ? `${hotel.city.name}${
+                                  hotel.city.countryName
+                                      ? `, ${hotel.city.countryName}`
+                                      : ""
+                              }`
+                            : hotel.address || "—";
+                        const rating = hotel.rating ?? 0;
+                        const rawPrice = hotel.startingPrice ?? hotel.price;
+                        const hasPrice =
+                            rawPrice !== null && rawPrice !== undefined;
+                        const displayPrice = hasPrice
+                            ? Number(rawPrice)
+                            : null;
+                        const typeName = hotel.hotelType?.name ?? "Hotel";
 
                         return (
                             <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
@@ -118,12 +121,23 @@ export function RecentArticles() {
                                             {location}
                                         </p>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-bold">
-                                                ${price}
-                                            </span>
-                                            <span className="text-sm text-gray-500">
-                                                per night
-                                            </span>
+                                            {hasPrice && displayPrice !== null ? (
+                                                <>
+                                                    <span className="text-xs text-gray-500">
+                                                        From
+                                                    </span>
+                                                    <span className="text-lg font-bold">
+                                                        ${displayPrice.toFixed(0)}
+                                                    </span>
+                                                    <span className="text-sm text-gray-500">
+                                                        per night
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-sm text-gray-500">
+                                                    See room prices
+                                                </span>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>

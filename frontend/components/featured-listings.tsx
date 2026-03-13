@@ -13,6 +13,13 @@ import { AlertCircle } from "lucide-react";
 export function FeaturedListings() {
     const { data: response, isLoading, error } = useGetFeaturedHotelsQuery();
 
+    // Stable but varied imagery per hotel: same hotelId → same photo
+    const getHotelImageUrl = (hotelId: string) => {
+        return `https://picsum.photos/seed/hotel-${encodeURIComponent(
+            hotelId
+        )}/800/480?blur=1`;
+    };
+
     if (isLoading) {
         return (
             <section className="py-16 bg-gray-50">
@@ -71,27 +78,20 @@ export function FeaturedListings() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {displayHotels.map((hotel) => {
-                        const imageUrl =
-                            hotel.images?.[0]?.urlHd ||
-                            hotel.images?.[0]?.url ||
-                            hotel.mainPhoto ||
-                            "/placeholder.svg?height=300&width=400";
+                        const imageUrl = getHotelImageUrl(hotel.id);
                         const location = hotel.city
-                            ? `${hotel.city.name}${hotel.city.countryName ? `, ${hotel.city.countryName}` : ""}`
-                            : hotel.location || "—";
-                        const price =
-                            hotel.basePrice ??
-                            hotel.minPrice ??
-                            hotel.price ??
-                            0;
-                        const rating =
-                            hotel.averageRating ??
-                            hotel.rating ??
-                            0;
-                        const reviews =
-                            hotel.totalReviews ??
-                            hotel.reviewsCount ??
-                            0;
+                            ? `${hotel.city.name}${hotel.city.countryName
+                                ? `, ${hotel.city.countryName}`
+                                : ""
+                            }`
+                            : hotel.address || "—";
+                        const rawPrice = hotel.startingPrice;
+                        const hasPrice = rawPrice !== null && rawPrice !== undefined;
+                        const displayPrice = hasPrice
+                            ? Number(rawPrice)
+                            : null;
+                        const rating = hotel.rating ?? 0;
+                        const reviews = hotel.reviewsCount ?? 0;
                         const badge = hotel.bestSeller ? "Superhost" : "Popular";
 
                         return (
@@ -134,12 +134,23 @@ export function FeaturedListings() {
                                             {reviews} reviews
                                         </p>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-bold">
-                                                ${price}
-                                            </span>
-                                            <span className="text-sm text-gray-500">
-                                                per night
-                                            </span>
+                                            {hasPrice && displayPrice !== null ? (
+                                                <>
+                                                    <span className="text-xs text-gray-500">
+                                                        From
+                                                    </span>
+                                                    <span className="text-lg font-bold">
+                                                        ${displayPrice.toFixed(0)}
+                                                    </span>
+                                                    <span className="text-sm text-gray-500">
+                                                        per night
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-sm text-gray-500">
+                                                    See room prices
+                                                </span>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -82,6 +82,7 @@ class BaseHotelSerializer(serializers.ModelSerializer):
         required=False,
         coerce_to_string=False,
     )
+    starting_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -107,7 +108,20 @@ class BaseHotelSerializer(serializers.ModelSerializer):
             "images",
             "is_active",
             "owner",
+            "starting_price",
         ]
+
+    def get_starting_price(self, obj):
+        """Minimum active room price; 0 when no priced rooms."""
+        from django.db.models import Min
+
+        result = obj.rooms.filter(
+            is_active=True, price__isnull=False
+        ).aggregate(min_price=Min("price"))
+        min_price = result["min_price"]
+        if min_price is None:
+            return 0
+        return float(min_price)
 
 
 class HotelListSerializer(BaseHotelSerializer):

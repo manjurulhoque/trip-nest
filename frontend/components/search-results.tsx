@@ -122,12 +122,10 @@ export function SearchResults({
                                             <div className="flex items-center mb-1">
                                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                                                 <span className="font-semibold">
-                                                    {hotel.averageRating?.toFixed(
-                                                        1
-                                                    )}
+                                                    {hotel.rating?.toFixed(1)}
                                                 </span>
                                                 <span className="text-sm text-gray-500 ml-1">
-                                                    ({hotel.totalReviews ?? hotel.reviewsCount})
+                                                    ({hotel.reviewsCount} reviews)
                                                 </span>
                                             </div>
                                         </div>
@@ -142,28 +140,21 @@ export function SearchResults({
                                                 Best Seller
                                             </Badge>
                                         )}
-                                        {hotel.type && (
+                                        {hotel.hotelType?.name && (
                                             <Badge
                                                 variant="secondary"
                                                 className="text-xs"
                                             >
-                                                {hotel.type}
+                                                {hotel.hotelType.name}
                                             </Badge>
                                         )}
-                                        {hotel.tags?.map((tag) => (
-                                            <Badge
-                                                key={tag}
-                                                variant="secondary"
-                                                className="text-xs"
-                                            >
-                                                {tag}
-                                            </Badge>
-                                        ))}
                                     </div>
 
-                                    <p className="text-gray-600 text-sm mb-3">
-                                        {hotel.description}
-                                    </p>
+                                    {hotel.description && (
+                                        <p className="text-gray-600 text-sm mb-3">
+                                            {hotel.description}
+                                        </p>
+                                    )}
 
                                     <div className="flex items-center gap-3 mb-3">
                                         {hotel.facilities
@@ -191,23 +182,38 @@ export function SearchResults({
                                 <div className="flex items-end justify-between">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            {hotel.price && hotel.basePrice &&
-                                                hotel.price >
-                                                hotel.basePrice && (
-                                                    <span className="text-sm text-gray-500 line-through">
-                                                        ${hotel.price}
-                                                    </span>
-                                                )}
-                                            <span className="text-2xl font-bold">
-                                                ${hotel.basePrice ?? hotel.minPrice ?? hotel.price}
-                                            </span>
-                                            <span className="text-gray-600">
-                                                per night
-                                            </span>
+                                            {(() => {
+                                                const rawPrice =
+                                                    hotel.startingPrice ??
+                                                    hotel.price;
+                                                const hasPrice =
+                                                    rawPrice !== null &&
+                                                    rawPrice !== undefined;
+                                                const displayPrice = hasPrice
+                                                    ? Number(rawPrice)
+                                                    : null;
+                                                if (!hasPrice || displayPrice === null) {
+                                                    return (
+                                                        <span className="text-sm text-gray-500">
+                                                            See room prices
+                                                        </span>
+                                                    );
+                                                }
+                                                return (
+                                                    <>
+                                                        <span className="text-xs text-gray-500">
+                                                            From
+                                                        </span>
+                                                        <span className="text-2xl font-bold">
+                                                            ${displayPrice.toFixed(0)}
+                                                        </span>
+                                                        <span className="text-gray-600">
+                                                            per night
+                                                        </span>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
-                                        <p className="text-xs text-gray-500">
-                                            includes taxes and fees
-                                        </p>
                                     </div>
                                     <Button
                                         onClick={() =>

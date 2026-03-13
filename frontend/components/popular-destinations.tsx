@@ -8,8 +8,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export function PopularDestinations() {
-    const { data: response, isLoading, error } =
-        useGetPopularDestinationsQuery();
+    const { data: response, isLoading, error } = useGetPopularDestinationsQuery();
+
+    // Stable but varied city imagery: same cityId → same photo, fixed aspect ratio
+    const getCityImageUrl = (cityId: string) => {
+        return `https://picsum.photos/seed/city-${encodeURIComponent(
+            cityId
+        )}/800/480?blur=1`;
+    };
 
     if (isLoading) {
         return (
@@ -34,8 +40,7 @@ export function PopularDestinations() {
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>
-                            {response?.errors?.detail ||
-                                "Failed to load popular destinations"}
+                            Failed to load popular destinations
                         </AlertDescription>
                     </Alert>
                 </div>
@@ -44,8 +49,7 @@ export function PopularDestinations() {
     }
 
     const destinations = response.data;
-    const displayDestinations =
-        destinations.length > 0 ? destinations.slice(0, 6) : [];
+    const displayDestinations = destinations.length > 0 ? destinations.slice(0, 6) : [];
 
     if (displayDestinations.length === 0) {
         return (
@@ -77,9 +81,10 @@ export function PopularDestinations() {
                             <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
                                 <div className="relative">
                                     <img
-                                        src="/placeholder.svg?height=200&width=300"
+                                        src={getCityImageUrl(dest.cityId)}
                                         alt={dest.cityName}
                                         className="w-full h-48 object-cover"
+                                        loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-black/30" />
                                     <CardContent className="absolute bottom-0 left-0 right-0 p-4 text-white">

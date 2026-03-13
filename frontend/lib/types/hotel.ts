@@ -167,12 +167,11 @@ export interface Hotel {
     bestSeller: boolean;
     chain?: HotelChain;
     hotelType?: HotelType;
-    price?: number;
+    startingPrice?: number;
     facilities: Facility[];
     images: HotelImage[];
     isActive: boolean;
     roomCount: number;
-    minPrice?: number;
     createdAt: string;
     updatedAt?: string;
     owner?: {
@@ -190,8 +189,6 @@ export interface Hotel {
     additionalInfo?: string;
     location?: string;
     averageRating?: number;
-    totalReviews?: number;
-    basePrice?: number;
     type?: string;
     tags?: string[];
     quickFacts?: QuickFact[];
