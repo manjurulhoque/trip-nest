@@ -17,11 +17,11 @@ interface HotelRoomsProps {
 const getAmenityIcon = (amenity: string) => {
     switch (amenity.toLowerCase()) {
         case "free wifi":
-            return <Wifi className="h-3 w-3" />;
+            return <Wifi className="h-3 w-3" aria-hidden="true" />;
         case "coffee machine":
-            return <Coffee className="h-3 w-3" />;
+            return <Coffee className="h-3 w-3" aria-hidden="true" />;
         case "smart tv":
-            return <Tv className="h-3 w-3" />;
+            return <Tv className="h-3 w-3" aria-hidden="true" />;
         default:
             return null;
     }
@@ -78,7 +78,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                             <div className="flex flex-col lg:flex-row">
                                 <div className="lg:w-80 flex-shrink-0">
                                     <img
-                                        src={room.image || "/placeholder.svg"}
+                                        src={room.photos[0].url || "/placeholder.svg"}
                                         alt={room.name}
                                         className="w-full h-48 lg:h-full object-cover"
                                     />
@@ -103,18 +103,27 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
 
                                             <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
                                                 <div className="flex items-center gap-1">
-                                                    <Users className="h-4 w-4" />
+                                                    <Users
+                                                        className="h-4 w-4"
+                                                        aria-hidden="true"
+                                                    />
                                                     <span>
                                                         Up to {room.maxGuests}{" "}
                                                         guests
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <Bed className="h-4 w-4" />
+                                                    <Bed
+                                                        className="h-4 w-4"
+                                                        aria-hidden="true"
+                                                    />
                                                     <span>{room.bedType}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <Maximize className="h-4 w-4" />
+                                                    <Maximize
+                                                        className="h-4 w-4"
+                                                        aria-hidden="true"
+                                                    />
                                                     <span>{room.size} m²</span>
                                                 </div>
                                             </div>

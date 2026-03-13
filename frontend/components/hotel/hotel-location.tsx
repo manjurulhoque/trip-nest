@@ -61,7 +61,10 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-primary" />
+                            <MapPin
+                                className="h-5 w-5 text-primary"
+                                aria-hidden="true"
+                            />
                             Nearby Attractions
                         </CardTitle>
                     </CardHeader>
@@ -100,7 +103,10 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Car className="h-5 w-5 text-primary" />
+                            <Car
+                                className="h-5 w-5 text-primary"
+                                aria-hidden="true"
+                            />
                             Transportation
                         </CardTitle>
                     </CardHeader>
@@ -140,7 +146,10 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
             <Card>
                 <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-4">
-                        <MapPin className="h-6 w-6 text-primary" />
+                        <MapPin
+                            className="h-6 w-6 text-primary"
+                            aria-hidden="true"
+                        />
                         <div>
                             <h3 className="font-semibold">Hotel Address</h3>
                             <p className="text-gray-600">

@@ -3,6 +3,7 @@ from .models import Hotel, HotelImage, HotelChain, HotelType
 from facilities.models import Facility
 from core.models import City
 from users.serializers import UserSerializer
+from facilities.serializers import CategorySerializer
 
 
 class HotelChainSerializer(serializers.ModelSerializer):
@@ -41,6 +42,7 @@ class CitySerializer(serializers.ModelSerializer):
 
 class FacilitySerializer(serializers.ModelSerializer):
     """Facility serializer"""
+    category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Facility

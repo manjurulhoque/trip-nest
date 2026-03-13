@@ -21,6 +21,7 @@ import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Facility } from "@/lib/types/hotel";
+import { Category } from "@/lib/types/category";
 
 interface HotelFacilitiesProps {
     hotelId: string;
@@ -69,21 +70,20 @@ export function HotelFacilities({ hotelId }: HotelFacilitiesProps) {
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                    {response?.errors?.detail ||
-                        "Failed to load hotel facilities"}
+                    Failed to load hotel facilities
                 </AlertDescription>
             </Alert>
         );
     }
 
     const hotel = response.data;
-    const facilities = hotel.facilities.reduce<Record<string, Facility[]>>(
+    const facilities = hotel.facilities.reduce<Record<Category["name"], Facility[]>>(
         (acc, facility) => {
             const category = facility.category || "Other";
-            if (!acc[category]) {
-                acc[category] = [];
+            if (!acc[category.name]) {
+                acc[category.name] = [];
             }
-            acc[category].push(facility);
+            acc[category.name].push(facility);
             return acc;
         },
         {}
@@ -130,7 +130,10 @@ export function HotelFacilities({ hotelId }: HotelFacilitiesProps) {
                                             key={item.id}
                                             className="flex items-center gap-3"
                                         >
-                                            <Icon className="h-5 w-5 text-primary flex-shrink-0" />
+                                            <Icon
+                                                className="h-5 w-5 text-primary flex-shrink-0"
+                                                aria-hidden="true"
+                                            />
                                             <span className="text-sm">
                                                 {item.name}
                                             </span>

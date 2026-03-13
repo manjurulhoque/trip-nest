@@ -59,42 +59,56 @@ export function HotelGallery({ hotelId }: HotelGalleryProps) {
     }
 
     return (
-        <div className="relative w-full min-w-0">
+        <div className="relative w-full min-w-0 overflow-hidden rounded-xl">
             <div className="grid grid-cols-4 gap-2 h-80 sm:h-96">
-                <div className="col-span-2 relative">
+                <div
+                    className={
+                        images.length > 1 ? "col-span-2 relative" : "col-span-4 relative"
+                    }
+                >
                     <img
                         src={images[currentImage] || "/placeholder.svg"}
                         alt={`Hotel view ${currentImage + 1}`}
-                        className="w-full h-full object-cover rounded-l-lg"
+                        className={
+                            images.length > 1
+                                ? "w-full h-full object-cover"
+                                : "w-full h-full object-cover"
+                        }
                     />
                     <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
                         onClick={prevImage}
+                        aria-label="Previous photo"
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                     </Button>
                     <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
                         onClick={nextImage}
+                        aria-label="Next photo"
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4" aria-hidden="true" />
                     </Button>
                 </div>
-                <div className="col-span-2 grid grid-cols-2 gap-2">
-                    {images.slice(1, 5).map((image, index) => (
-                        <img
-                            key={index}
-                            src={image || "/placeholder.svg"}
-                            alt={`Hotel view ${index + 2}`}
-                            className="w-full h-full object-cover rounded-r-lg cursor-pointer hover:opacity-80"
-                            onClick={() => setCurrentImage(index + 1)}
-                        />
-                    ))}
-                </div>
+                {images.length > 1 && (
+                    <div className="col-span-2 grid grid-cols-2 gap-2">
+                        {images.slice(1, 5).map((image, index) => (
+                            <img
+                                key={index}
+                                src={image || "/placeholder.svg"}
+                                alt={`Hotel view ${index + 2}`}
+                                className="w-full h-full object-cover cursor-pointer hover:opacity-80"
+                                onClick={() => setCurrentImage(index + 1)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
             <Button
                 variant="outline"

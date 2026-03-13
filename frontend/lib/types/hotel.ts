@@ -1,5 +1,7 @@
 // Hotel related types and interfaces
 
+import { Category } from "./category";
+
 export interface City {
     id: string;
     name: string;
@@ -42,7 +44,7 @@ export interface Facility {
     name: string;
     description?: string;
     icon?: string;
-    category: string;
+    category: Category;
 }
 
 export interface HotelImage {
@@ -90,7 +92,6 @@ export interface HotelRoom {
     bedType: string;
     size: number;
     amenities: Facility[];
-    image: string;
     availableRooms: number;
     isPopular: boolean;
     hotel: string; // Hotel ID
@@ -104,7 +105,7 @@ export interface HotelRoom {
     hasSeaView: boolean;
     hasCityView: boolean;
     hasMountainView: boolean;
-    images: RoomImage[];
+    photos: RoomImage[];
     isActive: boolean;
     createdAt: string;
     updatedAt: string;

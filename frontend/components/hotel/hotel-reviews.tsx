@@ -68,7 +68,10 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                     <h2 className="text-2xl font-bold mb-2">Guest Reviews</h2>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center">
-                            <Star className="h-6 w-6 fill-yellow-400 text-yellow-400 mr-2" />
+                            <Star
+                                className="h-6 w-6 fill-yellow-400 text-yellow-400 mr-2"
+                                aria-hidden="true"
+                            />
                             <span className="text-2xl font-bold">
                                 {(hotel.averageRating ?? hotel.rating)?.toFixed(1)}
                             </span>
@@ -104,7 +107,10 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                         <span className="text-sm w-6">
                                             {item.stars}
                                         </span>
-                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                        <Star
+                                            className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                                            aria-hidden="true"
+                                        />
                                         <Progress
                                             value={item.percentage}
                                             className="flex-1"
@@ -136,7 +142,10 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                             <span className="text-sm font-medium">
                                                 {item.rating.toFixed(1)}
                                             </span>
-                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                            <Star
+                                                className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                                                aria-hidden="true"
+                                            />
                                         </div>
                                     </div>
                                 ))}
@@ -215,6 +224,7 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                                     <Star
                                                         key={i}
                                                         className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                                                        aria-hidden="true"
                                                     />
                                                 ))}
                                             </div>
@@ -232,7 +242,10 @@ export function HotelReviews({ hotelId }: HotelReviewsProps) {
                                             size="sm"
                                             className="p-0 h-auto text-gray-600"
                                         >
-                                            <ThumbsUp className="h-3 w-3 mr-1" />
+                                            <ThumbsUp
+                                                className="h-3 w-3 mr-1"
+                                                aria-hidden="true"
+                                            />
                                             Helpful ({review.helpfulCount})
                                         </Button>
                                     </div>
