@@ -1,4 +1,4 @@
-import PrivacyPage from "@/components/privacy-page";
+import PrivacyPage from "@/components/legal/privacy-page";
 
 export const metadata = {
     title: "Privacy Policy | TripNest",

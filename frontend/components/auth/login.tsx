@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { LoginForm } from "./login-form";
-import { Header } from "../header";
 import Link from "next/link";
 import CenterLoader from "@/components/loaders/center-loader";
+import { Header } from "../layout/header";
 
 const Login = () => {
     const [isMounted, setIsMounted] = useState(false);

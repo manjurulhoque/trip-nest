@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/components/header";
+import { Header } from "@/components/layout/header";
 import { PropertyGallery } from "@/components/property/property-gallery";
 import { PropertyDetails } from "@/components/property/property-details";
 import { PropertyBooking } from "@/components/property/property-booking";

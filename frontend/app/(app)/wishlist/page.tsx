@@ -1,4 +1,4 @@
-import WishlistPage from "@/components/wishlist-page";
+import WishlistPage from "@/components/wishlist/wishlist-page";
 
 export const metadata = {
     title: "Wishlist | TripNest",

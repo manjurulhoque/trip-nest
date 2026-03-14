@@ -29,7 +29,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { RegisterRequest } from "@/lib/types/auth";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 export function SignupForm() {
     const router = useRouter();
@@ -138,7 +138,7 @@ export function SignupForm() {
                                     value={formData.firstName}
                                     onChange={(e) =>
                                         handleChange(
-                                            "first_name",
+                                            "firstName",
                                             e.target.value
                                         )
                                     }

@@ -2,7 +2,8 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 import { API_ENDPOINTS } from "@/lib/api";
-import { LoginResponse, ApiResponse, UserDetail } from "@/lib/types/auth";
+import { LoginResponse, UserDetail } from "@/lib/types/auth";
+import { ApiResponse } from "@/lib/types";
 
 // Function to refresh access token
 async function refreshAccessToken(token: JWT) {
@@ -60,16 +61,11 @@ const authOptions: NextAuthOptions = {
                         }
                     );
 
-                    const response: ApiResponse<LoginResponse> =
-                        await res.json();
+                    const response: ApiResponse<LoginResponse> = await res.json();
+                    console.log(response);
 
                     if (!response.success) {
-                        throw new Error(
-                            response.errors?.detail ||
-                                response.errors?.message ||
-                                response.errors?.non_field_errors?.[0] ||
-                                "Invalid credentials"
-                        );
+                        throw new Error("Invalid credentials");
                     }
 
                     const { user, access, refresh } = response.data;

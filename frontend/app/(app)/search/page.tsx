@@ -1,4 +1,4 @@
-import SearchPage from "@/components/search-page";
+import SearchPage from "@/components/search/search-page";
 
 export const metadata = {
     title: "Search Hotels | TripNest",

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ForgotPasswordForm } from "./forgot-password-form";
-import { Header } from "../header";
+import { Header } from "../layout/header";
 import Link from "next/link";
 import CenterLoader from "@/components/loaders/center-loader";
 

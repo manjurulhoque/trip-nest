@@ -2,40 +2,9 @@
 export * from "./user";
 export * from "./hotel";
 export * from "./booking";
-
-// API Response types
-export interface ApiResponse<T> {
-    success: boolean;
-    data: T;
-    errors?: Record<string, any>;
-}
-
-export interface PaginatedApiResponse<T>
-    extends ApiResponse<{
-        results: T[];
-        count: number;
-        next: string | null;
-        previous: string | null;
-    }> { }
-
-export interface ApiError {
-    success: false;
-    errors: {
-        detail?: string;
-        message?: string;
-        [key: string]: any;
-    };
-    data: null;
-}
+export * from "./http";
 
 // Common utility types
-export interface PaginatedResponse<T> {
-    results: T[];
-    count: number;
-    next: string | null;
-    previous: string | null;
-}
-
 export interface SelectOption {
     value: string;
     label: string;

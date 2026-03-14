@@ -1,4 +1,4 @@
-import CookiesPage from "@/components/cookies-page";
+import CookiesPage from "@/components/legal/cookies-page";
 
 export const metadata = {
     title: "Cookie Policy | TripNest",

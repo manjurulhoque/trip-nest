@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/layout/app-sidebar";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import CenterLoader from "@/components/loaders/center-loader";

@@ -3,16 +3,16 @@ import type { NextRequest } from "next/server";
 import { API_ENDPOINTS } from "@/lib/api";
 import {
     RegisterRequest,
-    ApiResponse,
     RegisterResponse,
 } from "@/lib/types/auth";
+import { ApiResponse } from "@/lib/types/http";
 
 export async function POST(req: NextRequest) {
     try {
         const data: RegisterRequest = await req.json();
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}${API_ENDPOINTS.AUTH.REGISTER}`,
+            `${process.env.BACKEND_URL}${API_ENDPOINTS.AUTH.REGISTER}`,
             {
                 method: "POST",
                 headers: {
@@ -28,11 +28,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     success: false,
-                    error:
-                        result.errors?.detail ||
-                        result.errors?.message ||
-                        result.errors?.non_field_errors?.[0] ||
-                        "Registration failed",
+                    error: "Registration failed",
                 },
                 { status: response.status }
             );

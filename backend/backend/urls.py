@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/', include('rooms.urls')),
     path('api/', include('facilities.urls')),
     path('api/', include('core.urls')),
+    path('api/', include('bookings.urls')),
     # path('api/', include('reviews.urls')),  # Uncomment when reviews app is ready
     
     # API documentation

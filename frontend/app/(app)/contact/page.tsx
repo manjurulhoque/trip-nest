@@ -1,4 +1,4 @@
-import ContactPage from "@/components/contact-page";
+import ContactPage from "@/components/contact/contact-page";
 
 export const metadata = {
     title: "Contact Us | TripNest",

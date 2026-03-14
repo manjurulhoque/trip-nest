@@ -205,8 +205,8 @@ export const authApi = createApi({
                     params.append("role", filters.role);
                 if (filters.page)
                     params.append("page", filters.page.toString());
-                if (filters.page_size)
-                    params.append("page_size", filters.page_size.toString());
+                if (filters.pageSize)
+                    params.append("page_size", filters.pageSize.toString());
 
                 // Handle status filters
                 if (filters.status && filters.status !== "all") {

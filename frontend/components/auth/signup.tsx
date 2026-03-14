@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SignupForm } from "@/components/auth/signup-form";
-import { Header } from "@/components/header";
+import { Header } from "@/components/layout/header";
 import Link from "next/link";
 import CenterLoader from "@/components/loaders/center-loader";
 
