@@ -2,6 +2,7 @@
 export * from "./user";
 export * from "./hotel";
 export * from "./booking";
+export * from "./checkout";
 export * from "./http";
 
 // Common utility types

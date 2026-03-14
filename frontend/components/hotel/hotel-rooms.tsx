@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Room, Facility } from "@/lib/types/hotel";
+import { getDefaultCheckoutDates } from "@/lib/types/checkout";
 
 interface HotelRoomsProps {
     hotelId: string;
@@ -187,8 +189,30 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                                                     per night
                                                 </span>
                                             </div>
-                                            <Button className="w-full min-w-[120px]">
-                                                Select Room
+                                            <Button
+                                                asChild
+                                                className="w-full min-w-[120px]"
+                                            >
+                                                <Link
+                                                    href={(() => {
+                                                        const {
+                                                            checkIn,
+                                                            checkOut,
+                                                        } =
+                                                            getDefaultCheckoutDates();
+                                                        const q = new URLSearchParams({
+                                                            hotelId,
+                                                            roomId: room.id,
+                                                            checkIn,
+                                                            checkOut,
+                                                            adults: "1",
+                                                            children: "0",
+                                                        });
+                                                        return `/checkout?${q.toString()}`;
+                                                    })()}
+                                                >
+                                                    Select Room
+                                                </Link>
                                             </Button>
                                         </div>
                                     </div>

@@ -262,6 +262,7 @@ class BookingCreateUpdateSerializer(serializers.ModelSerializer):
         validated_data["user"] = self.context["request"].user
         booking = Booking.objects.create(**validated_data)
         for i, gd in enumerate(guest_details_data):
-            is_primary = gd.get("is_primary", i == 0)
+            gd = dict(gd)
+            is_primary = gd.pop("is_primary", i == 0)
             GuestDetail.objects.create(booking=booking, is_primary=is_primary, **gd)
         return booking

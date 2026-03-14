@@ -7,6 +7,7 @@ import { hotelTypeApi } from "./api/hotelTypeApi";
 import authSlice from "./slices/authSlice";
 import { facilityApi } from "./api/facilityApi";
 import { categoryApi } from "./api/categoryApi";
+import { bookingApi } from "./api/bookingApi";
 
 export const store = configureStore({
     reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
         [hotelTypeApi.reducerPath]: hotelTypeApi.reducer,
         [facilityApi.reducerPath]: facilityApi.reducer,
         [categoryApi.reducerPath]: categoryApi.reducer,
+        [bookingApi.reducerPath]: bookingApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
@@ -33,7 +35,8 @@ export const store = configureStore({
             hotelChainApi.middleware,
             hotelTypeApi.middleware,
             facilityApi.middleware,
-            categoryApi.middleware
+            categoryApi.middleware,
+            bookingApi.middleware
         ),
     devTools: process.env.NODE_ENV !== "production",
 });

@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import CheckoutPage from "@/components/checkout/checkout-page";
+import CenterLoader from "@/components/loaders/center-loader";
 
 export const metadata = {
     title: "Checkout | TripNest",
@@ -7,5 +9,9 @@ export const metadata = {
 };
 
 export default function Checkout() {
-    return <CheckoutPage />;
+    return (
+        <Suspense fallback={<CenterLoader />}>
+            <CheckoutPage />
+        </Suspense>
+    );
 }
