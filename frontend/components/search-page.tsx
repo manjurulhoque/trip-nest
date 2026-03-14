@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { Header } from "@/components/header";
 import { SearchFilters } from "@/components/search-filters";
 import { SearchResults } from "@/components/search-results";
@@ -9,6 +10,14 @@ import { Map, List } from "lucide-react";
 import CenterLoader from "@/components/loaders/center-loader";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { HotelSearchParams } from "@/lib/types/hotel";
+
+const SearchResultsMap = dynamic(
+    () =>
+        import("@/components/search-results-map").then((mod) => mod.SearchResultsMap),
+    { ssr: false }
+);
+
+type ViewMode = "list" | "map";
 
 function searchParamsToQueryString(params: HotelSearchParams): string {
     const q = new URLSearchParams();
@@ -26,6 +35,7 @@ function searchParamsToQueryString(params: HotelSearchParams): string {
 
 export default function SearchPage() {
     const [isMounted, setIsMounted] = useState(false);
+    const [viewMode, setViewMode] = useState<ViewMode>("list");
     const router = useRouter();
     const pathname = usePathname();
     const urlSearchParams = useSearchParams();
@@ -112,20 +122,32 @@ export default function SearchPage() {
                                 Search Results
                             </h1>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="sm">
+                                <Button
+                                    variant={viewMode === "list" ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setViewMode("list")}
+                                >
                                     <List className="h-4 w-4 mr-2" />
                                     List
                                 </Button>
-                                <Button variant="outline" size="sm">
+                                <Button
+                                    variant={viewMode === "map" ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setViewMode("map")}
+                                >
                                     <Map className="h-4 w-4 mr-2" />
                                     Map
                                 </Button>
                             </div>
                         </div>
-                        <SearchResults
-                            searchParams={searchParams}
-                            onPageChange={handlePageChange}
-                        />
+                        {viewMode === "list" ? (
+                            <SearchResults
+                                searchParams={searchParams}
+                                onPageChange={handlePageChange}
+                            />
+                        ) : (
+                            <SearchResultsMap searchParams={searchParams} />
+                        )}
                     </main>
                 </div>
             </div>
