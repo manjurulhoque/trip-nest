@@ -28,6 +28,12 @@ const getAmenityIcon = (amenity: string) => {
 };
 
 export function HotelRooms({ hotelId }: HotelRoomsProps) {
+    const getRoomImageUrl = (roomId: string) => {
+        return `https://picsum.photos/seed/room-${encodeURIComponent(
+            roomId
+        )}/800/480?blur=1`;
+    };
+
     const { data: response, isLoading, error } = useGetHotelQuery(hotelId);
 
     if (isLoading) {
@@ -39,7 +45,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                    {response?.errors?.detail || "Failed to load hotel rooms"}
+                    Failed to load hotel rooms
                 </AlertDescription>
             </Alert>
         );
@@ -78,7 +84,7 @@ export function HotelRooms({ hotelId }: HotelRoomsProps) {
                             <div className="flex flex-col lg:flex-row">
                                 <div className="lg:w-80 flex-shrink-0">
                                     <img
-                                        src={room.photos[0].url || "/placeholder.svg"}
+                                        src={getRoomImageUrl(room.id)}
                                         alt={room.name}
                                         className="w-full h-48 lg:h-full object-cover"
                                     />

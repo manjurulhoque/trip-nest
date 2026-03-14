@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { SearchHero } from "@/components/search-hero";
 import { FeaturedListings } from "@/components/featured-listings";
 import { PopularDestinations } from "@/components/popular-destinations";
-import { RecentArticles } from "@/components/recent-hotels";
+import { RecentHotels } from "@/components/recent-hotels";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
@@ -83,7 +83,7 @@ export default function HomePage() {
                     variants={fadeInUp}
                     transition={{ delay: 0.1 }}
                 >
-                    <RecentArticles />
+                    <RecentHotels />
                 </motion.div>
             </main>
 

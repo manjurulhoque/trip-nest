@@ -58,6 +58,12 @@ export function SearchResults({
         );
     }
 
+    const getHotelImageUrl = (hotelId: string) => {
+        return `https://picsum.photos/seed/hotel-${encodeURIComponent(
+            hotelId
+        )}/800/480?blur=1`;
+    };
+
     const rawData = response.data;
     const hotels = rawData?.results ?? [];
     const totalCount = rawData.count;
@@ -90,7 +96,7 @@ export function SearchResults({
                         <div className="flex gap-4 p-4">
                             <div className="relative flex-shrink-0">
                                 <img
-                                    src={hotel.mainPhoto || "/placeholder.svg"}
+                                    src={getHotelImageUrl(hotel.id)}
                                     alt={hotel.name}
                                     className="w-64 h-48 object-cover rounded-lg"
                                 />
@@ -107,7 +113,9 @@ export function SearchResults({
                                 <div>
                                     <div className="flex items-start justify-between mb-2">
                                         <div>
-                                            <h3 className="text-xl font-semibold mb-1">
+                                            <h3 onClick={() =>
+                                                router.push(`/hotel/${hotel.id}`)
+                                            } className="text-xl font-semibold mb-1 cursor-pointer">
                                                 {hotel.name}
                                             </h3>
                                             <div className="flex items-center text-gray-600 mb-1">
@@ -183,9 +191,7 @@ export function SearchResults({
                                     <div>
                                         <div className="flex items-center gap-2">
                                             {(() => {
-                                                const rawPrice =
-                                                    hotel.startingPrice ??
-                                                    hotel.price;
+                                                const rawPrice = hotel.startingPrice ?? null;
                                                 const hasPrice =
                                                     rawPrice !== null &&
                                                     rawPrice !== undefined;

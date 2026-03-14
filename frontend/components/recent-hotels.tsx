@@ -10,7 +10,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function RecentArticles() {
+export function RecentHotels() {
+
+    const getHotelImageUrl = (hotelId: string) => {
+        return `https://picsum.photos/seed/hotel-${encodeURIComponent(
+            hotelId
+        )}/800/480?blur=1`;
+    };
+
     const { data: response, isLoading, error } = useGetHotelsQuery({
         page: 1,
     });
@@ -72,11 +79,7 @@ export function RecentArticles() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {displayHotels.map((hotel) => {
-                        const imageUrl =
-                            hotel.images?.[0]?.urlHd ||
-                            hotel.images?.[0]?.url ||
-                            hotel.mainPhoto ||
-                            "/placeholder.svg?height=200&width=300";
+                        const imageUrl = hotel.images?.[0]?.url || hotel.mainPhoto;
                         const location = hotel.city
                             ? `${hotel.city.name}${
                                   hotel.city.countryName
@@ -85,9 +88,8 @@ export function RecentArticles() {
                               }`
                             : hotel.address || "—";
                         const rating = hotel.rating ?? 0;
-                        const rawPrice = hotel.startingPrice ?? hotel.price;
-                        const hasPrice =
-                            rawPrice !== null && rawPrice !== undefined;
+                        const rawPrice = hotel.startingPrice ?? 0;
+                        const hasPrice = rawPrice !== null && rawPrice !== undefined;
                         const displayPrice = hasPrice
                             ? Number(rawPrice)
                             : null;
@@ -97,7 +99,7 @@ export function RecentArticles() {
                             <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
                                 <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
                                     <img
-                                        src={imageUrl}
+                                        src={getHotelImageUrl(hotel.id)}
                                         alt={hotel.name}
                                         className="w-full h-48 object-cover"
                                     />

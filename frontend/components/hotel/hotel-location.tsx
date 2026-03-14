@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Car } from "lucide-react";
@@ -7,6 +8,12 @@ import { useGetHotelQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+
+const HotelLocationMap = dynamic(
+    () =>
+        import("./hotel-location-map").then((mod) => mod.HotelLocationMap),
+    { ssr: false }
+);
 
 interface HotelLocationProps {
     hotelId: string;
@@ -158,8 +165,22 @@ export function HotelLocation({ hotelId }: HotelLocationProps) {
                             </p>
                         </div>
                     </div>
-                    <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <p className="text-gray-500">Interactive Map View</p>
+                    <div className="w-full h-64 rounded-lg overflow-hidden">
+                        {hotel.latitude != null && hotel.longitude != null ? (
+                            <HotelLocationMap
+                                latitude={hotel.latitude}
+                                longitude={hotel.longitude}
+                                title={hotel.name}
+                                address={`${hotel.address}, ${hotel.city.name}, ${hotel.city.countryName}`}
+                                className="h-full w-full"
+                            />
+                        ) : (
+                            <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <p className="text-gray-500">
+                                    Map not available (no coordinates)
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>
