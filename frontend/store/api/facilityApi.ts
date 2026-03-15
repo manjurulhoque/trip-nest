@@ -23,13 +23,22 @@ export const facilityApi = createApi({
             query: () => "facilities/popular/",
         }),
 
-        // Admin endpoints
-        getAdminFacilities: builder.query<PaginatedApiResponse<Facility>, void>(
-            {
-                query: () => "admin/facilities/",
-                providesTags: ["Facility"],
-            }
-        ),
+        // Admin endpoints (page_size for loading all data)
+        getAdminFacilities: builder.query<
+            PaginatedApiResponse<Facility>,
+            { page?: number; page_size?: number } | void
+        >({
+            query: (params) => {
+                const p = params ?? {};
+                const search = new URLSearchParams();
+                if (p.page != null) search.set("page", String(p.page));
+                if (p.page_size != null)
+                    search.set("page_size", String(p.page_size));
+                const q = search.toString();
+                return q ? `admin/facilities/?${q}` : "admin/facilities/";
+            },
+            providesTags: ["Facility"],
+        }),
 
         getFacilityStats: builder.query<ApiResponse<FacilityStats>, void>({
             query: () => "admin/facilities/stats/",

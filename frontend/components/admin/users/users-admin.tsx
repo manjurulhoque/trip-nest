@@ -151,7 +151,7 @@ export default function UsersAdmin() {
                       | "verified"
                       | "unverified"),
         page: currentPage,
-        page_size: 20,
+        pageSize: 2000,
     });
 
     const [toggleUserStatus] = useToggleUserStatusMutation();

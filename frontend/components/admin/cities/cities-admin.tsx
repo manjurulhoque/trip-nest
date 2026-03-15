@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Table,
     TableBody,
@@ -32,59 +32,60 @@ import CenterLoader from "@/components/loaders/center-loader";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { useGetCitiesQuery, useGetCountriesQuery } from "@/store/api/coreApi";
+import type { CoreCity } from "@/store/api/coreApi";
 
 export default function CitiesAdmin() {
     const [isMounted, setIsMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [countryFilter, setCountryFilter] = useState<string>("all");
 
-    // Mock data - replace with actual API call
-    const cities = [
-        {
-            id: 1,
-            name: "Paris",
-            country: "France",
-            region: "Île-de-France",
-            totalProperties: 3500,
-            isPopular: true,
-            coordinates: "48.8566° N, 2.3522° E",
-        },
-        {
-            id: 2,
-            name: "Barcelona",
-            country: "Spain",
-            region: "Catalonia",
-            totalProperties: 2800,
-            isPopular: true,
-            coordinates: "41.3851° N, 2.1734° E",
-        },
-        {
-            id: 3,
-            name: "Amsterdam",
-            country: "Netherlands",
-            region: "North Holland",
-            totalProperties: 2100,
-            isPopular: true,
-            coordinates: "52.3676° N, 4.9041° E",
-        },
-        // Add more mock data as needed
-    ];
+    const { data: citiesResponse, isLoading: citiesLoading } = useGetCitiesQuery(
+        { page_size: 2000 }
+    );
+    const { data: countriesResponse } = useGetCountriesQuery({
+        page_size: 2000,
+    });
 
-    const countries = [
-        "France",
-        "Spain",
-        "Netherlands",
-        "Italy",
-        "Germany",
-        "United Kingdom",
-        // Add more countries as needed
-    ];
+    const rawCities =
+        citiesResponse?.data?.results ??
+        citiesResponse?.data?.data?.results ??
+        [];
+    const cities: CoreCity[] = Array.isArray(rawCities) ? rawCities : [];
+    const rawCountries =
+        countriesResponse?.data?.results ??
+        countriesResponse?.data?.data?.results ??
+        [];
+    const countriesList = Array.isArray(rawCountries) ? rawCountries : [];
+
+    const filteredCities = useMemo(() => {
+        return cities.filter((city) => {
+            const matchesSearch =
+                city.name
+                    ?.toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                (city.countryName ?? "")
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase());
+            const matchesCountry =
+                countryFilter === "all" ||
+                (city.countryName ?? "").toLowerCase() ===
+                    countryFilter.toLowerCase();
+            return matchesSearch && matchesCountry;
+        });
+    }, [cities, searchQuery, countryFilter]);
+
+    const countries = useMemo(
+        () => [...new Set(countriesList.map((c: { name: string }) => c.name))],
+        [countriesList]
+    );
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    if (!isMounted) {
+    if (!isMounted || citiesLoading) {
         return <CenterLoader />;
     }
 
@@ -137,7 +138,7 @@ export default function CitiesAdmin() {
                                                         (country) => (
                                                             <SelectItem
                                                                 key={country}
-                                                                value={country.toLowerCase()}
+                                                                value={country}
                                                             >
                                                                 {country}
                                                             </SelectItem>
@@ -224,13 +225,10 @@ export default function CitiesAdmin() {
                                     <TableRow>
                                         <TableHead>City Name</TableHead>
                                         <TableHead>Country</TableHead>
-                                        <TableHead>Region</TableHead>
-                                        <TableHead className="text-right">
-                                            Properties
-                                        </TableHead>
                                         <TableHead className="text-center">
                                             Popular
                                         </TableHead>
+                                        <TableHead>Status</TableHead>
                                         <TableHead>Coordinates</TableHead>
                                         <TableHead className="text-right">
                                             Actions
@@ -238,46 +236,64 @@ export default function CitiesAdmin() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {cities.map((city) => (
-                                        <TableRow key={city.id}>
-                                            <TableCell className="font-medium">
-                                                {city.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {city.country}
-                                            </TableCell>
-                                            <TableCell>{city.region}</TableCell>
-                                            <TableCell className="text-right">
-                                                {city.totalProperties}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {city.isPopular ? "✓" : "-"}
-                                            </TableCell>
-                                            <TableCell className="font-mono text-sm">
-                                                <div className="flex items-center">
-                                                    <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                                    {city.coordinates}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end space-x-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="text-red-600"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
+                                    {filteredCities.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={6}
+                                                className="text-center text-muted-foreground py-8"
+                                            >
+                                                No cities found
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        filteredCities.map((city) => (
+                                            <TableRow key={city.id}>
+                                                <TableCell className="font-medium text-foreground">
+                                                    {city.name}
+                                                </TableCell>
+                                                <TableCell className="text-foreground">
+                                                    {city.countryName ?? city.country ?? "—"}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {city.isPopular ? "✓" : "—"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {city.isActive ? (
+                                                        <span className="text-green-600">Active</span>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">Inactive</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="font-mono text-sm text-foreground">
+                                                    <div className="flex items-center">
+                                                        <MapPin className="h-4 w-4 mr-1 text-muted-foreground" aria-hidden />
+                                                        {city.latitude != null && city.longitude != null
+                                                            ? `${Number(city.latitude).toFixed(4)}°, ${Number(city.longitude).toFixed(4)}°`
+                                                            : "—"}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end space-x-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            aria-label={`Edit ${city.name}`}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-600"
+                                                            aria-label={`Delete ${city.name}`}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                         </div>

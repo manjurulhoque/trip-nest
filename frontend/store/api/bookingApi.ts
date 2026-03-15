@@ -13,7 +13,7 @@ export const bookingApi = createApi({
     tagTypes: ["Booking"],
     endpoints: (builder) => ({
         getBookings: builder.query<
-            ApiResponse<PaginatedApiResponse<Booking>>,
+            PaginatedApiResponse<Booking>,
             { page?: number; status?: string }
         >({
             query: ({ page = 1, status }) => {
@@ -64,6 +64,17 @@ export const bookingApi = createApi({
                 { type: "Booking", id: "LIST" },
             ],
         }),
+
+        completePayment: builder.mutation<ApiResponse<Booking>, { id: string }>({
+            query: ({ id }) => ({
+                url: API_ENDPOINTS.BOOKINGS.COMPLETE_PAYMENT(id),
+                method: "POST",
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                { type: "Booking", id },
+                { type: "Booking", id: "LIST" },
+            ],
+        }),
     }),
 });
 
@@ -72,4 +83,5 @@ export const {
     useGetBookingQuery,
     useCreateBookingMutation,
     useCancelBookingMutation,
+    useCompletePaymentMutation,
 } = bookingApi;

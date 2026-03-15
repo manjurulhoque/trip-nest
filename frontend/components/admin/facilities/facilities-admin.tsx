@@ -149,11 +149,11 @@ export default function FacilitiesAdmin() {
 
     // Queries and Mutations
     const { data: facilitiesResponse, isLoading: isLoadingFacilities } =
-        useGetAdminFacilitiesQuery(undefined, {
+        useGetAdminFacilitiesQuery({ page_size: 2000 }, {
             skip: !isSuperuser(),
         });
     const { data: categoryResponse } =
-        categoryApiHooks.useGetAdminCategoriesQuery();
+        categoryApiHooks.useGetAdminCategoriesQuery({ page_size: 2000 });
     const [createFacility] = useCreateFacilityMutation();
     const [updateFacility] = useUpdateFacilityMutation();
     const [deleteFacility] = useDeleteFacilityMutation();

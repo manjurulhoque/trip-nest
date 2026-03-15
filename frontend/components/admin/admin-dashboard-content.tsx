@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,51 +24,62 @@ import {
     TrendingUp,
     AlertTriangle,
 } from "lucide-react";
-
-const platformData = [
-    { month: "Jan", users: 1200, bookings: 450, revenue: 135000 },
-    { month: "Feb", users: 1350, bookings: 520, revenue: 156000 },
-    { month: "Mar", users: 1500, bookings: 580, revenue: 174000 },
-    { month: "Apr", users: 1680, bookings: 640, revenue: 192000 },
-    { month: "May", users: 1850, bookings: 720, revenue: 216000 },
-    { month: "Jun", users: 2100, bookings: 850, revenue: 255000 },
-];
-
-const userTypeData = [
-    { name: "Guests", value: 1800, color: "#3b82f6" },
-    { name: "Hosts", value: 300, color: "#10b981" },
-];
-
-const pendingActions = [
-    {
-        id: 1,
-        type: "Property Review",
-        description: "New listing requires approval",
-        priority: "High",
-        time: "2 hours ago",
-    },
-    {
-        id: 2,
-        type: "Dispute Resolution",
-        description: "Guest complaint about cleanliness",
-        priority: "Medium",
-        time: "4 hours ago",
-    },
-    {
-        id: 3,
-        type: "Host Verification",
-        description: "Identity verification pending",
-        priority: "Low",
-        time: "1 day ago",
-    },
-];
+import { useGetUserStatsQuery } from "@/store/api/authApi";
+import { useGetHotelsQuery } from "@/store/api/hotelApi";
+import { useGetBookingsQuery } from "@/store/api/bookingApi";
+import { useGetFacilityStatsQuery } from "@/store/api/facilityApi";
+import { useGetPendingHostsQuery } from "@/store/api/authApi";
+import CenterLoader from "@/components/loaders/center-loader";
+import Link from "next/link";
 
 export function AdminDashboardContent() {
+    const { data: userStatsResponse, isLoading: userStatsLoading } = useGetUserStatsQuery();
+    const { data: hotelsResponse } = useGetHotelsQuery({ page: 1 });
+    const { data: bookingsResponse } = useGetBookingsQuery({ page: 1 });
+    const { data: facilityStatsResponse } = useGetFacilityStatsQuery();
+    const { data: pendingHostsResponse } = useGetPendingHostsQuery();
+
+    const userStats = userStatsResponse?.data;
+    const totalUsers = userStats?.totalUsers ?? 0;
+    const activeUsers = userStats?.activeUsers ?? 0;
+    const newThisMonth = userStats?.newRegistrationsThisMonth ?? 0;
+    const pendingHosts = userStats?.pendingHosts ?? 0;
+    const approvedHosts = userStats?.approvedHosts ?? 0;
+
+    const hotelCount = hotelsResponse?.data?.count ?? 0;
+    const bookingCount = bookingsResponse?.data?.count ?? 0;
+    const facilityStats = facilityStatsResponse?.data;
+    const totalFacilities = facilityStats?.totalFacilities ?? 0;
+
+    const guestCount = totalUsers - approvedHosts - pendingHosts;
+    const hostCount = approvedHosts + pendingHosts;
+    const userTypeData = [
+        { name: "Guests", value: Math.max(0, guestCount), color: "#3b82f6" },
+        { name: "Hosts", value: hostCount, color: "#10b981" },
+    ].filter((d) => d.value > 0);
+
+    const pendingList = pendingHostsResponse?.data ?? [];
+    const pendingActions = pendingList.slice(0, 5).map((user: { id: string; firstName?: string; lastName?: string; email?: string }, i: number) => ({
+        id: user.id,
+        type: "Host Verification",
+        description: `${user.firstName ?? ""} ${user.lastName ?? ""} (${user.email ?? ""}) – pending host approval`,
+        priority: "High",
+        time: "",
+    }));
+
+    if (userStatsLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <CenterLoader />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                <p className="text-gray-600">
+                <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+                <p className="text-muted-foreground">
                     Platform overview and management tools
                 </p>
             </div>
@@ -81,10 +94,10 @@ export function AdminDashboardContent() {
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">2,100</div>
+                        <div className="text-2xl font-bold text-foreground">{totalUsers.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            <TrendingUp className="h-3 w-3 inline mr-1" />
-                            +13.5% from last month
+                            <TrendingUp className="h-3 w-3 inline mr-1" aria-hidden />
+                            {newThisMonth} new this month
                         </p>
                     </CardContent>
                 </Card>
@@ -97,9 +110,9 @@ export function AdminDashboardContent() {
                         <Home className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">1,245</div>
+                        <div className="text-2xl font-bold text-foreground">{hotelCount.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            +8.2% from last month
+                            Hotels on platform
                         </p>
                     </CardContent>
                 </Card>
@@ -107,14 +120,14 @@ export function AdminDashboardContent() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Monthly Bookings
+                            Total Bookings
                         </CardTitle>
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">850</div>
+                        <div className="text-2xl font-bold text-foreground">{bookingCount.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            +18.1% from last month
+                            All-time bookings
                         </p>
                     </CardContent>
                 </Card>
@@ -122,14 +135,14 @@ export function AdminDashboardContent() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Platform Revenue
+                            Facilities
                         </CardTitle>
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$255K</div>
+                        <div className="text-2xl font-bold text-foreground">{totalFacilities.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            +18.1% from last month
+                            Amenities & categories
                         </p>
                     </CardContent>
                 </Card>
@@ -139,17 +152,23 @@ export function AdminDashboardContent() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle>Platform Growth</CardTitle>
+                        <CardTitle>Platform Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={platformData}>
+                            <BarChart
+                                data={[
+                                    { name: "Users", count: totalUsers, fill: "#3b82f6" },
+                                    { name: "Hotels", count: hotelCount, fill: "#10b981" },
+                                    { name: "Bookings", count: bookingCount, fill: "#8b5cf6" },
+                                    { name: "Facilities", count: totalFacilities, fill: "#f59e0b" },
+                                ]}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
+                                <XAxis dataKey="name" />
                                 <YAxis />
                                 <Tooltip />
-                                <Bar dataKey="users" fill="#3b82f6" />
-                                <Bar dataKey="bookings" fill="#10b981" />
+                                <Bar dataKey="count" fill="#3b82f6" />
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -194,11 +213,11 @@ export function AdminDashboardContent() {
                                                 backgroundColor: item.color,
                                             }}
                                         />
-                                        <span className="text-sm">
+                                        <span className="text-sm text-foreground">
                                             {item.name}
                                         </span>
                                     </div>
-                                    <span className="text-sm font-medium">
+                                    <span className="text-sm font-medium text-foreground">
                                         {item.value}
                                     </span>
                                 </div>
@@ -211,45 +230,44 @@ export function AdminDashboardContent() {
             {/* Pending Actions */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center">
-                        <AlertTriangle className="h-5 w-5 mr-2 text-orange-500" />
+                    <CardTitle className="flex items-center text-foreground">
+                        <AlertTriangle className="h-5 w-5 mr-2 text-orange-500" aria-hidden />
                         Pending Actions
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        {pendingActions.map((action) => (
-                            <div
-                                key={action.id}
-                                className="flex items-center justify-between p-4 border rounded-lg"
-                            >
-                                <div>
-                                    <h4 className="font-semibold">
-                                        {action.type}
-                                    </h4>
-                                    <p className="text-sm text-gray-600">
-                                        {action.description}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        {action.time}
-                                    </p>
+                        {pendingActions.length === 0 ? (
+                            <p className="text-sm text-muted-foreground py-4">
+                                No pending host verifications.
+                            </p>
+                        ) : (
+                            pendingActions.map((action) => (
+                                <div
+                                    key={action.id}
+                                    className="flex items-center justify-between p-4 border rounded-lg"
+                                >
+                                    <div>
+                                        <h4 className="font-semibold text-foreground">
+                                            {action.type}
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            {action.description}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="destructive">
+                                            {action.priority}
+                                        </Badge>
+                                        <Button size="sm" asChild>
+                                            <Link href="/admin/dashboard/users">
+                                                Review
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <Badge
-                                        variant={
-                                            action.priority === "High"
-                                                ? "destructive"
-                                                : action.priority === "Medium"
-                                                ? "default"
-                                                : "secondary"
-                                        }
-                                    >
-                                        {action.priority}
-                                    </Badge>
-                                    <Button size="sm">Review</Button>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </CardContent>
             </Card>

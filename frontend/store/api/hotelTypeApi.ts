@@ -24,12 +24,20 @@ export const hotelTypeApi = createApi({
             providesTags: (result, error, id) => [{ type: "HotelType", id }],
         }),
 
-        // Admin endpoints
+        // Admin endpoints (page_size for loading all data)
         getAdminHotelTypes: builder.query<
             PaginatedApiResponse<HotelType>,
-            void
+            { page?: number; page_size?: number } | void
         >({
-            query: () => "admin/hotel-types/",
+            query: (params) => {
+                const p = params ?? {};
+                const search = new URLSearchParams();
+                if (p.page != null) search.set("page", String(p.page));
+                if (p.page_size != null)
+                    search.set("page_size", String(p.page_size));
+                const q = search.toString();
+                return q ? `admin/hotel-types/?${q}` : "admin/hotel-types/";
+            },
             providesTags: ["HotelType"],
         }),
 

@@ -24,13 +24,22 @@ export const categoryApi = createApi({
             providesTags: (result, error, id) => [{ type: "Category", id }],
         }),
 
-        // Admin endpoints
-        getAdminCategories: builder.query<PaginatedApiResponse<Category>, void>(
-            {
-                query: () => "admin/categories/",
-                providesTags: ["Category"],
-            }
-        ),
+        // Admin endpoints (page_size for loading all data)
+        getAdminCategories: builder.query<
+            PaginatedApiResponse<Category>,
+            { page?: number; page_size?: number } | void
+        >({
+            query: (params) => {
+                const p = params ?? {};
+                const search = new URLSearchParams();
+                if (p.page != null) search.set("page", String(p.page));
+                if (p.page_size != null)
+                    search.set("page_size", String(p.page_size));
+                const q = search.toString();
+                return q ? `admin/categories/?${q}` : "admin/categories/";
+            },
+            providesTags: ["Category"],
+        }),
 
         getCategoryStats: builder.query<ApiResponse<CategoryStats>, void>({
             query: () => "categories/stats/",

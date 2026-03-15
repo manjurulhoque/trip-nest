@@ -76,7 +76,7 @@ class BookingViewSet(ModelViewSet):
             return [IsSuperAdmin()]
         if self.action == "create":
             return [IsGuestOrHost()]
-        if self.action in ["retrieve", "partial_update", "update", "cancel"]:
+        if self.action in ["retrieve", "partial_update", "update", "cancel", "complete_payment"]:
             return [
                 permissions.IsAuthenticated(),
                 IsBookingGuestOrHotelOwnerOrSuperAdmin(),
@@ -110,6 +110,32 @@ class BookingViewSet(ModelViewSet):
         booking.status = Booking.STATUS_CANCELLED
         booking.cancelled_at = timezone.now()
         booking.cancellation_reason = reason
+        booking.save()
+        serializer = BookingDetailSerializer(booking, context={"request": request})
+        return api_response(success=True, data=serializer.data)
+
+    @extend_schema(
+        summary="Complete Payment",
+        description="Mark a booking as paid. For demo/simplified flow; in production this would integrate with a payment provider.",
+        request=dict,
+    )
+    @action(detail=True, methods=["post"], url_path="complete-payment")
+    def complete_payment(self, request, pk=None):
+        """Mark booking payment as paid. Guest, hotel host, or admin only."""
+        booking = self.get_object()
+        if booking.status == Booking.STATUS_CANCELLED:
+            return api_response(
+                success=False,
+                errors={"detail": "Cannot pay a cancelled booking."},
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        if booking.payment_status == Booking.PAYMENT_PAID:
+            return api_response(
+                success=False,
+                errors={"detail": "Payment is already complete."},
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        booking.payment_status = Booking.PAYMENT_PAID
         booking.save()
         serializer = BookingDetailSerializer(booking, context={"request": request})
         return api_response(success=True, data=serializer.data)

@@ -72,7 +72,7 @@ export default function CategoriesAdmin() {
         isLoading: isCategoriesLoading,
         error: categoriesError,
         refetch: refetchCategories,
-    } = useGetAdminCategoriesQuery();
+    } = useGetAdminCategoriesQuery({ page_size: 2000 });
 
     const [createCategory, { isLoading: isCreating }] =
         useCreateCategoryMutation();

@@ -147,7 +147,7 @@ export default function HotelTypesAdmin() {
 
     // Queries and Mutations
     const { data: hotelTypesResponse, isLoading: isLoadingTypes } =
-        useGetAdminHotelTypesQuery(undefined, {
+        useGetAdminHotelTypesQuery({ page_size: 2000 }, {
             skip: !isSuperuser(),
         });
     const [createHotelType] = useCreateHotelTypeMutation();

@@ -117,10 +117,16 @@ export const API_ENDPOINTS = {
         BASE: "reviews/",
         BY_HOTEL: (hotelId: string) => `hotels/${hotelId}/reviews/`,
     },
+    // Core (cities, countries)
+    CORE: {
+        CITIES: "cities/",
+        COUNTRIES: "countries/",
+    },
     // Booking endpoints
     BOOKINGS: {
         BASE: "bookings/",
         DETAIL: (id: string) => `bookings/${id}/`,
         CANCEL: (id: string) => `bookings/${id}/cancel/`,
+        COMPLETE_PAYMENT: (id: string) => `bookings/${id}/complete-payment/`,
     },
 } as const;

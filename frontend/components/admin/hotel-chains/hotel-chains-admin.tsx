@@ -149,7 +149,7 @@ export default function HotelChainsAdmin() {
 
     // Queries and Mutations
     const { data: hotelChainsResponse, isLoading: isLoadingChains } =
-        useGetAdminHotelChainsQuery(undefined, {
+        useGetAdminHotelChainsQuery({ page_size: 2000 }, {
             skip: !isSuperuser(),
         });
     const [createHotelChain] = useCreateHotelChainMutation();

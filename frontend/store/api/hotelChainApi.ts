@@ -24,12 +24,22 @@ export const hotelChainApi = createApi({
             providesTags: (result, error, id) => [{ type: "HotelChain", id }],
         }),
 
-        // Admin endpoints
+        // Admin endpoints (page_size for loading all data)
         getAdminHotelChains: builder.query<
             PaginatedApiResponse<HotelChain>,
-            void
+            { page?: number; page_size?: number } | void
         >({
-            query: () => "admin/hotel-chains/",
+            query: (params) => {
+                const p = params ?? {};
+                const search = new URLSearchParams();
+                if (p.page != null) search.set("page", String(p.page));
+                if (p.page_size != null)
+                    search.set("page_size", String(p.page_size));
+                const q = search.toString();
+                return q
+                    ? `admin/hotel-chains/?${q}`
+                    : "admin/hotel-chains/";
+            },
             providesTags: ["HotelChain"],
         }),
 
