@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "drf_spectacular",
+    "django_extensions",
     # Custom apps
     "core",
     "hotels",
