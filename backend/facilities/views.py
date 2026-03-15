@@ -364,9 +364,12 @@ class AdminFacilityViewSet(ModelViewSet):
         )
 
         for category in categories:
-            stats["facilities_by_category"][category["category_id"] or "uncategorized"] = (
-                category["count"]
+            key = (
+                str(category["category_id"])
+                if category["category_id"] is not None
+                else "uncategorized"
             )
+            stats["facilities_by_category"][key] = category["count"]
 
         # Popular facilities (by hotel usage)
         stats["popular_facilities"] = list(

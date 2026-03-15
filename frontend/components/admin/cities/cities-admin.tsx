@@ -35,46 +35,46 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { useGetCitiesQuery, useGetCountriesQuery } from "@/store/api/coreApi";
 import type { CoreCity } from "@/store/api/coreApi";
 
+const PAGE_SIZE = 20;
+
 export default function CitiesAdmin() {
     const [isMounted, setIsMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [countryFilter, setCountryFilter] = useState<string>("all");
+    const [currentPage, setCurrentPage] = useState(1);
 
     const { data: citiesResponse, isLoading: citiesLoading } = useGetCitiesQuery(
-        { page_size: 2000 }
+        {
+            page: currentPage,
+            page_size: PAGE_SIZE,
+            search: searchQuery.trim() || undefined,
+        }
     );
     const { data: countriesResponse } = useGetCountriesQuery({
-        page_size: 2000,
+        page_size: 20,
     });
 
-    const rawCities =
-        citiesResponse?.data?.results ??
-        citiesResponse?.data?.data?.results ??
-        [];
+    const rawCities = citiesResponse?.data?.results ?? [];
     const cities: CoreCity[] = Array.isArray(rawCities) ? rawCities : [];
-    const rawCountries =
-        countriesResponse?.data?.results ??
-        countriesResponse?.data?.data?.results ??
-        [];
+    const totalCount = citiesResponse?.data?.count ?? 0;
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+    const rawCountries = countriesResponse?.data?.results ?? [];
     const countriesList = Array.isArray(rawCountries) ? rawCountries : [];
 
     const filteredCities = useMemo(() => {
         return cities.filter((city) => {
-            const matchesSearch =
-                city.name
-                    ?.toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                (city.countryName ?? "")
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase());
             const matchesCountry =
                 countryFilter === "all" ||
                 (city.countryName ?? "").toLowerCase() ===
                     countryFilter.toLowerCase();
-            return matchesSearch && matchesCountry;
+            return matchesCountry;
         });
-    }, [cities, searchQuery, countryFilter]);
+    }, [cities, countryFilter]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, countryFilter]);
 
     const countries = useMemo(
         () => [...new Set(countriesList.map((c: { name: string }) => c.name))],
@@ -296,6 +296,46 @@ export default function CitiesAdmin() {
                                     )}
                                 </TableBody>
                             </Table>
+                            {totalCount > 0 && (
+                            <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30 rounded-b-lg">
+                                <p className="text-sm text-muted-foreground">
+                                    Showing{" "}
+                                    {(currentPage - 1) * PAGE_SIZE + 1} to{" "}
+                                    {Math.min(
+                                        currentPage * PAGE_SIZE,
+                                        totalCount
+                                    )}{" "}
+                                    of {totalCount} cities
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            setCurrentPage((p) => Math.max(1, p - 1))
+                                        }
+                                        disabled={currentPage <= 1}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <span className="px-3 py-1 text-sm text-muted-foreground">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.min(totalPages, p + 1)
+                                            )
+                                        }
+                                        disabled={currentPage >= totalPages}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                            )}
                         </div>
                     </div>
                 </SidebarInset>
