@@ -151,6 +151,14 @@ export const hotelApi = createApi({
             query: () => API_ENDPOINTS.HOTELS.POPULAR_DESTINATIONS,
             providesTags: ["Hotel"],
         }),
+
+        // Get similar hotels nearby (same city, same type preferred)
+        getSimilarHotels: builder.query<ApiResponse<Hotel[]>, string>({
+            query: (hotelId) => API_ENDPOINTS.HOTELS.SIMILAR(hotelId),
+            providesTags: (result, error, hotelId) => [
+                { type: "Hotel", id: hotelId },
+            ],
+        }),
     }),
 });
 
@@ -159,6 +167,7 @@ export const {
     useGetMyHotelsQuery,
     useGetHotelsQuery,
     useGetHotelQuery,
+    useGetSimilarHotelsQuery,
     useCreateHotelMutation,
     useUpdateHotelMutation,
     useDeleteHotelMutation,

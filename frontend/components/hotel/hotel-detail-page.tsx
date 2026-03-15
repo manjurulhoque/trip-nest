@@ -9,6 +9,7 @@ import { HotelFacilities } from "@/components/hotel/hotel-facilities";
 import { HotelReviews } from "@/components/hotel/hotel-reviews";
 import { HotelLocation } from "@/components/hotel/hotel-location";
 import { HotelFaq } from "@/components/hotel/hotel-faq";
+import { SimilarHotelsNearby } from "@/components/hotel/similar-hotels-nearby";
 import CenterLoader from "@/components/loaders/center-loader";
 
 interface HotelDetailPageProps {
@@ -54,6 +55,7 @@ export default function HotelDetailPage({ hotelId }: HotelDetailPageProps) {
                     <HotelLocation hotelId={hotelId} />
                     <HotelReviews hotelId={hotelId} />
                     <HotelFaq />
+                    <SimilarHotelsNearby hotelId={hotelId} />
                 </section>
             </main>
         </div>

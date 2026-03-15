@@ -89,6 +89,7 @@ export const API_ENDPOINTS = {
         BASE: "hotels/",
         MY_HOTELS: "hotels/my-hotels/",
         DETAIL: (id: string) => `hotels/${id}/`,
+        SIMILAR: (id: string) => `hotels/${id}/similar/`,
         TOGGLE_ACTIVE: (id: string) => `hotels/${id}/toggle-active/`,
         FORM_DATA: "hotels/form-data/",
         SEARCH: "hotels/search/",

@@ -3,7 +3,7 @@ import { getSession, signOut } from "next-auth/react";
 
 // Role checking utilities
 export const isAdmin = (user?: UserDetail | null): boolean =>
-    user?.is_superuser || false;
+    user?.isSuperuser || false;
 export const isHost = (user?: UserDetail | null): boolean =>
     user?.role === "host";
 export const isGuest = (user?: UserDetail | null): boolean =>
@@ -11,9 +11,9 @@ export const isGuest = (user?: UserDetail | null): boolean =>
 export const isVerifiedHost = (user?: UserDetail | null): boolean =>
     user?.isVerifiedHost || false;
 export const canListProperties = (user?: UserDetail | null): boolean =>
-    user?.can_list_properties || false;
+    user?.canListProperties || false;
 export const canBookProperties = (user?: UserDetail | null): boolean =>
-    user?.can_book_properties || false;
+    user?.canBookProperties || false;
 
 // Permission checking utilities
 export const hasPermission = (

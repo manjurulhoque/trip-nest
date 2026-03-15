@@ -2,8 +2,8 @@ from rest_framework import status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Avg, Count, F
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from django.db.models import Q, Avg, Count, F, Case, When, Value, IntegerField
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
 from .models import Hotel, HotelImage, HotelChain, HotelType
 from .serializers import (
@@ -118,6 +118,7 @@ class HotelViewSet(ModelViewSet):
             "popular_destinations",
             "rooms",
             "facilities",
+            "similar",
             "form_data",
         ]
         if self.action in public_actions:
@@ -301,6 +302,51 @@ class HotelViewSet(ModelViewSet):
         facilities = hotel.facilities.filter(is_active=True)
 
         serializer = FacilitySerializer(facilities, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    @extend_schema(
+        summary="Similar hotels nearby",
+        description="Get similar hotels in the same city (same type preferred), ordered by rating. Optional query: limit (default 6, max 12).",
+        parameters=[
+            OpenApiParameter(
+                name="limit",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Max number of hotels to return (default 6, max 12)",
+            ),
+        ],
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        url_path="similar",
+    )
+    def similar(self, request, pk=None):
+        """Get similar hotels nearby (same city, optionally same type, ordered by rating)."""
+        hotel = self.get_object()
+        limit = min(int(request.query_params.get("limit", 6)), 12)
+        base_qs = (
+            Hotel.objects.filter(is_active=True, city=hotel.city)
+            .exclude(pk=hotel.pk)
+        )
+        same_type_id = hotel.hotel_type_id
+        if same_type_id:
+            ordering = [
+                Case(
+                    When(hotel_type_id=same_type_id, then=Value(0)),
+                    default=Value(1),
+                    output_field=IntegerField(),
+                ),
+                "-rating",
+                "name",
+            ]
+        else:
+            ordering = ["-rating", "name"]
+        similar_qs = base_qs.order_by(*ordering)[:limit]
+        serializer = HotelListSerializer(
+            similar_qs, many=True, context={"request": request}
+        )
         return api_response(success=True, data=serializer.data)
 
     @action(detail=True, methods=["get"], permission_classes=[IsHostOrReadOnly])
