@@ -30,6 +30,10 @@ function searchParamsToQueryString(params: HotelSearchParams): string {
         q.set("facilities", params.facilities.join(","));
     if (params.q) q.set("q", params.q);
     if (params.page != null && params.page > 1) q.set("page", String(params.page));
+    if (params.checkIn) q.set("checkIn", params.checkIn);
+    if (params.checkOut) q.set("checkOut", params.checkOut);
+    if (params.adults != null && params.adults >= 1) q.set("adults", String(params.adults));
+    if (params.children != null && params.children >= 0) q.set("children", String(params.children));
     return q.toString();
 }
 
@@ -48,6 +52,10 @@ export default function SearchPage() {
         const facilitiesParam = urlSearchParams.get("facilities");
         const q = urlSearchParams.get("q") || undefined;
         const pageParam = urlSearchParams.get("page");
+        const checkIn = urlSearchParams.get("checkIn") || undefined;
+        const checkOut = urlSearchParams.get("checkOut") || undefined;
+        const adultsParam = urlSearchParams.get("adults");
+        const childrenParam = urlSearchParams.get("children");
 
         return {
             city,
@@ -60,6 +68,10 @@ export default function SearchPage() {
                 : undefined,
             q,
             page: pageParam ? parseInt(pageParam, 10) : 1,
+            checkIn,
+            checkOut,
+            adults: adultsParam != null ? Math.max(1, parseInt(adultsParam, 10) || 1) : undefined,
+            children: childrenParam != null ? Math.max(0, parseInt(childrenParam, 10) || 0) : undefined,
         };
     });
 
@@ -86,6 +98,7 @@ export default function SearchPage() {
 
     const handleFiltersChange = useCallback(
         (filters: {
+            q?: string;
             priceMin?: number;
             priceMax?: number;
             hotelTypes?: string[];
@@ -94,6 +107,7 @@ export default function SearchPage() {
         }) => {
             setSearchParams((prev) => ({
                 ...prev,
+                q: filters.q,
                 priceMin: filters.priceMin,
                 priceMax: filters.priceMax,
                 minRating: filters.rating,

@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Hotel, HotelSearchParams } from "@/lib/types/hotel";
 import { useRouter } from "next/navigation";
+import { hotelUrlWithTripParams } from "./search-utils";
 
 const PAGE_SIZE = 20;
 
@@ -114,7 +115,7 @@ export function SearchResults({
                                     <div className="flex items-start justify-between mb-2">
                                         <div>
                                             <h3 onClick={() =>
-                                                router.push(`/hotel/${hotel.id}`)
+                                                router.push(hotelUrlWithTripParams(hotel.id, searchParams))
                                             } className="text-xl font-semibold mb-1 cursor-pointer">
                                                 {hotel.name}
                                             </h3>
@@ -223,7 +224,7 @@ export function SearchResults({
                                     </div>
                                     <Button
                                         onClick={() =>
-                                            router.push(`/hotel/${hotel.id}`)
+                                            router.push(hotelUrlWithTripParams(hotel.id, searchParams))
                                         }
                                     >
                                         View Details

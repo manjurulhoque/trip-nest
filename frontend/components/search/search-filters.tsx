@@ -4,16 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useGetFormDataQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
 interface SearchFiltersProps {
     onFiltersChange: (filters: {
+        q?: string;
         priceMin?: number;
         priceMax?: number;
         hotelTypes?: string[];
@@ -39,6 +41,7 @@ function parsePriceRangeFromParams(searchParams: URLSearchParams): [number, numb
 
 function readFiltersFromParams(searchParams: URLSearchParams) {
     return {
+        q: searchParams.get("q") ?? "",
         priceRange: parsePriceRangeFromParams(searchParams),
         types: searchParams.get("hotel_types")?.split(",").filter(Boolean) ?? [],
         rating: (() => {
@@ -51,10 +54,18 @@ function readFiltersFromParams(searchParams: URLSearchParams) {
     };
 }
 
+const HOTEL_NAME_DEBOUNCE_MS = 400;
+
 export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     const searchParams = useSearchParams();
     const { data: response, isLoading, error } = useGetFormDataQuery();
 
+    const [hotelName, setHotelName] = useState<string>(() =>
+        searchParams.get("q") ?? ""
+    );
+    const [hotelNameDebounced, setHotelNameDebounced] = useState<string>(() =>
+        searchParams.get("q") ?? ""
+    );
     const [priceRange, setPriceRange] = useState<[number, number]>(() =>
         parsePriceRangeFromParams(searchParams)
     );
@@ -73,9 +84,18 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     const isInitialMount = useRef(true);
 
     useEffect(() => {
+        const t = setTimeout(() => {
+            setHotelNameDebounced(hotelName);
+        }, HOTEL_NAME_DEBOUNCE_MS);
+        return () => clearTimeout(t);
+    }, [hotelName]);
+
+    useEffect(() => {
         // Sync filters when URL changes (e.g. back/forward navigation)
-        const { priceRange: nextPrice, types, rating, facilities } =
+        const { q, priceRange: nextPrice, types, rating, facilities } =
             readFiltersFromParams(searchParams);
+        setHotelName(q);
+        setHotelNameDebounced(q);
         setPriceRange((prev) =>
             prev[0] === nextPrice[0] && prev[1] === nextPrice[1] ? prev : nextPrice
         );
@@ -89,12 +109,14 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
             isInitialMount.current = false;
             return;
         }
+        const urlQ = searchParams.get("q") ?? "";
         const urlPriceMin = searchParams.get("price_min");
         const urlPriceMax = searchParams.get("price_max");
         const urlRating = searchParams.get("min_rating");
         const urlFacilities = searchParams.get("facilities")?.split(",").filter(Boolean);
         const urlTypes = searchParams.get("hotel_types")?.split(",").filter(Boolean);
         const matchesUrl =
+            hotelNameDebounced.trim() === urlQ.trim() &&
             String(priceRange[0]) === (urlPriceMin ?? "") &&
             String(priceRange[1]) === (urlPriceMax ?? "") &&
             (selectedRating === null ? !urlRating : String(selectedRating) === (urlRating ?? "")) &&
@@ -106,6 +128,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
                 : selectedTypes.join(",") === (urlTypes ?? []).join(","));
         if (matchesUrl) return;
         onFiltersChange({
+            q: hotelNameDebounced.trim() || undefined,
             priceMin: priceRange[0],
             priceMax: priceRange[1],
             hotelTypes: selectedTypes.length > 0 ? selectedTypes : undefined,
@@ -113,6 +136,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
             facilities: selectedFacilities.length > 0 ? selectedFacilities : undefined,
         });
     }, [
+        hotelNameDebounced,
         priceRange,
         selectedTypes,
         selectedRating,
@@ -140,6 +164,8 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
     const { types: hotelTypes, facilities } = filters;
 
     const handleClearAll = () => {
+        setHotelName("");
+        setHotelNameDebounced("");
         setPriceRange([0, 1000]);
         setSelectedTypes([]);
         setSelectedRating(null);
@@ -152,6 +178,23 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
                 <CardTitle className="text-lg">Filters</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+                {/* Hotel name search */}
+                <div>
+                    <h3 className="font-semibold mb-3">Hotel name</h3>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden />
+                        <Input
+                            type="text"
+                            placeholder="Search by hotel name..."
+                            value={hotelName}
+                            onChange={(e) => setHotelName(e.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
+                </div>
+
+                <Separator />
+
                 {/* Price Range */}
                 <div>
                     <h3 className="font-semibold mb-3">Price per night</h3>
@@ -313,6 +356,7 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
                         className="flex-1"
                         onClick={() =>
                             onFiltersChange({
+                                q: hotelName.trim() || undefined,
                                 priceMin: priceRange[0],
                                 priceMax: priceRange[1],
                                 hotelTypes:

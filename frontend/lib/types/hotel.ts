@@ -314,7 +314,7 @@ export interface FormLookupData {
     }>;
 }
 
-// Hotel search parameters
+// Hotel search parameters (includes trip params from search hero)
 export interface HotelSearchParams {
     city?: string;
     stars?: number;
@@ -324,6 +324,10 @@ export interface HotelSearchParams {
     facilities?: string[];
     q?: string;
     page?: number;
+    checkIn?: string;
+    checkOut?: string;
+    adults?: number;
+    children?: number;
 }
 
 // Hotel filter options

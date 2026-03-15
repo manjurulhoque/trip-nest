@@ -10,6 +10,7 @@ import { AlertCircle } from "lucide-react";
 import { HotelSearchParams } from "@/lib/types/hotel";
 import { Hotel } from "@/lib/types/hotel";
 import Link from "next/link";
+import { hotelUrlWithTripParams } from "./search-utils";
 
 const defaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -120,7 +121,7 @@ export function SearchResultsMap({ searchParams }: SearchResultsMapProps) {
                                     </p>
                                 )}
                                 <Link
-                                    href={`/hotel/${hotel.id}`}
+                                    href={hotelUrlWithTripParams(hotel.id, searchParams)}
                                     className="inline-block mt-2 text-sm font-medium text-primary hover:underline"
                                 >
                                     View details →

@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,16 @@ import { signIn, useSession } from "next-auth/react";
 import { LoginRequest } from "@/lib/types/auth";
 import { useToast } from "@/hooks/use-toast";
 
+function getRedirectPath(next: string | null): string {
+    if (!next || typeof next !== "string") return "/";
+    const path = next.startsWith("/") ? next : `/${next}`;
+    if (path.startsWith("//") || path.includes("\\")) return "/";
+    return path;
+}
+
 export function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { data: session, status } = useSession();
     const { toast } = useToast();
 
@@ -28,12 +36,14 @@ export function LoginForm() {
         password: "",
     });
 
+    const redirectPath = getRedirectPath(searchParams.get("next"));
+
     // Redirect if already authenticated
     useEffect(() => {
         if (status === "authenticated") {
-            router.push("/dashboard");
+            router.push(redirectPath);
         }
-    }, [status, router]);
+    }, [status, router, redirectPath]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,11 +64,11 @@ export function LoginForm() {
                     description: result.error,
                 });
             } else {
-                // Successful login will trigger the useEffect above
                 toast({
                     title: "Success",
                     description: "Login successful!",
                 });
+                router.push(redirectPath);
             }
         } catch (error: any) {
             setError(error.message || "An error occurred during login");
@@ -155,6 +165,7 @@ export function LoginForm() {
                             <span>Remember me</span>
                         </label>
                         <Button
+                            type="button"
                             variant="link"
                             className="p-0 h-auto text-sm"
                             disabled={isLoading}
@@ -188,7 +199,7 @@ export function LoginForm() {
                     <Button
                         variant="outline"
                         onClick={() =>
-                            signIn("google", { callbackUrl: "/dashboard" })
+                            signIn("google", { callbackUrl: redirectPath })
                         }
                         disabled={isLoading}
                     >
@@ -215,7 +226,7 @@ export function LoginForm() {
                     <Button
                         variant="outline"
                         onClick={() =>
-                            signIn("facebook", { callbackUrl: "/dashboard" })
+                            signIn("facebook", { callbackUrl: redirectPath })
                         }
                         disabled={isLoading}
                     >
