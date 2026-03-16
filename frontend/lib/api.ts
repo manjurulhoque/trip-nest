@@ -89,13 +89,17 @@ export const API_ENDPOINTS = {
         BASE: "hotels/",
         MY_HOTELS: "hotels/my-hotels/",
         DETAIL: (id: string) => `hotels/${id}/`,
+        ADMIN_DETAIL: (id: string) => `admin/hotels/${id}/`,
         SIMILAR: (id: string) => `hotels/${id}/similar/`,
         TOGGLE_ACTIVE: (id: string) => `hotels/${id}/toggle-active/`,
+        ADMIN_TOGGLE_ACTIVE: (id: string) =>
+            `admin/hotels/${id}/toggle-active/`,
         FORM_DATA: "hotels/form-data/",
         SEARCH: "hotels/search/",
         FEATURED: "hotels/featured/",
         POPULAR_DESTINATIONS: "hotels/popular-destinations/",
         DASHBOARD_STATS: "hotels/dashboard-stats/",
+        ADMIN_BASE: "admin/hotels/",
     },
     FACILITIES: {
         BASE: "facilities/",

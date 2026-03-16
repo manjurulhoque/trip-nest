@@ -25,7 +25,7 @@ export const hotelApi = createApi({
 
         // Get host's hotels
         getMyHotels: builder.query<
-            ApiResponse<PaginatedApiResponse<Hotel>>,
+            PaginatedApiResponse<Hotel>,
             { page?: number }
         >({
             query: ({ page = 1 }) =>
@@ -40,6 +40,16 @@ export const hotelApi = createApi({
         >({
             query: ({ page = 1, search = "" }) =>
                 `${API_ENDPOINTS.HOTELS.BASE}?page=${page}&search=${search}`,
+            providesTags: ["Hotel"],
+        }),
+
+        // Admin - list hotels (superuser only)
+        getAdminHotels: builder.query<
+            PaginatedApiResponse<Hotel>,
+            { page?: number; search?: string }
+        >({
+            query: ({ page = 1, search = "" }) =>
+                `${API_ENDPOINTS.HOTELS.ADMIN_BASE}?page=${page}&search=${search}`,
             providesTags: ["Hotel"],
         }),
 
@@ -76,6 +86,23 @@ export const hotelApi = createApi({
             ],
         }),
 
+        // Admin - update hotel (superuser only)
+        updateAdminHotel: builder.mutation<
+            ApiResponse<Hotel>,
+            { id: string; data: Partial<HotelFormData> }
+        >({
+            query: ({ id, data }) => ({
+                url: API_ENDPOINTS.HOTELS.ADMIN_DETAIL(id),
+                method: "PATCH",
+                body: data,
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                { type: "Hotel", id },
+                "Hotel",
+                "HotelStats",
+            ],
+        }),
+
         // Delete hotel
         deleteHotel: builder.mutation<ApiResponse<void>, string>({
             query: (id) => ({
@@ -92,6 +119,22 @@ export const hotelApi = createApi({
         >({
             query: (id) => ({
                 url: API_ENDPOINTS.HOTELS.TOGGLE_ACTIVE(id),
+                method: "POST",
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: "Hotel", id },
+                "Hotel",
+                "HotelStats",
+            ],
+        }),
+
+        // Admin - toggle hotel active status
+        toggleAdminHotelActive: builder.mutation<
+            ApiResponse<ToggleHotelActiveResponse>,
+            string
+        >({
+            query: (id) => ({
+                url: API_ENDPOINTS.HOTELS.ADMIN_TOGGLE_ACTIVE(id),
                 method: "POST",
             }),
             invalidatesTags: (result, error, id) => [
@@ -166,12 +209,15 @@ export const {
     useGetHostDashboardStatsQuery,
     useGetMyHotelsQuery,
     useGetHotelsQuery,
+    useGetAdminHotelsQuery,
     useGetHotelQuery,
     useGetSimilarHotelsQuery,
     useCreateHotelMutation,
     useUpdateHotelMutation,
+    useUpdateAdminHotelMutation,
     useDeleteHotelMutation,
     useToggleHotelActiveMutation,
+    useToggleAdminHotelActiveMutation,
     useGetFormDataQuery,
     useSearchHotelsQuery,
     useGetFeaturedHotelsQuery,

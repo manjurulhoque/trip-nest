@@ -64,8 +64,8 @@ const propertyMenuItems = [
         icon: MapPin,
     },
     {
-        title: "Listing Moderation",
-        url: "/admin/listings",
+        title: "Hotels",
+        url: "/admin/dashboard/hotels",
         icon: Building,
     },
 ];

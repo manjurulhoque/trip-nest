@@ -650,6 +650,24 @@ class AdminHotelViewSet(ModelViewSet):
             success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
         )
 
+    @action(
+        detail=True, methods=["post"], url_path="toggle-active", permission_classes=[IsSuperAdmin]
+    )
+    def toggle_active(self, request, pk=None):
+        """Admin: toggle hotel active status"""
+        hotel = self.get_object()
+        hotel.is_active = not hotel.is_active
+        hotel.save()
+
+        return api_response(
+            success=True,
+            data={
+                "hotel": AdminHotelSerializer(
+                    hotel, context={"request": request}
+                ).data,
+            },
+        )
+
     @action(detail=False, methods=["get"])
     def stats(self, request):
         """Get hotel statistics for admin dashboard"""
