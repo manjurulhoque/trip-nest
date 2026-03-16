@@ -135,6 +135,8 @@ export default function FacilitiesAdmin() {
     const [isMounted, setIsMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [editingFacility, setEditingFacility] = useState<Facility | null>(
         null
@@ -147,10 +149,14 @@ export default function FacilitiesAdmin() {
     });
 
     // Queries and Mutations
-    const { data: facilitiesResponse, isLoading: isLoadingFacilities } = useGetAdminFacilitiesQuery({ page_size: 2000 }, {
-        skip: !isSuperuser(),
-    });
-    const { data: categoryResponse } = categoryApiHooks.useGetAdminCategoriesQuery({ page_size: 2000 });
+    const { data: facilitiesResponse, isLoading: isLoadingFacilities } =
+        useGetAdminFacilitiesQuery(
+            { page: currentPage, page_size: pageSize },
+            {
+                skip: !isSuperuser(),
+            }
+        );
+    const { data: categoryResponse } = categoryApiHooks.useGetAdminCategoriesQuery({ page_size: pageSize });
     const [createFacility] = useCreateFacilityMutation();
     const [updateFacility] = useUpdateFacilityMutation();
     const [deleteFacility] = useDeleteFacilityMutation();
@@ -274,6 +280,11 @@ export default function FacilitiesAdmin() {
             return matchesSearch && matchesCategory;
         }
     );
+
+    const totalFacilities = facilitiesResponse?.data.count ?? 0;
+    const pageStart = (currentPage - 1) * pageSize + 1;
+    const pageEnd = Math.min(currentPage * pageSize, totalFacilities);
+    const totalPages = Math.max(1, Math.ceil(totalFacilities / pageSize));
 
     return (
         <motion.div
@@ -665,6 +676,52 @@ export default function FacilitiesAdmin() {
                                         </AnimatePresence>
                                     </TableBody>
                                 </Table>
+                            </motion.div>
+                        )}
+
+                        {!isLoadingFacilities && totalFacilities > pageSize && (
+                            <motion.div
+                                className="flex items-center justify-between px-4 py-3 bg-background border-t"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5, duration: 0.3 }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <p className="text-sm text-muted-foreground">
+                                        Showing {pageStart} to{" "}
+                                        {Math.min(pageEnd, totalFacilities)} of{" "}
+                                        {totalFacilities} facilities
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            setCurrentPage((prev) =>
+                                                Math.max(1, prev - 1)
+                                            )
+                                        }
+                                        disabled={currentPage === 1}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <span className="px-3 py-1 text-sm">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            setCurrentPage((prev) =>
+                                                Math.min(totalPages, prev + 1)
+                                            )
+                                        }
+                                        disabled={currentPage >= totalPages}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
                             </motion.div>
                         )}
                     </motion.div>

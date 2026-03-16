@@ -83,6 +83,24 @@ class CategoryViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
+    def list(self, request, *args, **kwargs):
+        """Override list to use api_response format"""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to use api_response format"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
     def create(self, request, *args, **kwargs):
         """Override create to use api_response format"""
         serializer = self.get_serializer(data=request.data)
@@ -275,6 +293,67 @@ class FacilityViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
+    def list(self, request, *args, **kwargs):
+        """Override list to use api_response format"""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to use api_response format"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Override create to use api_response format"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        facility = serializer.save()
+
+        return api_response(
+            success=True,
+            data={
+                "facility": AdminFacilitySerializer(
+                    facility, context={"request": request}
+                ).data
+            },
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Override update to use api_response format"""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        facility = serializer.save()
+
+        return api_response(
+            success=True,
+            data={
+                "facility": AdminFacilitySerializer(
+                    facility, context={"request": request}
+                ).data
+            },
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """Override destroy to use soft delete and api_response format"""
+        instance = self.get_object()
+        instance.delete()
+        return api_response(
+            success=True,
+            data={},
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
+
     @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def categories(self, request):
         """Get all facility categories"""
@@ -342,6 +421,57 @@ class AdminFacilityViewSet(ModelViewSet):
     search_fields = ["name", "description", "category_id"]
     ordering_fields = ["name", "category_id", "created_at"]
     ordering = ["-created_at"]
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return single facility in api_response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        """Return paginated list in api_response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Create facility and return in api_response format."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        facility = serializer.save()
+        return api_response(
+            success=True,
+            data=AdminFacilitySerializer(facility, context={"request": request}).data,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update facility and return in api_response format."""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        facility = serializer.save()
+        return api_response(
+            success=True,
+            data=AdminFacilitySerializer(facility, context={"request": request}).data,
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete facility and return in api_response format."""
+        facility = self.get_object()
+        facility.delete()
+        return api_response(
+            success=True,
+            data={},
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
 
     @action(detail=False, methods=["get"])
     def stats(self, request):

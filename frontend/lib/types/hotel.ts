@@ -220,7 +220,6 @@ export interface HotelStats {
 
 // Hotel Chain form data types
 export interface HotelChainFormData {
-    chainId: number;
     name: string;
     description?: string;
     logo?: string;

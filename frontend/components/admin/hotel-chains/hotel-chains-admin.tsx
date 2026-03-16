@@ -138,18 +138,19 @@ export default function HotelChainsAdmin() {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [editingChain, setEditingChain] = useState<HotelChain | null>(null);
     const [formData, setFormData] = useState<Partial<HotelChainFormData>>({
-        chain_id: 0,
         name: "",
         description: "",
         logo: "",
         website: "",
-        headquarters_country: "",
+        headquartersCountry: "",
         isActive: true,
     });
+    const pageSize = 10;
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Queries and Mutations
     const { data: hotelChainsResponse, isLoading: isLoadingChains } =
-        useGetAdminHotelChainsQuery({ page_size: 2000 }, {
+        useGetAdminHotelChainsQuery({ page: currentPage, page_size: pageSize }, {
             skip: !isSuperuser(),
         });
     const [createHotelChain] = useCreateHotelChainMutation();
@@ -182,12 +183,11 @@ export default function HotelChainsAdmin() {
             setIsAddDialogOpen(false);
             setEditingChain(null);
             setFormData({
-                chain_id: 0,
                 name: "",
                 description: "",
                 logo: "",
                 website: "",
-                headquarters_country: "",
+                headquartersCountry: "",
                 isActive: true,
             });
         } catch (error) {
@@ -202,12 +202,11 @@ export default function HotelChainsAdmin() {
     const handleEdit = (chain: HotelChain) => {
         setEditingChain(chain);
         setFormData({
-            chain_id: chain.chain_id || 0,
             name: chain.name,
             description: chain.description || "",
             logo: chain.logo || "",
             website: chain.website || "",
-            headquarters_country: chain.headquarters_country || "",
+            headquartersCountry: chain.headquartersCountry || "",
             isActive: chain.isActive ?? true,
         });
         setIsAddDialogOpen(true);
@@ -278,12 +277,11 @@ export default function HotelChainsAdmin() {
                                     if (!open) {
                                         setEditingChain(null);
                                         setFormData({
-                                            chain_id: 0,
                                             name: "",
                                             description: "",
                                             logo: "",
                                             website: "",
-                                            headquarters_country: "",
+                                            headquartersCountry: "",
                                             isActive: true,
                                         });
                                     }
@@ -321,32 +319,6 @@ export default function HotelChainsAdmin() {
                                             <div className="space-y-4 py-4">
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="chain_id">
-                                                            Chain ID
-                                                        </label>
-                                                        <Input
-                                                            id="chain_id"
-                                                            type="number"
-                                                            value={
-                                                                formData.chain_id ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setFormData({
-                                                                    ...formData,
-                                                                    chain_id:
-                                                                        parseInt(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        ) || 0,
-                                                                })
-                                                            }
-                                                            placeholder="Enter chain ID"
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
                                                         <label htmlFor="name">
                                                             Chain Name
                                                         </label>
@@ -358,9 +330,7 @@ export default function HotelChainsAdmin() {
                                                             onChange={(e) =>
                                                                 setFormData({
                                                                     ...formData,
-                                                                    name: e
-                                                                        .target
-                                                                        .value,
+                                                                    name: e.target.value,
                                                                 })
                                                             }
                                                             placeholder="Enter chain name"
@@ -380,9 +350,7 @@ export default function HotelChainsAdmin() {
                                                         onChange={(e) =>
                                                             setFormData({
                                                                 ...formData,
-                                                                description:
-                                                                    e.target
-                                                                        .value,
+                                                                description: e.target.value,
                                                             })
                                                         }
                                                         placeholder="Enter chain description"
@@ -422,9 +390,7 @@ export default function HotelChainsAdmin() {
                                                             onChange={(e) =>
                                                                 setFormData({
                                                                     ...formData,
-                                                                    website:
-                                                                        e.target
-                                                                            .value,
+                                                                    website: e.target.value,
                                                                 })
                                                             }
                                                             placeholder="Enter website URL"
@@ -432,18 +398,18 @@ export default function HotelChainsAdmin() {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label htmlFor="headquarters_country">
+                                                    <label htmlFor="headquartersCountry">
                                                         Headquarters Country
                                                     </label>
                                                     <Input
-                                                        id="headquarters_country"
+                                                        id="headquartersCountry"
                                                         value={
-                                                            formData.headquarters_country
+                                                            formData.headquartersCountry
                                                         }
                                                         onChange={(e) =>
                                                             setFormData({
                                                                 ...formData,
-                                                                headquarters_country:
+                                                                headquartersCountry:
                                                                     e.target
                                                                         .value,
                                                             })
@@ -582,8 +548,7 @@ export default function HotelChainsAdmin() {
                                                             {chain.name}
                                                         </TableCell>
                                                         <TableCell className="max-w-md truncate">
-                                                            {chain.description ||
-                                                                "No description"}
+                                                            {chain.description || "No description"}
                                                         </TableCell>
                                                         <TableCell>
                                                             {chain.website ? (
@@ -607,8 +572,7 @@ export default function HotelChainsAdmin() {
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {chain.hotel_count ||
-                                                                0}
+                                                            {chain.hotelCount || 0}
                                                         </TableCell>
                                                         <TableCell className="text-center">
                                                             {chain.isActive
@@ -629,7 +593,7 @@ export default function HotelChainsAdmin() {
                                                                 transition={{
                                                                     delay:
                                                                         index *
-                                                                            0.05 +
+                                                                        0.05 +
                                                                         0.2,
                                                                 }}
                                                             >
@@ -659,26 +623,11 @@ export default function HotelChainsAdmin() {
                                                                     <AlertDialogContent>
                                                                         <AlertDialogHeader>
                                                                             <AlertDialogTitle>
-                                                                                Delete
-                                                                                Hotel
-                                                                                Chain
+                                                                                Delete Hotel Chain
                                                                             </AlertDialogTitle>
                                                                             <AlertDialogDescription>
-                                                                                Are
-                                                                                you
-                                                                                sure
-                                                                                you
-                                                                                want
-                                                                                to
-                                                                                delete
-                                                                                this
-                                                                                hotel
-                                                                                chain?
-                                                                                This
-                                                                                action
-                                                                                cannot
-                                                                                be
-                                                                                undone.
+                                                                                Are you sure you want to delete this hotel chain?
+                                                                                This action cannot be undone.
                                                                             </AlertDialogDescription>
                                                                         </AlertDialogHeader>
                                                                         <AlertDialogFooter>
