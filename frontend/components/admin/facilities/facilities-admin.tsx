@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import {
     Table,
     TableBody,
@@ -35,7 +36,6 @@ import DashboardHeader from "@/components/dashboard/dashboard-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/components/ui/use-toast";
 import {
     useGetAdminFacilitiesQuery,
     useCreateFacilityMutation,
@@ -132,7 +132,6 @@ const pageVariants = {
 
 export default function FacilitiesAdmin() {
     const { isSuperuser } = useAuth();
-    const { toast } = useToast();
     const [isMounted, setIsMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -143,17 +142,15 @@ export default function FacilitiesAdmin() {
     const [formData, setFormData] = useState<Partial<FacilityFormData>>({
         name: "",
         description: "",
-        category_id: "",
+        categoryId: "",
         isActive: true,
     });
 
     // Queries and Mutations
-    const { data: facilitiesResponse, isLoading: isLoadingFacilities } =
-        useGetAdminFacilitiesQuery({ page_size: 2000 }, {
-            skip: !isSuperuser(),
-        });
-    const { data: categoryResponse } =
-        categoryApiHooks.useGetAdminCategoriesQuery({ page_size: 2000 });
+    const { data: facilitiesResponse, isLoading: isLoadingFacilities } = useGetAdminFacilitiesQuery({ page_size: 2000 }, {
+        skip: !isSuperuser(),
+    });
+    const { data: categoryResponse } = categoryApiHooks.useGetAdminCategoriesQuery({ page_size: 2000 });
     const [createFacility] = useCreateFacilityMutation();
     const [updateFacility] = useUpdateFacilityMutation();
     const [deleteFacility] = useDeleteFacilityMutation();
@@ -204,48 +201,36 @@ export default function FacilitiesAdmin() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const categoryId =
-                formData.category_id === "none" ? "" : formData.category_id;
+            const categoryId = formData.categoryId === "none" ? "" : formData.categoryId;
 
             if (editingFacility) {
                 await updateFacility({
                     id: editingFacility.id,
                     data: {
                         ...formData,
-                        category_id: categoryId || "",
+                        categoryId: categoryId || "",
                     },
                 }).unwrap();
-                toast({
-                    title: "Success",
-                    description: "Facility updated successfully",
-                });
+                toast.success("Facility updated successfully");
             } else {
                 await createFacility({
-                    facility_id: Math.floor(Math.random() * 1000000), // Temporary solution
                     name: formData.name!,
                     description: formData.description,
-                    category_id: categoryId || undefined,
+                    categoryId: categoryId || undefined,
                     isActive: formData.isActive,
                 }).unwrap();
-                toast({
-                    title: "Success",
-                    description: "Facility created successfully",
-                });
+                toast.success("Facility created successfully");
             }
             setIsAddDialogOpen(false);
             setEditingFacility(null);
             setFormData({
                 name: "",
                 description: "",
-                category_id: "none",
+                categoryId: "none",
                 isActive: true,
             });
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to save facility. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to save facility. Please try again.");
         }
     };
 
@@ -254,7 +239,7 @@ export default function FacilitiesAdmin() {
         setFormData({
             name: facility.name,
             description: facility.description || "",
-            category_id: getCategoryId(facility.category),
+            categoryId: getCategoryId(facility.category),
             isActive: facility.isActive,
         });
         setIsAddDialogOpen(true);
@@ -263,16 +248,9 @@ export default function FacilitiesAdmin() {
     const handleDelete = async (id: number) => {
         try {
             await deleteFacility(id).unwrap();
-            toast({
-                title: "Success",
-                description: "Facility deleted successfully",
-            });
+            toast.success("Facility deleted successfully");
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to delete facility. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to delete facility. Please try again.");
         }
     };
 
@@ -327,7 +305,7 @@ export default function FacilitiesAdmin() {
                                         setFormData({
                                             name: "",
                                             description: "",
-                                            category_id: "none",
+                                            categoryId: "none",
                                             isActive: true,
                                         });
                                     }
@@ -387,14 +365,14 @@ export default function FacilitiesAdmin() {
                                                     </label>
                                                     <Select
                                                         value={
-                                                            formData.category_id
+                                                            formData.categoryId
                                                         }
                                                         onValueChange={(
                                                             value
                                                         ) =>
                                                             setFormData({
                                                                 ...formData,
-                                                                category_id:
+                                                                categoryId:
                                                                     value,
                                                             })
                                                         }
@@ -591,8 +569,7 @@ export default function FacilitiesAdmin() {
                                                             }
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {facility.hotel_count ||
-                                                                0}
+                                                            {facility.hotelCount || 0}
                                                         </TableCell>
                                                         <TableCell className="text-center">
                                                             {facility.isActive
@@ -613,7 +590,7 @@ export default function FacilitiesAdmin() {
                                                                 transition={{
                                                                     delay:
                                                                         index *
-                                                                            0.05 +
+                                                                        0.05 +
                                                                         0.2,
                                                                 }}
                                                             >

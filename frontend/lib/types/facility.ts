@@ -2,7 +2,6 @@ import { Category } from "./category";
 
 export interface Facility {
     id: number;
-    facilityId: number;
     name: string;
     description: string | null;
     icon: string | null;
@@ -14,7 +13,6 @@ export interface Facility {
 }
 
 export interface FacilityFormData {
-    facilityId: number;
     name: string;
     description?: string;
     icon?: string;
