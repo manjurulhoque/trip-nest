@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Hotel, HotelImage, HotelChain, HotelType
 from facilities.models import Facility
-from core.models import City
+from core.models import City, Country
 from users.serializers import UserSerializer
 from facilities.serializers import CategorySerializer
 from core.serializers import CountrySerializer
@@ -43,6 +43,7 @@ class CitySerializer(serializers.ModelSerializer):
 
 class FacilitySerializer(serializers.ModelSerializer):
     """Facility serializer"""
+
     category = CategorySerializer(read_only=True)
 
     class Meta:
@@ -116,9 +117,9 @@ class BaseHotelSerializer(serializers.ModelSerializer):
         """Minimum active room price; 0 when no priced rooms."""
         from django.db.models import Min
 
-        result = obj.rooms.filter(
-            is_active=True, price__isnull=False
-        ).aggregate(min_price=Min("price"))
+        result = obj.rooms.filter(is_active=True, price__isnull=False).aggregate(
+            min_price=Min("price")
+        )
         min_price = result["min_price"]
         if min_price is None:
             return 0
@@ -150,6 +151,7 @@ class HotelListSerializer(BaseHotelSerializer):
     def get_room_count(self, obj):
         """Get the number of rooms"""
         return obj.rooms.filter(is_active=True).count()
+
 
 class HotelDetailSerializer(BaseHotelSerializer):
     """Hotel detail serializer"""
@@ -319,7 +321,6 @@ class HotelChainSerializer(serializers.ModelSerializer):
         model = HotelChain
         fields = [
             "id",
-            "chain_id",
             "name",
             "description",
             "logo",
@@ -332,25 +333,23 @@ class HotelChainSerializer(serializers.ModelSerializer):
 class HotelChainCreateUpdateSerializer(serializers.ModelSerializer):
     """Hotel chain create/update serializer for admins"""
 
+    headquarters_country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(),
+        required=False,
+        allow_null=True,
+        source="headquarters_country",
+    )
+
     class Meta:
         model = HotelChain
         fields = [
-            "chain_id",
             "name",
             "description",
             "logo",
             "website",
-            "headquarters_country",
+            "headquarters_country_id",
             "is_active",
         ]
-
-    def validate_chain_id(self, value):
-        """Validate that chain_id is unique"""
-        if self.instance and self.instance.chain_id == value:
-            return value
-        if HotelChain.objects.filter(chain_id=value).exists():
-            raise serializers.ValidationError("Chain ID already exists.")
-        return value
 
 
 class AdminHotelChainSerializer(serializers.ModelSerializer):
@@ -366,7 +365,7 @@ class AdminHotelChainSerializer(serializers.ModelSerializer):
     def get_hotel_count(self, obj):
         """Get count of hotels in this chain"""
         return obj.hotels.filter(is_active=True).count()
-    
+
     def get_headquarters_country(self, obj):
         return CountrySerializer(obj.headquarters_country).data
 

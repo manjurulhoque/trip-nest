@@ -560,6 +560,7 @@ export default function HotelChainsAdmin() {
                                             <TableHead>Chain Name</TableHead>
                                             <TableHead>Description</TableHead>
                                             <TableHead>Website</TableHead>
+                                            <TableHead>Headquarters Country</TableHead>
                                             <TableHead className="text-right">
                                                 Hotel Count
                                             </TableHead>
@@ -618,6 +619,9 @@ export default function HotelChainsAdmin() {
                                                             ) : (
                                                                 "No website"
                                                             )}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {chain.headquartersCountry?.name || "No headquarters country"}
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             {chain.hotelCount || 0}
