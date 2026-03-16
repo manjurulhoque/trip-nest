@@ -30,6 +30,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
+import AsyncSelect from "react-select/async";
 import CenterLoader from "@/components/loaders/center-loader";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -54,6 +55,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { HotelChain, HotelChainFormData } from "@/lib/types/hotel";
+import type { Country } from "@/lib/types/country";
+import { coreApi } from "@/store/api/coreApi";
 
 // Animation variants (same as facilities-admin)
 const containerVariants = {
@@ -142,9 +145,13 @@ export default function HotelChainsAdmin() {
         description: "",
         logo: "",
         website: "",
-        headquartersCountry: "",
+        headquartersCountryId: "",
         isActive: true,
     });
+    const [selectedHeadquartersCountry, setSelectedHeadquartersCountry] =
+        useState<{ value: string; label: string } | null>(null);
+    const [triggerAdminCountries] =
+        coreApi.useLazyGetAdminCountriesQuery();
     const pageSize = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -160,6 +167,33 @@ export default function HotelChainsAdmin() {
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (editingChain?.headquartersCountry) {
+            setSelectedHeadquartersCountry({
+                value: editingChain.headquartersCountry.id,
+                label: editingChain.headquartersCountry.name,
+            });
+        } else {
+            setSelectedHeadquartersCountry(null);
+        }
+    }, [editingChain]);
+
+    const loadCountryOptions = async (inputValue: string) => {
+        const search = inputValue.trim() || undefined;
+        const result = await triggerAdminCountries({
+            page: 1,
+            page_size: 20,
+            search,
+        }).unwrap();
+
+        const countries = (result?.data?.results as Country[] | undefined) ?? [];
+
+        return countries.map((country) => ({
+            value: country.id,
+            label: `${country.name} (${country.code})`,
+        }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -187,9 +221,10 @@ export default function HotelChainsAdmin() {
                 description: "",
                 logo: "",
                 website: "",
-                headquartersCountry: "",
+                headquartersCountryId: "",
                 isActive: true,
             });
+            setSelectedHeadquartersCountry(null);
         } catch (error) {
             toast({
                 title: "Error",
@@ -206,7 +241,7 @@ export default function HotelChainsAdmin() {
             description: chain.description || "",
             logo: chain.logo || "",
             website: chain.website || "",
-            headquartersCountry: chain.headquartersCountry || "",
+            headquartersCountryId: chain.headquartersCountry?.id || "",
             isActive: chain.isActive ?? true,
         });
         setIsAddDialogOpen(true);
@@ -281,7 +316,7 @@ export default function HotelChainsAdmin() {
                                             description: "",
                                             logo: "",
                                             website: "",
-                                            headquartersCountry: "",
+                                            headquartersCountryId: "",
                                             isActive: true,
                                         });
                                     }
@@ -370,9 +405,7 @@ export default function HotelChainsAdmin() {
                                                             onChange={(e) =>
                                                                 setFormData({
                                                                     ...formData,
-                                                                    logo: e
-                                                                        .target
-                                                                        .value,
+                                                                    logo: e.target.value,
                                                                 })
                                                             }
                                                             placeholder="Enter logo URL"
@@ -401,20 +434,35 @@ export default function HotelChainsAdmin() {
                                                     <label htmlFor="headquartersCountry">
                                                         Headquarters Country
                                                     </label>
-                                                    <Input
-                                                        id="headquartersCountry"
+                                                    <AsyncSelect
+                                                        cacheOptions
+                                                        defaultOptions
+                                                        loadOptions={loadCountryOptions}
                                                         value={
-                                                            formData.headquartersCountry
+                                                            selectedHeadquartersCountry
                                                         }
-                                                        onChange={(e) =>
+                                                        onChange={(
+                                                            option: any
+                                                        ) => {
+                                                            const nextOption =
+                                                                option
+                                                                    ? {
+                                                                          value: option.value,
+                                                                          label: option.label,
+                                                                      }
+                                                                    : null;
+                                                            setSelectedHeadquartersCountry(
+                                                                nextOption
+                                                            );
                                                             setFormData({
                                                                 ...formData,
-                                                                headquartersCountry:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        placeholder="Enter headquarters country"
+                                                                headquartersCountryId:
+                                                                    nextOption?.value ??
+                                                                    "",
+                                                            });
+                                                        }}
+                                                        placeholder="Search and select a country..."
+                                                        inputId="headquartersCountry"
                                                     />
                                                 </div>
                                                 <div className="flex items-center space-x-2">

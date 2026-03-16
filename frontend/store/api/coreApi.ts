@@ -64,7 +64,30 @@ export const coreApi = createApi({
             },
             providesTags: ["Country"],
         }),
+
+        getAdminCountries: builder.query<
+            PaginatedApiResponse<CoreCountry>,
+            { page?: number; page_size?: number; search?: string } | void
+        >({
+            query: (params) => {
+                const p = params ?? {};
+                const search = new URLSearchParams();
+                if (p.page != null) search.set("page", String(p.page));
+                if (p.page_size != null)
+                    search.set("page_size", String(p.page_size));
+                if (p.search) search.set("search", p.search);
+                const q = search.toString();
+                return q
+                    ? `${API_ENDPOINTS.CORE.ADMIN.COUNTRIES}?${q}`
+                    : API_ENDPOINTS.CORE.ADMIN.COUNTRIES;
+            },
+            providesTags: ["Country"],
+        }),
     }),
 });
 
-export const { useGetCitiesQuery, useGetCountriesQuery } = coreApi;
+export const {
+    useGetCitiesQuery,
+    useGetCountriesQuery,
+    useGetAdminCountriesQuery,
+} = coreApi;

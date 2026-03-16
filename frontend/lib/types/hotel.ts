@@ -1,6 +1,7 @@
 // Hotel related types and interfaces
 
 import { Category } from "./category";
+import { Country } from "./country";
 
 export interface City {
     id: string;
@@ -15,8 +16,7 @@ export interface HotelChain {
     description?: string;
     logo?: string;
     website?: string;
-    headquartersCountry?: string;
-    headquartersCountryName?: string;
+    headquartersCountry?: Country;
     isActive?: boolean;
     hotelCount?: number;
     createdAt?: string;
@@ -224,7 +224,7 @@ export interface HotelChainFormData {
     description?: string;
     logo?: string;
     website?: string;
-    headquartersCountry?: string;
+    headquartersCountryId?: string;
     isActive: boolean;
 }
 

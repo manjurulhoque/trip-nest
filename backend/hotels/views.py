@@ -326,9 +326,8 @@ class HotelViewSet(ModelViewSet):
         """Get similar hotels nearby (same city, optionally same type, ordered by rating)."""
         hotel = self.get_object()
         limit = min(int(request.query_params.get("limit", 6)), 12)
-        base_qs = (
-            Hotel.objects.filter(is_active=True, city=hotel.city)
-            .exclude(pk=hotel.pk)
+        base_qs = Hotel.objects.filter(is_active=True, city=hotel.city).exclude(
+            pk=hotel.pk
         )
         same_type_id = hotel.hotel_type_id
         if same_type_id:
@@ -651,7 +650,10 @@ class AdminHotelViewSet(ModelViewSet):
         )
 
     @action(
-        detail=True, methods=["post"], url_path="toggle-active", permission_classes=[IsSuperAdmin]
+        detail=True,
+        methods=["post"],
+        url_path="toggle-active",
+        permission_classes=[IsSuperAdmin],
     )
     def toggle_active(self, request, pk=None):
         """Admin: toggle hotel active status"""
@@ -662,9 +664,7 @@ class AdminHotelViewSet(ModelViewSet):
         return api_response(
             success=True,
             data={
-                "hotel": AdminHotelSerializer(
-                    hotel, context={"request": request}
-                ).data,
+                "hotel": AdminHotelSerializer(hotel, context={"request": request}).data,
             },
         )
 
@@ -816,6 +816,23 @@ class HotelChainViewSet(ModelViewSet):
             permission_classes = [IsSuperAdmin]
 
         return [permission() for permission in permission_classes]
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return single hotel chain in api_response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return api_response(success=True, data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        """Return paginated list in api_response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated = self.get_paginated_response(serializer.data)
+            return api_response(success=True, data=paginated.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
 
     def create(self, request, *args, **kwargs):
         """Override create to use api_response format"""

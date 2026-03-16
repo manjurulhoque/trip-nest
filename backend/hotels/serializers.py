@@ -4,6 +4,7 @@ from facilities.models import Facility
 from core.models import City
 from users.serializers import UserSerializer
 from facilities.serializers import CategorySerializer
+from core.serializers import CountrySerializer
 
 
 class HotelChainSerializer(serializers.ModelSerializer):
@@ -356,9 +357,7 @@ class AdminHotelChainSerializer(serializers.ModelSerializer):
     """Admin hotel chain serializer with all fields"""
 
     hotel_count = serializers.SerializerMethodField()
-    headquarters_country_name = serializers.CharField(
-        source="headquarters_country.name", read_only=True
-    )
+    headquarters_country = serializers.SerializerMethodField()
 
     class Meta:
         model = HotelChain
@@ -367,6 +366,9 @@ class AdminHotelChainSerializer(serializers.ModelSerializer):
     def get_hotel_count(self, obj):
         """Get count of hotels in this chain"""
         return obj.hotels.filter(is_active=True).count()
+    
+    def get_headquarters_country(self, obj):
+        return CountrySerializer(obj.headquarters_country).data
 
 
 class HotelTypeSerializer(serializers.ModelSerializer):

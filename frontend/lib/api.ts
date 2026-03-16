@@ -126,6 +126,9 @@ export const API_ENDPOINTS = {
     CORE: {
         CITIES: "cities/",
         COUNTRIES: "countries/",
+        ADMIN: {
+            COUNTRIES: "admin/countries/",
+        },
     },
     // Booking endpoints
     BOOKINGS: {
