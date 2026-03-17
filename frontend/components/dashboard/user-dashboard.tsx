@@ -7,7 +7,7 @@ import DashboardHeader from "@/components/dashboard/dashboard-header";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import CenterLoader from "@/components/loaders/center-loader";
 
-export default function Dashboard() {
+export default function UserDashboard() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {

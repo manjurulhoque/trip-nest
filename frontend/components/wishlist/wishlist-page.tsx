@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/components/layout/header";
 import { WishlistContent } from "@/components/wishlist/wishlist-content";
 import CenterLoader from "@/components/loaders/center-loader";
+import { SidebarInset, SidebarProvider } from "../ui/sidebar";
+import { AppSidebar } from "../layout/app-sidebar";
+import DashboardHeader from "../dashboard/dashboard-header";
 
 export default function WishlistPage() {
     const [isMounted, setIsMounted] = useState(false);
@@ -18,16 +20,13 @@ export default function WishlistPage() {
 
     return (
         <div className="min-h-screen bg-background">
-            <Header />
-            <div className="container mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold mb-2">Your Wishlist</h1>
-                    <p className="text-gray-600">
-                        Save your favorite hotels for later
-                    </p>
-                </div>
-                <WishlistContent />
-            </div>
+            <DashboardHeader />
+            <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset className="p-6">
+                    <WishlistContent />
+                </SidebarInset>
+            </SidebarProvider>
         </div>
     );
 }
