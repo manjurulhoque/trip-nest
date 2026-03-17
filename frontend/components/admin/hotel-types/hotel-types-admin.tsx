@@ -138,7 +138,6 @@ export default function HotelTypesAdmin() {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [editingType, setEditingType] = useState<HotelType | null>(null);
     const [formData, setFormData] = useState<Partial<HotelTypeFormData>>({
-        type_id: 0,
         name: "",
         description: "",
         icon: "",
@@ -146,10 +145,9 @@ export default function HotelTypesAdmin() {
     });
 
     // Queries and Mutations
-    const { data: hotelTypesResponse, isLoading: isLoadingTypes } =
-        useGetAdminHotelTypesQuery({ page_size: 2000 }, {
-            skip: !isSuperuser(),
-        });
+    const { data: hotelTypesResponse, isLoading: isLoadingTypes } = useGetAdminHotelTypesQuery({ page_size: 2000 }, {
+        skip: !isSuperuser(),
+    });
     const [createHotelType] = useCreateHotelTypeMutation();
     const [updateHotelType] = useUpdateHotelTypeMutation();
     const [deleteHotelType] = useDeleteHotelTypeMutation();
@@ -180,7 +178,6 @@ export default function HotelTypesAdmin() {
             setIsAddDialogOpen(false);
             setEditingType(null);
             setFormData({
-                type_id: 0,
                 name: "",
                 description: "",
                 icon: "",
@@ -198,7 +195,6 @@ export default function HotelTypesAdmin() {
     const handleEdit = (type: HotelType) => {
         setEditingType(type);
         setFormData({
-            type_id: type.type_id || 0,
             name: type.name,
             description: type.description || "",
             icon: type.icon || "",
@@ -272,7 +268,6 @@ export default function HotelTypesAdmin() {
                                     if (!open) {
                                         setEditingType(null);
                                         setFormData({
-                                            type_id: 0,
                                             name: "",
                                             description: "",
                                             icon: "",
@@ -312,32 +307,6 @@ export default function HotelTypesAdmin() {
                                         <form onSubmit={handleSubmit}>
                                             <div className="space-y-4 py-4">
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="type_id">
-                                                            Type ID
-                                                        </label>
-                                                        <Input
-                                                            id="type_id"
-                                                            type="number"
-                                                            value={
-                                                                formData.type_id ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setFormData({
-                                                                    ...formData,
-                                                                    type_id:
-                                                                        parseInt(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        ) || 0,
-                                                                })
-                                                            }
-                                                            placeholder="Enter type ID"
-                                                            required
-                                                        />
-                                                    </div>
                                                     <div className="space-y-2">
                                                         <label htmlFor="name">
                                                             Type Name
@@ -564,7 +533,7 @@ export default function HotelTypesAdmin() {
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {type.hotel_count ||
+                                                            {type.hotelCount ||
                                                                 0}
                                                         </TableCell>
                                                         <TableCell className="text-center">
@@ -584,10 +553,7 @@ export default function HotelTypesAdmin() {
                                                                     x: 0,
                                                                 }}
                                                                 transition={{
-                                                                    delay:
-                                                                        index *
-                                                                            0.05 +
-                                                                        0.2,
+                                                                    delay: index * 0.05 + 0.2,
                                                                 }}
                                                             >
                                                                 <Button
@@ -616,26 +582,11 @@ export default function HotelTypesAdmin() {
                                                                     <AlertDialogContent>
                                                                         <AlertDialogHeader>
                                                                             <AlertDialogTitle>
-                                                                                Delete
-                                                                                Hotel
-                                                                                Type
+                                                                                Delete Hotel Type
                                                                             </AlertDialogTitle>
                                                                             <AlertDialogDescription>
-                                                                                Are
-                                                                                you
-                                                                                sure
-                                                                                you
-                                                                                want
-                                                                                to
-                                                                                delete
-                                                                                this
-                                                                                hotel
-                                                                                type?
-                                                                                This
-                                                                                action
-                                                                                cannot
-                                                                                be
-                                                                                undone.
+                                                                                Are you sure want to delete this hotel type?
+                                                                                This action cannot be undone.
                                                                             </AlertDialogDescription>
                                                                         </AlertDialogHeader>
                                                                         <AlertDialogFooter>

@@ -245,7 +245,6 @@ export interface HotelChainStats {
 
 // Hotel Type form data types
 export interface HotelTypeFormData {
-    typeId: number;
     name: string;
     description?: string;
     icon?: string;
