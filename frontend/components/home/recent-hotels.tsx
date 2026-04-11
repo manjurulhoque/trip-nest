@@ -82,11 +82,10 @@ export function RecentHotels() {
                     {displayHotels.map((hotel) => {
                         const imageUrl = hotel.images?.[0]?.url || hotel.mainPhoto;
                         const location = hotel.city
-                            ? `${hotel.city.name}${
-                                  hotel.city.countryName
-                                      ? `, ${hotel.city.countryName}`
-                                      : ""
-                              }`
+                            ? `${hotel.city.name}${hotel.city.countryName
+                                ? `, ${hotel.city.countryName}`
+                                : ""
+                            }`
                             : hotel.address || "—";
                         const rating = hotel.rating ?? 0;
                         const rawPrice = hotel.startingPrice ?? 0;
@@ -97,7 +96,7 @@ export function RecentHotels() {
                         const typeName = hotel.hotelType?.name ?? "Hotel";
 
                         return (
-                            <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
+                            <Link key={hotel.id} href={`/hotels/${hotel.id}`}>
                                 <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
                                     <div className="relative">
                                         <img

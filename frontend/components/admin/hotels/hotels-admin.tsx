@@ -154,8 +154,7 @@ export default function HotelsAdmin() {
         try {
             await toggleAdminHotelActive(hotelId).unwrap();
             toast.success(
-                `${name} has been ${
-                    isActive ? "deactivated" : "activated"
+                `${name} has been ${isActive ? "deactivated" : "activated"
                 } successfully.`
             );
             refetch();
@@ -450,7 +449,7 @@ export default function HotelsAdmin() {
                                                             asChild
                                                         >
                                                             <Link
-                                                                href={`/hotel/${hotel.id}`}
+                                                                href={`/hotels/${hotel.id}`}
                                                                 title="View hotel"
                                                                 target="_blank"
                                                             >
@@ -713,7 +712,7 @@ export default function HotelsAdmin() {
                                                         handleEditChange(
                                                             "rating",
                                                             e.target.value
-                                                                ? Number(e.target .value)
+                                                                ? Number(e.target.value)
                                                                 : 0
                                                         )
                                                     }

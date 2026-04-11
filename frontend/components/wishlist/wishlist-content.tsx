@@ -136,7 +136,7 @@ export function WishlistContent() {
                             </p>
 
                             <Button className="w-full mt-4" asChild>
-                                <Link href={`/hotel/${item.hotel.id}`}>View Details</Link>
+                                <Link href={`/hotels/${item.hotel.id}`}>View Details</Link>
                             </Button>
                         </CardContent>
                     </Card>

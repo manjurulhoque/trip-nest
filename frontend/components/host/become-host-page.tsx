@@ -17,6 +17,7 @@ import {
 import { useSwitchToHostMutation } from "@/store/api/authApi";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 
 export function BecomeHostPage() {
     const { isAuthenticated, isGuest, isHost, user, updateSession } = useAuth();
@@ -266,6 +267,8 @@ export function BecomeHostPage() {
                     </div>
                 </div>
             </main>
+
+            <Footer />
         </div>
     );
 }

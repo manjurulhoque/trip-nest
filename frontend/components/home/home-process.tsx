@@ -41,11 +41,11 @@ export function HomeProcess() {
                     <ol className="space-y-8">
                         {steps.map(({ icon: Icon, title, description }, i) => (
                             <li key={title} className="flex gap-4">
-                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700">
+                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                                     <Icon className="h-6 w-6" aria-hidden />
                                 </span>
                                 <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-violet-600 mb-1">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
                                         Step {i + 1}
                                     </p>
                                     <h3 className="font-semibold text-slate-900 mb-1">{title}</h3>

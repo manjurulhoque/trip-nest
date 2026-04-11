@@ -356,8 +356,8 @@ export default function HostHotelsManagement() {
                                             <div className="text-2xl font-bold">
                                                 {stats.avgRating != null
                                                     ? Number(
-                                                          stats.avgRating
-                                                      ).toFixed(1)
+                                                        stats.avgRating
+                                                    ).toFixed(1)
                                                     : "N/A"}
                                             </div>
                                         </CardContent>
@@ -538,7 +538,7 @@ export default function HostHotelsManagement() {
                                                             }}
                                                         >
                                                             <Link
-                                                                href={`/hotel/${hotel.id}`}
+                                                                href={`/hotels/${hotel.id}`}
                                                             >
                                                                 <Button
                                                                     variant="ghost"

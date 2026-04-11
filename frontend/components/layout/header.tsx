@@ -114,10 +114,10 @@ export function Header({ variant = "default" }: HeaderProps) {
                                 Stays
                             </Link>
                             <Link
-                                href="/experiences"
+                                href="/host"
                                 className="text-sm font-medium hover:text-primary"
                             >
-                                Experiences
+                                Host
                             </Link>
                         </nav>
                     )}

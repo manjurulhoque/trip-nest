@@ -30,7 +30,7 @@ export function HomeBenefits() {
             <div className="container mx-auto px-4">
                 <h2 className="text-center text-2xl md:text-3xl font-bold uppercase tracking-tight text-slate-800 mb-12 md:mb-16">
                     Popular{" "}
-                    <span className="text-violet-600">benefits</span> that we provide
+                    <span className="text-primary">benefits</span> that we provide
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                     {benefits.map(({ icon: Icon, title, description }) => (
@@ -51,7 +51,7 @@ export function HomeBenefits() {
                 <div className="text-center mt-12">
                     <Button
                         asChild
-                        className="rounded-full bg-violet-600 hover:bg-violet-700 px-10 uppercase font-semibold tracking-wide"
+                        className="rounded-full bg-primary hover:bg-primary/90 px-10 uppercase font-semibold tracking-wide"
                     >
                         <Link href="/search">View all</Link>
                     </Button>

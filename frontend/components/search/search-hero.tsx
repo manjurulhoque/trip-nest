@@ -111,10 +111,10 @@ export function SearchHero() {
                         Explore your{" "}
                         <span className="relative inline-block px-3 py-0.5 mx-1">
                             <span
-                                className="absolute inset-0 rounded-full border-2 border-white/90 -rotate-1"
+                                className="absolute inset-0 rounded-full border-2 border-primary -rotate-1"
                                 aria-hidden
                             />
-                            <span className="relative text-white">dream</span>
+                            <span className="relative text-primary">dream</span>
                         </span>{" "}
                         hotel all over the world
                     </h1>

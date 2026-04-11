@@ -66,8 +66,7 @@ export function HostDashboardContent() {
         try {
             await toggleHotelActive(hotelId).unwrap();
             toast.success(
-                `Hotel ${
-                    currentStatus ? "deactivated" : "activated"
+                `Hotel ${currentStatus ? "deactivated" : "activated"
                 } successfully`
             );
         } catch (error) {
@@ -128,9 +127,8 @@ export function HostDashboardContent() {
                             <Skeleton className="h-3 w-24" />
                         ) : (
                             <p className="text-xs text-muted-foreground">
-                                {`${stats?.activeHotels ?? 0} active, ${
-                                    stats?.inactiveHotels ?? 0
-                                } inactive`}
+                                {`${stats?.activeHotels ?? 0} active, ${stats?.inactiveHotels ?? 0
+                                    } inactive`}
                             </p>
                         )}
                     </CardContent>
@@ -181,7 +179,7 @@ export function HostDashboardContent() {
                                 {`Based on ${stats?.totalReviews ?? 0} reviews`}
                             </p>
                         )}
-                        
+
                     </CardContent>
                 </Card>
 
@@ -205,8 +203,8 @@ export function HostDashboardContent() {
                                 value={
                                     (stats.totalHotels ?? 0) > 0
                                         ? ((stats.activeHotels ?? 0) /
-                                              (stats.totalHotels ?? 1)) *
-                                          100
+                                            (stats.totalHotels ?? 1)) *
+                                        100
                                         : 0
                                 }
                                 className="mt-2"
@@ -346,7 +344,7 @@ export function HostDashboardContent() {
                                                 : "Inactive"}
                                         </Badge>
                                         <div className="flex space-x-1">
-                                            <Link href={`/hotel/${hotel.id}`}>
+                                            <Link href={`/hotels/${hotel.id}`}>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"

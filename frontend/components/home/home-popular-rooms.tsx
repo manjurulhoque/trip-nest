@@ -22,7 +22,7 @@ export function HomePopularRooms() {
             <section id="popular-rooms" className="py-16 md:py-24 bg-slate-50 scroll-mt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-2xl md:text-3xl font-bold text-center uppercase mb-12">
-                        Find most <span className="text-violet-600">popular</span> rooms
+                        Find most <span className="text-primary">popular</span> rooms
                     </h2>
                     <CenterLoader />
                 </div>
@@ -35,7 +35,7 @@ export function HomePopularRooms() {
             <section id="popular-rooms" className="py-16 md:py-24 bg-slate-50 scroll-mt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-2xl md:text-3xl font-bold text-center uppercase mb-12">
-                        Find most <span className="text-violet-600">popular</span> rooms
+                        Find most <span className="text-primary">popular</span> rooms
                     </h2>
                     <Alert variant="destructive" className="max-w-lg mx-auto">
                         <AlertCircle className="h-4 w-4" />
@@ -57,10 +57,10 @@ export function HomePopularRooms() {
                     Find most{" "}
                     <span className="relative inline-block px-2">
                         <span
-                            className="absolute inset-0 rounded-full border-2 border-violet-500 -rotate-1"
+                            className="absolute inset-0 rounded-full border-2 border-primary -rotate-1"
                             aria-hidden
                         />
-                        <span className="relative text-violet-600">popular</span>
+                        <span className="relative text-primary">popular</span>
                     </span>{" "}
                     rooms
                 </h2>
@@ -77,7 +77,7 @@ export function HomePopularRooms() {
                                 className="overflow-hidden border-0 shadow-lg rounded-2xl bg-white group"
                             >
                                 <div className="relative aspect-[4/5] overflow-hidden">
-                                    <Link href={`/hotel/${hotel.id}`} className="block h-full w-full">
+                                    <Link href={`/hotels/${hotel.id}`} className="block h-full w-full">
                                         <img
                                             src={getHotelImageUrl(hotel.id)}
                                             alt={hotel.name}
@@ -103,12 +103,12 @@ export function HomePopularRooms() {
                                         className={cn(
                                             "w-full rounded-full uppercase font-semibold tracking-wide",
                                             highlighted
-                                                ? "bg-violet-600 hover:bg-violet-700"
+                                                ? "bg-primary hover:bg-primary/90"
                                                 : "bg-slate-800 hover:bg-slate-900"
                                         )}
                                         asChild
                                     >
-                                        <Link href={`/hotel/${hotel.id}`}>Book room</Link>
+                                        <Link href={`/hotels/${hotel.id}`}>Book room</Link>
                                     </Button>
                                 </div>
                             </Card>

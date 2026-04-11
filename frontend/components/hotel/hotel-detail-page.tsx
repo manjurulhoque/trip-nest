@@ -11,6 +11,7 @@ import { HotelLocation } from "@/components/hotel/hotel-location";
 import { HotelFaq } from "@/components/hotel/hotel-faq";
 import { SimilarHotelsNearby } from "@/components/hotel/similar-hotels-nearby";
 import CenterLoader from "@/components/loaders/center-loader";
+import { Footer } from "@/components/layout/footer";
 
 interface HotelDetailPageProps {
     hotelId: string;
@@ -58,6 +59,8 @@ export default function HotelDetailPage({ hotelId }: HotelDetailPageProps) {
                     <SimilarHotelsNearby hotelId={hotelId} />
                 </section>
             </main>
+
+            <Footer />
         </div>
     );
 }

@@ -175,7 +175,7 @@ function BookingCard({
                                         asChild
                                     >
                                         <Link
-                                            href={`/hotel/${(booking.hotel as { id: string }).id}`}
+                                            href={`/hotels/${(booking.hotel as { id: string }).id}`}
                                         >
                                             View property
                                         </Link>
@@ -465,7 +465,7 @@ export function DashboardContent() {
                                                 size="sm"
                                                 asChild
                                             >
-                                                <Link href={`/hotel/${item.hotel.id}`}>
+                                                <Link href={`/hotels/${item.hotel.id}`}>
                                                     View hotel
                                                 </Link>
                                             </Button>

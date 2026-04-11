@@ -4,7 +4,7 @@ export function hotelUrlWithTripParams(
     hotelId: string,
     params: HotelSearchParams
 ): string {
-    const base = `/hotel/${hotelId}`;
+    const base = `/hotels/${hotelId}`;
     if (
         !params.checkIn &&
         !params.checkOut &&

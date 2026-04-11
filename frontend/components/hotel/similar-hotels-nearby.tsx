@@ -60,7 +60,7 @@ export function SimilarHotelsNearby({ hotelId }: SimilarHotelsNearbyProps) {
                     const badge = hotel.bestSeller ? "Superhost" : "Popular";
 
                     return (
-                        <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
+                        <Link key={hotel.id} href={`/hotels/${hotel.id}`}>
                             <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                                 <div className="relative">
                                     <img

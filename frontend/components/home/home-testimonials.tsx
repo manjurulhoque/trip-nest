@@ -39,7 +39,7 @@ export function HomeTestimonials() {
         <section className="py-16 md:py-24 bg-gradient-to-b from-rose-50/80 to-violet-50/40">
             <div className="container mx-auto px-4">
                 <h2 className="text-center text-2xl md:text-3xl font-bold uppercase tracking-tight text-slate-800 mb-10 md:mb-14">
-                    What our <span className="text-violet-600">clients</span> say
+                    What our <span className="text-primary">clients</span> say
                 </h2>
                 <div className="max-w-3xl mx-auto relative">
                     <div className="rounded-3xl bg-rose-100/60 border border-rose-200/50 shadow-sm px-6 py-10 md:px-12 md:py-12">
