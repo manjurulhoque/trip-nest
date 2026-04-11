@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Star, MapPin } from "lucide-react";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import { useGetHotelQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -50,7 +51,7 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
         <div className="space-y-6 w-full min-w-0">
             <div>
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                    <div>
+                    <div className="min-w-0 flex-1">
                         <h1 className="text-3xl font-bold mb-2">
                             {hotelData.name}
                         </h1>
@@ -85,6 +86,10 @@ export function HotelDetails({ hotelId }: HotelDetailsProps) {
                             )}
                         </div>
                     </div>
+                    <WishlistToggleButton
+                        hotelId={hotelData.id}
+                        className="shrink-0 h-10 w-10 rounded-full border border-border/60 bg-background/80"
+                    />
                 </div>
             </div>
 

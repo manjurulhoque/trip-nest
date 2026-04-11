@@ -11,6 +11,7 @@ import { HotelSearchParams } from "@/lib/types/hotel";
 import { Hotel } from "@/lib/types/hotel";
 import Link from "next/link";
 import { hotelUrlWithTripParams } from "./search-utils";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 
 const defaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -120,12 +121,15 @@ export function SearchResultsMap({ searchParams }: SearchResultsMapProps) {
                                         {hotel.address}
                                     </p>
                                 )}
-                                <Link
-                                    href={hotelUrlWithTripParams(hotel.id, searchParams)}
-                                    className="inline-block mt-2 text-sm font-medium text-primary hover:underline"
-                                >
-                                    View details →
-                                </Link>
+                                <div className="mt-2 flex flex-wrap items-center gap-2">
+                                    <WishlistToggleButton hotelId={hotel.id} />
+                                    <Link
+                                        href={hotelUrlWithTripParams(hotel.id, searchParams)}
+                                        className="inline-block text-sm font-medium text-primary hover:underline"
+                                    >
+                                        View details →
+                                    </Link>
+                                </div>
                             </div>
                         </Popup>
                     </Marker>

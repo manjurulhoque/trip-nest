@@ -422,7 +422,7 @@ const DashboardHeader = () => {
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
                                                 <Link
-                                                    href="/wishlist"
+                                                    href="/dashboard/wishlist"
                                                     className="flex items-center"
                                                 >
                                                     <Heart className="h-4 w-4 mr-2" />

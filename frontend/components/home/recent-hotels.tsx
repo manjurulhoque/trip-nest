@@ -9,6 +9,7 @@ import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 
 export function RecentHotels() {
 
@@ -98,11 +99,18 @@ export function RecentHotels() {
                         return (
                             <Link key={hotel.id} href={`/hotel/${hotel.id}`}>
                                 <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
-                                    <img
-                                        src={getHotelImageUrl(hotel.id)}
-                                        alt={hotel.name}
-                                        className="w-full h-48 object-cover"
-                                    />
+                                    <div className="relative">
+                                        <img
+                                            src={getHotelImageUrl(hotel.id)}
+                                            alt={hotel.name}
+                                            className="w-full h-48 object-cover"
+                                        />
+                                        <WishlistToggleButton
+                                            hotelId={hotel.id}
+                                            className="absolute top-2 right-2 z-10"
+                                            stopPropagation
+                                        />
+                                    </div>
                                     <CardHeader>
                                         <div className="flex items-center justify-between mb-2">
                                             <Badge variant="secondary">

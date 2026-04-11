@@ -4,6 +4,7 @@ export * from "./hotel";
 export * from "./booking";
 export * from "./checkout";
 export * from "./http";
+export * from "./wishlist";
 
 // Common utility types
 export interface SelectOption {

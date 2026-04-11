@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import { useGetFeaturedHotelsQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -103,14 +103,11 @@ export function FeaturedListings() {
                                             alt={hotel.name}
                                             className="w-full h-48 object-cover"
                                         />
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                                            onClick={(e) => e.preventDefault()}
-                                        >
-                                            <Heart className="h-4 w-4" />
-                                        </Button>
+                                        <WishlistToggleButton
+                                            hotelId={hotel.id}
+                                            className="absolute top-2 right-2 z-10"
+                                            stopPropagation
+                                        />
                                         <Badge className="absolute top-2 left-2 bg-white text-black">
                                             {badge}
                                         </Badge>

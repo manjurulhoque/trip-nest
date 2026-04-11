@@ -137,4 +137,8 @@ export const API_ENDPOINTS = {
         CANCEL: (id: string) => `bookings/${id}/cancel/`,
         COMPLETE_PAYMENT: (id: string) => `bookings/${id}/complete-payment/`,
     },
+    // Wishlist endpoints
+    WISHLIST: {
+        BASE: "users/wishlist/",
+    },
 } as const;

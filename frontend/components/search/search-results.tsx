@@ -3,7 +3,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Heart, MapPin, Wifi, Car, Waves } from "lucide-react";
+import { Star, MapPin, Wifi, Car, Waves } from "lucide-react";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import { useSearchHotelsQuery } from "@/store/api/hotelApi";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -101,13 +102,10 @@ export function SearchResults({
                                     alt={hotel.name}
                                     className="w-64 h-48 object-cover rounded-lg"
                                 />
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                                >
-                                    <Heart className="h-4 w-4" />
-                                </Button>
+                                <WishlistToggleButton
+                                    hotelId={hotel.id}
+                                    className="absolute top-2 right-2"
+                                />
                             </div>
 
                             <div className="flex-1 flex flex-col justify-between">

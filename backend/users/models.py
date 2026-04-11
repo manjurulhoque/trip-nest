@@ -206,3 +206,24 @@ class UserActivity(SoftDeleteModel):
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.activity_type}"
+
+
+class Wishlist(SoftDeleteModel):
+    """User wishlist for hotels"""
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="wishlist_items"
+    )
+    hotel = models.ForeignKey(
+        "hotels.Hotel", on_delete=models.CASCADE, related_name="wishlist_items"
+    )
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Wishlist Item"
+        verbose_name_plural = "Wishlist Items"
+        ordering = ["-created_at"]
+        unique_together = ("user", "hotel")
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.hotel.name}"

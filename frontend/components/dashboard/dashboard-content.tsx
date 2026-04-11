@@ -16,35 +16,17 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Calendar, CreditCard, MapPin, Star, Users, AlertCircle } from "lucide-react";
+import { Calendar, CreditCard, Heart, MapPin, Star, Users, AlertCircle } from "lucide-react";
 import {
     useGetBookingsQuery,
     useCancelBookingMutation,
     useCompletePaymentMutation,
 } from "@/store/api/bookingApi";
+import { useGetWishlistQuery } from "@/store/api/wishlistApi";
 import { useAuth } from "@/hooks/useAuth";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { Booking, BookingStatus, PaymentStatus } from "@/lib/types/booking";
-
-const wishlistItems = [
-    {
-        id: "1",
-        property: "Historic Countryside Manor",
-        location: "Tuscany, Italy",
-        price: 380,
-        rating: 4.9,
-        image: "/placeholder.svg?height=100&width=150",
-    },
-    {
-        id: "2",
-        property: "Seaside Cottage",
-        location: "Cornwall, UK",
-        price: 220,
-        rating: 4.7,
-        image: "/placeholder.svg?height=100&width=150",
-    },
-];
 
 function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -248,11 +230,14 @@ export function DashboardContent() {
         { page: 1 },
         { skip: !user }
     );
+    const { data: wishlistResponse, isLoading: wishlistLoading } =
+        useGetWishlistQuery(undefined, { skip: !user });
     const [cancelBooking, { isLoading: isCancelling }] = useCancelBookingMutation();
     const [completePayment, { isLoading: isCompletingPayment }] = useCompletePaymentMutation();
 
     const rawResults = bookingsResponse?.data?.results ?? [];
     const bookings = Array.isArray(rawResults) ? rawResults : [];
+    const savedHotels = wishlistResponse?.data ?? [];
 
     const { upcoming, past } = useMemo(() => {
         const today = new Date();
@@ -418,49 +403,87 @@ export function DashboardContent() {
                 </TabsContent>
 
                 <TabsContent value="wishlist" className="space-y-4" role="tabpanel">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {wishlistItems.map((item) => (
-                            <Card key={item.id}>
-                                <CardContent className="p-4">
-                                    <div className="flex gap-3">
-                                        <img
-                                            src={item.image}
-                                            alt=""
-                                            className="w-20 h-16 object-cover rounded"
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-semibold text-foreground">
-                                                {item.property}
-                                            </h4>
-                                            <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                                <MapPin className="h-3 w-3 shrink-0" aria-hidden />
-                                                {item.location}
-                                            </p>
-                                            <div className="flex items-center justify-between mt-2">
-                                                <div className="flex items-center gap-1">
-                                                    <Star
-                                                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                                                        aria-hidden
-                                                    />
-                                                    <span className="text-sm">{item.rating}</span>
-                                                </div>
-                                                <span className="font-bold text-foreground">
-                                                    ${item.price}/night
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <Button
-                                        className="w-full mt-3 min-h-[44px]"
-                                        size="sm"
-                                        asChild
-                                    >
-                                        <Link href="/search">Book now</Link>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm text-muted-foreground">
+                            Hotels you saved from search and listings
+                        </p>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href="/dashboard/wishlist">Open full wishlist</Link>
+                        </Button>
                     </div>
+                    {wishlistLoading ? (
+                        <CenterLoader />
+                    ) : savedHotels.length === 0 ? (
+                        <Card>
+                            <CardContent className="py-10 text-center">
+                                <Heart
+                                    className="h-12 w-12 text-muted-foreground/40 mx-auto mb-3"
+                                    aria-hidden
+                                />
+                                <p className="font-medium text-foreground">No saved hotels yet</p>
+                                <p className="text-sm text-muted-foreground mt-1 mb-4">
+                                    Tap the heart on any hotel to save it here
+                                </p>
+                                <Button asChild>
+                                    <Link href="/search">Browse hotels</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {savedHotels.map((item) => {
+                                const img =
+                                    item.hotel.mainPhoto ||
+                                    item.hotel.thumbnail ||
+                                    "/placeholder.svg?height=100&width=150";
+                                const loc = item.hotel.cityName ?? "—";
+                                const rating = item.hotel.rating;
+                                return (
+                                    <Card key={item.id}>
+                                        <CardContent className="p-4">
+                                            <div className="flex gap-3">
+                                                <img
+                                                    src={img}
+                                                    alt=""
+                                                    className="w-20 h-16 object-cover rounded"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-foreground truncate">
+                                                        {item.hotel.name}
+                                                    </h4>
+                                                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                                        <MapPin className="h-3 w-3 shrink-0" aria-hidden />
+                                                        {loc}
+                                                    </p>
+                                                    <div className="flex items-center gap-1 mt-2">
+                                                        <Star
+                                                            className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                                                            aria-hidden
+                                                        />
+                                                        <span className="text-sm">
+                                                            {rating != null ? Number(rating).toFixed(1) : "—"}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground ml-1">
+                                                            ({item.hotel.reviewsCount} reviews)
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                className="w-full mt-3 min-h-[44px]"
+                                                size="sm"
+                                                asChild
+                                            >
+                                                <Link href={`/hotel/${item.hotel.id}`}>
+                                                    View hotel
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
                 </TabsContent>
             </Tabs>
 

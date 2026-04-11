@@ -49,6 +49,9 @@ urlpatterns = [
     path('guest/dashboard/', views.guest_dashboard_stats, name='guest-dashboard'),
     path('guest/list/', views.GuestListView.as_view(), name='guest-list'),
     
+    # Wishlist endpoints
+    path('wishlist/', views.WishlistView.as_view(), name='wishlist'),
+    
     # Activity endpoints
     path('activity/', views.UserActivityListView.as_view(), name='user-activity'),
     

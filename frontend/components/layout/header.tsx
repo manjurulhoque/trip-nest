@@ -22,8 +22,14 @@ import {
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { getInitials } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
-export function Header() {
+export interface HeaderProps {
+    /** Centered marketing nav for the landing page */
+    variant?: "default" | "marketing";
+}
+
+export function Header({ variant = "default" }: HeaderProps) {
     const {
         user,
         isAuthenticated,
@@ -42,18 +48,65 @@ export function Header() {
         }
     };
 
+    const isMarketing = variant === "marketing";
+
     return (
-        <header className="border-b bg-white sticky top-0 z-50">
+        <header
+            className={cn(
+                "sticky top-0 z-50 border-b bg-white",
+                isMarketing && "border-slate-200/80 shadow-sm"
+            )}
+        >
             <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center space-x-8">
-                        <Link
-                            href="/"
-                            className="text-2xl font-bold text-primary"
+                <div className="flex items-center justify-between h-16 gap-4">
+                    <Link
+                        href="/"
+                        className={cn(
+                            "text-xl sm:text-2xl font-bold shrink-0 tracking-tight",
+                            isMarketing ? "text-primary" : "text-primary"
+                        )}
+                    >
+                        TripNest
+                    </Link>
+
+                    {isMarketing ? (
+                        <nav
+                            className="hidden md:flex flex-1 justify-center items-center gap-8 lg:gap-10"
+                            aria-label="Primary"
                         >
-                            TripNest
-                        </Link>
-                        <nav className="hidden md:flex space-x-6">
+                            <Link
+                                href="/"
+                                className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-violet-600"
+                            >
+                                Home
+                            </Link>
+                            <Link
+                                href="/search"
+                                className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-violet-600"
+                            >
+                                Stays
+                            </Link>
+                            <Link
+                                href="/#about"
+                                className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-violet-600"
+                            >
+                                About
+                            </Link>
+                            <Link
+                                href="/#benefits"
+                                className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-violet-600"
+                            >
+                                Features
+                            </Link>
+                            <Link
+                                href="/contact"
+                                className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-violet-600"
+                            >
+                                Contact
+                            </Link>
+                        </nav>
+                    ) : (
+                        <nav className="hidden md:flex flex-1 justify-start items-center space-x-6 pl-8">
                             <Link
                                 href="/search"
                                 className="text-sm font-medium hover:text-primary"
@@ -73,17 +126,19 @@ export function Header() {
                                 Become a Host
                             </Link>
                         </nav>
-                    </div>
+                    )}
 
-                    <div className="flex items-center space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hidden md:flex"
-                        >
-                            <Globe className="h-4 w-4 mr-2" />
-                            EN
-                        </Button>
+                    <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
+                        {!isMarketing && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="hidden md:flex"
+                            >
+                                <Globe className="h-4 w-4 mr-2" />
+                                EN
+                            </Button>
+                        )}
 
                         {isAuthenticated ? (
                             // Authenticated User Menu
@@ -150,7 +205,7 @@ export function Header() {
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link href="/wishlist">
+                                                <Link href="/dashboard/wishlist">
                                                     <Heart className="h-4 w-4 mr-2" />
                                                     Wishlist
                                                 </Link>
@@ -189,11 +244,19 @@ export function Header() {
                         ) : (
                             // Non-authenticated User Buttons
                             <div className="flex items-center space-x-2">
-                                <Button asChild variant="ghost" size="sm">
-                                    <Link href="/auth/login">Sign In</Link>
+                                <Button asChild variant="ghost" size="sm" className="text-slate-700">
+                                    <Link href="/auth/login">Sign in</Link>
                                 </Button>
-                                <Button asChild size="sm">
-                                    <Link href="/auth/signup">Sign Up</Link>
+                                <Button
+                                    asChild
+                                    variant={isMarketing ? "outline" : "default"}
+                                    size="sm"
+                                    className={cn(
+                                        isMarketing &&
+                                            "rounded-full border-primary text-primary hover:bg-primary/10"
+                                    )}
+                                >
+                                    <Link href="/auth/signup">Sign up</Link>
                                 </Button>
                             </div>
                         )}

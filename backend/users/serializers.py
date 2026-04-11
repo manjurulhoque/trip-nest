@@ -1,14 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
-from django.conf import settings
-from .models import User, UserProfile, HostVerification, UserActivity
+from .models import User, UserProfile, HostVerification, UserActivity, Wishlist
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -305,6 +302,55 @@ class UserActivitySerializer(serializers.ModelSerializer):
         model = UserActivity
         fields = '__all__'
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    """Serializer for user wishlist items"""
+
+    hotelId = serializers.UUIDField(write_only=True, source='hotel.id')
+    hotel = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'hotelId', 'hotel', 'notes', 'created_at']
+        read_only_fields = ['id', 'hotel', 'created_at']
+
+    def get_hotel(self, obj):
+        hotel = obj.hotel
+        city = getattr(hotel, 'city', None)
+        return {
+            'id': str(hotel.id),
+            'name': hotel.name,
+            'mainPhoto': hotel.main_photo,
+            'thumbnail': hotel.thumbnail,
+            'cityName': getattr(city, 'name', None),
+            'rating': hotel.rating,
+            'reviewsCount': hotel.reviews_count,
+            'stars': hotel.stars,
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        hotel_id = validated_data.pop('hotel')['id']
+
+        from hotels.models import Hotel
+
+        try:
+            hotel = Hotel.objects.get(id=hotel_id, is_active=True)
+        except Hotel.DoesNotExist:
+            raise serializers.ValidationError({'hotelId': 'Invalid hotel.'})
+
+        wishlist_item, _created = Wishlist.objects.get_or_create(
+            user=user,
+            hotel=hotel,
+            defaults={'notes': validated_data.get('notes', '')},
+        )
+        # Update notes if provided
+        if 'notes' in validated_data:
+            wishlist_item.notes = validated_data['notes']
+            wishlist_item.save(update_fields=['notes'])
+        return wishlist_item
 
 
 class PasswordChangeSerializer(serializers.Serializer):

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import status, generics, permissions, filters
+from rest_framework import status, generics, permissions, filters, mixins
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, UserProfile, HostVerification, UserActivity
+from .models import User, UserProfile, HostVerification, UserActivity, Wishlist
 from .permissions import IsHost, IsGuest, IsApprovedHost, IsHostOrAdmin, IsOwnerOrSuperAdmin, IsSuperAdmin, IsOwner, IsGuestOrHost
 from .serializers import (
     UserRegistrationSerializer,
@@ -29,7 +29,8 @@ from .serializers import (
     HostApprovalSerializer,
     UserActivitySerializer,
     AdminUserSerializer,
-    UserDetailSerializer
+    UserDetailSerializer,
+    WishlistSerializer
 )
 from utils.response import api_response
 
@@ -792,6 +793,61 @@ def guest_dashboard_stats(request):
         success=True,
         data=stats
     )
+
+
+class WishlistView(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   generics.GenericAPIView):
+    """Manage user wishlist (list, add, remove)"""
+
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated, IsGuestOrHost]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(
+            success=True,
+            data=serializer.data
+        )
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=request.data, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        item = serializer.save()
+        return api_response(
+            success=True,
+            data=WishlistSerializer(item).data,
+            status_code=status.HTTP_201_CREATED
+        )
+
+    def delete(self, request, *args, **kwargs):
+        hotel_id = request.data.get('hotelId') or request.query_params.get('hotelId')
+        if not hotel_id:
+            return api_response(
+                success=False,
+                errors={'hotelId': 'hotelId is required'},
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        deleted, _ = Wishlist.objects.filter(
+            user=request.user,
+            hotel_id=hotel_id
+        ).delete()
+
+        if not deleted:
+            return api_response(
+                success=False,
+                errors={'detail': 'Wishlist item not found'},
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+
+        return api_response(success=True, data={})
 
 
 # Password Management Views

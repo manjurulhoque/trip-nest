@@ -9,6 +9,7 @@ import { facilityApi } from "./api/facilityApi";
 import { categoryApi } from "./api/categoryApi";
 import { bookingApi } from "./api/bookingApi";
 import { coreApi } from "./api/coreApi";
+import { wishlistApi } from "./api/wishlistApi";
 
 export const store = configureStore({
     reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
         [categoryApi.reducerPath]: categoryApi.reducer,
         [bookingApi.reducerPath]: bookingApi.reducer,
         [coreApi.reducerPath]: coreApi.reducer,
+        [wishlistApi.reducerPath]: wishlistApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
@@ -39,7 +41,8 @@ export const store = configureStore({
             facilityApi.middleware,
             categoryApi.middleware,
             bookingApi.middleware,
-            coreApi.middleware
+            coreApi.middleware,
+            wishlistApi.middleware
         ),
     devTools: process.env.NODE_ENV !== "production",
 });

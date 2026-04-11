@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SearchHero } from "@/components/search/search-hero";
-import { FeaturedListings } from "@/components/home/featured-listings";
-import { PopularDestinations } from "@/components/home/popular-destinations";
-import { RecentHotels } from "@/components/home/recent-hotels";
+import { HomePartners } from "@/components/home/home-partners";
+import { HomeBenefits } from "@/components/home/home-benefits";
+import { HomeProcess } from "@/components/home/home-process";
+import { HomePopularRooms } from "@/components/home/home-popular-rooms";
+import { HomeTestimonials } from "@/components/home/home-testimonials";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-// Animation variants
 const fadeInUp = {
     hidden: {
         opacity: 0,
@@ -35,24 +36,19 @@ export default function HomePage() {
     if (!isMounted) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-white text-slate-900">
             <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
-                <Header />
+                <Header variant="marketing" />
             </motion.div>
 
             <main>
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                    variants={fadeInUp}
-                >
+                <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
                     <SearchHero />
                 </motion.div>
 
@@ -61,9 +57,8 @@ export default function HomePage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
                     variants={fadeInUp}
-                    transition={{ delay: 0.2 }}
                 >
-                    <FeaturedListings />
+                    <HomePartners />
                 </motion.div>
 
                 <motion.div
@@ -71,9 +66,9 @@ export default function HomePage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
                     variants={fadeInUp}
-                    transition={{ delay: 0.1 }}
+                    transition={{ delay: 0.05 }}
                 >
-                    <PopularDestinations />
+                    <HomeBenefits />
                 </motion.div>
 
                 <motion.div
@@ -81,9 +76,29 @@ export default function HomePage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
                     variants={fadeInUp}
-                    transition={{ delay: 0.1 }}
+                    transition={{ delay: 0.05 }}
                 >
-                    <RecentHotels />
+                    <HomeProcess />
+                </motion.div>
+
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={fadeInUp}
+                    transition={{ delay: 0.05 }}
+                >
+                    <HomePopularRooms />
+                </motion.div>
+
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={fadeInUp}
+                    transition={{ delay: 0.05 }}
+                >
+                    <HomeTestimonials />
                 </motion.div>
             </main>
 
