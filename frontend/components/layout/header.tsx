@@ -119,12 +119,6 @@ export function Header({ variant = "default" }: HeaderProps) {
                             >
                                 Experiences
                             </Link>
-                            <Link
-                                href="/host"
-                                className="text-sm font-medium hover:text-primary"
-                            >
-                                Become a Host
-                            </Link>
                         </nav>
                     )}
 
