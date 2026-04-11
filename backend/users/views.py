@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -563,8 +567,9 @@ def deactivate_account(request):
     user.is_active = False
     user.save()
 
-    # Delete user tokens
-    Token.objects.filter(user=user).delete()
+    # Blacklist all outstanding JWT refresh tokens for this user
+    for outstanding in OutstandingToken.objects.filter(user=user):
+        BlacklistedToken.objects.get_or_create(token=outstanding)
 
     return api_response(success=True, data={})
 
