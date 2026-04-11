@@ -134,9 +134,9 @@ export function Footer() {
                         <Link href="/cookies" className="hover:text-violet-600">
                             Cookies
                         </Link>
-                        <a href="#" className="hover:text-violet-600">
+                        <Link href="/terms" className="hover:text-violet-600">
                             Terms
-                        </a>
+                        </Link>
                         <a href="#" className="hover:text-violet-600">
                             Sitemap
                         </a>

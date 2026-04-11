@@ -808,11 +808,11 @@ class WishlistView(
         )
 
     def delete(self, request, *args, **kwargs):
-        hotel_id = request.data.get("hotelId") or request.query_params.get("hotelId")
+        hotel_id = request.data.get("hotel_id") or request.query_params.get("hotel_id")
         if not hotel_id:
             return api_response(
                 success=False,
-                errors={"hotelId": "hotelId is required"},
+                errors={"hotel_id": "hotel id is required"},
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 

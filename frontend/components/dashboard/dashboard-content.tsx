@@ -6,16 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Calendar, CreditCard, Heart, MapPin, Star, Users, AlertCircle } from "lucide-react";
 import {
     useGetBookingsQuery,
@@ -487,30 +478,24 @@ export function DashboardContent() {
                 </TabsContent>
             </Tabs>
 
-            <AlertDialog
+            <ConfirmDialog
                 open={cancelTargetId !== null}
                 onOpenChange={(open) => !open && setCancelTargetId(null)}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Cancel booking?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will cancel your reservation. You may be charged a
-                            fee depending on the property’s cancellation policy. This
-                            action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Keep booking</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleConfirmCancel}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                            Cancel booking
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+                title="Cancel booking?"
+                description={
+                    <>
+                        This will cancel your reservation. You may be charged a fee
+                        depending on the property’s cancellation policy. This action
+                        cannot be undone.
+                    </>
+                }
+                cancelLabel="Keep booking"
+                confirmLabel="Cancel booking"
+                pendingLabel="Cancelling…"
+                confirmVariant="destructive"
+                onConfirm={handleConfirmCancel}
+                isPending={isCancelling}
+            />
         </div>
     );
 }

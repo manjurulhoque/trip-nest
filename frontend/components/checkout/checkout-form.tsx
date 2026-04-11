@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,13 +33,32 @@ export function CheckoutForm({ params, onBookingCreated }: CheckoutFormProps) {
         useCreateBookingMutation();
 
     const [formData, setFormData] = useState({
-        firstName: session?.user?.name?.split(" ")[0] ?? "",
-        lastName: session?.user?.name?.split(" ").slice(1).join(" ") ?? "",
-        email: session?.user?.email ?? "",
+        firstName: "",
+        lastName: "",
+        email: "",
         phone: "",
         specialRequests: "",
         agreeTerms: false,
     });
+
+    const hydratedFromSession = useRef(false);
+    useEffect(() => {
+        if (
+            hydratedFromSession.current ||
+            sessionStatus !== "authenticated" ||
+            !session?.user
+        ) {
+            return;
+        }
+        hydratedFromSession.current = true;
+        const u = session.user;
+        setFormData((prev) => ({
+            ...prev,
+            firstName: u.firstName ?? "",
+            lastName: u.lastName ?? "",
+            email: u.email ?? "",
+        }));
+    }, [sessionStatus, session?.user]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -244,10 +264,26 @@ export function CheckoutForm({ params, onBookingCreated }: CheckoutFormProps) {
                             />
                             <label
                                 htmlFor="terms"
-                                className="text-sm text-muted-foreground"
+                                className="text-sm text-muted-foreground leading-relaxed"
                             >
-                                I agree to the Terms and Conditions and Privacy
-                                Policy
+                                I agree to the{" "}
+                                <Link
+                                    href="/terms"
+                                    className="text-primary underline-offset-4 hover:underline font-medium"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Terms and Conditions
+                                </Link>{" "}
+                                and{" "}
+                                <Link
+                                    href="/privacy"
+                                    className="text-primary underline-offset-4 hover:underline font-medium"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Privacy Policy
+                                </Link>
                             </label>
                         </div>
                     </div>
