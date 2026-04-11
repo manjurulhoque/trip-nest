@@ -307,12 +307,12 @@ class UserActivitySerializer(serializers.ModelSerializer):
 class WishlistSerializer(serializers.ModelSerializer):
     """Serializer for user wishlist items"""
 
-    hotelId = serializers.UUIDField(write_only=True, source='hotel.id')
+    hotel_id = serializers.UUIDField(write_only=True, source='hotel.id')
     hotel = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Wishlist
-        fields = ['id', 'hotelId', 'hotel', 'notes', 'created_at']
+        fields = ['id', 'hotel_id', 'hotel', 'notes', 'created_at']
         read_only_fields = ['id', 'hotel', 'created_at']
 
     def get_hotel(self, obj):
@@ -321,11 +321,11 @@ class WishlistSerializer(serializers.ModelSerializer):
         return {
             'id': str(hotel.id),
             'name': hotel.name,
-            'mainPhoto': hotel.main_photo,
+            'main_photo': hotel.main_photo,
             'thumbnail': hotel.thumbnail,
-            'cityName': getattr(city, 'name', None),
+            'city_name': getattr(city, 'name', None),
             'rating': hotel.rating,
-            'reviewsCount': hotel.reviews_count,
+            'reviews_count': hotel.reviews_count,
             'stars': hotel.stars,
         }
 
@@ -339,7 +339,7 @@ class WishlistSerializer(serializers.ModelSerializer):
         try:
             hotel = Hotel.objects.get(id=hotel_id, is_active=True)
         except Hotel.DoesNotExist:
-            raise serializers.ValidationError({'hotelId': 'Invalid hotel.'})
+            raise serializers.ValidationError({'hotel_id': 'Invalid hotel.'})
 
         wishlist_item, _created = Wishlist.objects.get_or_create(
             user=user,

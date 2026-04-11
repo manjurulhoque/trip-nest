@@ -77,6 +77,17 @@ class HotelViewSet(ModelViewSet):
         if self.action == "list":
             # Public listing - only active hotels
             return Hotel.objects.filter(is_active=True)
+        if self.action == "retrieve":
+            # Single hotel detail: only active properties for the public; owners and
+            # superusers may still load inactive hotels they manage.
+            user = self.request.user
+            if user.is_superuser:
+                return Hotel.objects.all()
+            if user.is_authenticated and user.is_host():
+                return Hotel.objects.filter(
+                    Q(is_active=True) | Q(owner=user)
+                )
+            return Hotel.objects.filter(is_active=True)
         elif self.request.user.is_superuser:
             # Admins can see all hotels
             return Hotel.objects.all()
