@@ -19,6 +19,9 @@ from .serializers import (
 )
 from users.permissions import IsSuperAdmin
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @extend_schema_view(
@@ -107,6 +110,12 @@ class CategoryViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         category = serializer.save()
 
+        logger.info(
+            "facility_category_created",
+            category_id=str(category.pk),
+            actor_id=str(request.user.pk),
+        )
+
         return api_response(
             success=True,
             data={
@@ -141,6 +150,12 @@ class CategoryViewSet(ModelViewSet):
         # Check if category has facilities
         facility_count = instance.facility_set.filter(is_active=True).count()
         if facility_count > 0:
+            logger.warning(
+                "facility_category_delete_blocked",
+                category_id=str(instance.pk),
+                active_facilities=facility_count,
+                actor_id=str(request.user.pk),
+            )
             return api_response(
                 success=False,
                 errors={
@@ -149,7 +164,13 @@ class CategoryViewSet(ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
+        category_id = str(instance.pk)
         instance.delete()  # This will use soft delete from SoftDeleteModel
+        logger.info(
+            "facility_category_deleted",
+            category_id=category_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True, data={}, status_code=status.HTTP_204_NO_CONTENT
         )
@@ -317,6 +338,12 @@ class FacilityViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         facility = serializer.save()
 
+        logger.info(
+            "facility_created",
+            facility_id=str(facility.pk),
+            actor_id=str(request.user.pk),
+        )
+
         return api_response(
             success=True,
             data={
@@ -347,7 +374,13 @@ class FacilityViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """Override destroy to use soft delete and api_response format"""
         instance = self.get_object()
+        facility_id = str(instance.pk)
         instance.delete()
+        logger.info(
+            "facility_deleted",
+            facility_id=facility_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data={},
@@ -445,6 +478,11 @@ class AdminFacilityViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         facility = serializer.save()
+        logger.info(
+            "admin_facility_created",
+            facility_id=str(facility.pk),
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data=AdminFacilitySerializer(facility, context={"request": request}).data,
@@ -466,7 +504,13 @@ class AdminFacilityViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """Delete facility and return in api_response format."""
         facility = self.get_object()
+        facility_id = str(facility.pk)
         facility.delete()
+        logger.info(
+            "admin_facility_deleted",
+            facility_id=facility_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data={},

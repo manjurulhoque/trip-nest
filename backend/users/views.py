@@ -46,6 +46,9 @@ from .serializers import (
     WishlistSerializer,
 )
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @extend_schema_view(
@@ -64,6 +67,13 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
+        logger.info(
+            "user_registered",
+            user_id=str(user.pk),
+            role=user.role,
+            email=user.email,
+        )
 
         # Log activity
         UserActivity.objects.create(
@@ -96,6 +106,8 @@ class UserLoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
+
+        logger.info("user_login", user_id=str(user.pk), email=user.email)
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
@@ -157,8 +169,14 @@ class LogoutView(generics.GenericAPIView):
                 user_agent=request.META.get("HTTP_USER_AGENT", ""),
             )
 
+            logger.info("user_logout", user_id=str(request.user.pk))
             return api_response(success=True, data={})
         except Exception as e:
+            logger.warning(
+                "user_logout_failed",
+                user_id=str(request.user.pk),
+                error=str(e),
+            )
             return api_response(
                 success=False,
                 errors={"error": "Logout failed"},
@@ -491,6 +509,15 @@ class HostVerificationViewSet(ModelViewSet):
             verification.user.is_verified_host = True
             verification.user.save()
 
+        logger.info(
+            "host_document_verification_updated",
+            verification_id=str(verification.pk),
+            user_id=str(verification.user_id),
+            document_type=document_type,
+            verified=verified,
+            actor_id=str(request.user.pk),
+        )
+
         return api_response(
             success=True,
             data={"verification": HostVerificationSerializer(verification).data},
@@ -571,6 +598,7 @@ def deactivate_account(request):
     for outstanding in OutstandingToken.objects.filter(user=user):
         BlacklistedToken.objects.get_or_create(token=outstanding)
 
+    logger.info("user_account_deactivated", user_id=str(user.pk))
     return api_response(success=True, data={})
 
 

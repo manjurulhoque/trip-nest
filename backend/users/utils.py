@@ -5,9 +5,9 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def send_welcome_email(user):
@@ -28,9 +28,15 @@ def send_welcome_email(user):
             html_message=html_message,
             fail_silently=False,
         )
-        logger.info(f"Welcome email sent to {user.email}")
+        logger.info("welcome_email_sent", user_id=str(user.pk), email=user.email)
     except Exception as e:
-        logger.error(f"Failed to send welcome email to {user.email}: {str(e)}")
+        logger.error(
+            "welcome_email_failed",
+            user_id=str(user.pk),
+            email=user.email,
+            error=str(e),
+            exc_info=True,
+        )
 
 
 def send_verification_email(user, verification_url=None):
@@ -55,9 +61,15 @@ def send_verification_email(user, verification_url=None):
             html_message=html_message,
             fail_silently=False,
         )
-        logger.info(f"Verification email sent to {user.email}")
+        logger.info("verification_email_sent", user_id=str(user.pk), email=user.email)
     except Exception as e:
-        logger.error(f"Failed to send verification email to {user.email}: {str(e)}")
+        logger.error(
+            "verification_email_failed",
+            user_id=str(user.pk),
+            email=user.email,
+            error=str(e),
+            exc_info=True,
+        )
 
 
 def send_password_reset_email(user, reset_url=None):
@@ -85,9 +97,15 @@ def send_password_reset_email(user, reset_url=None):
             html_message=html_message,
             fail_silently=False,
         )
-        logger.info(f"Password reset email sent to {user.email}")
+        logger.info("password_reset_email_sent", user_id=str(user.pk), email=user.email)
     except Exception as e:
-        logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
+        logger.error(
+            "password_reset_email_failed",
+            user_id=str(user.pk),
+            email=user.email,
+            error=str(e),
+            exc_info=True,
+        )
 
 
 def send_password_changed_email(user):
@@ -108,9 +126,17 @@ def send_password_changed_email(user):
             html_message=html_message,
             fail_silently=False,
         )
-        logger.info(f"Password changed notification sent to {user.email}")
+        logger.info(
+            "password_changed_email_sent", user_id=str(user.pk), email=user.email
+        )
     except Exception as e:
-        logger.error(f"Failed to send password changed notification to {user.email}: {str(e)}")
+        logger.error(
+            "password_changed_email_failed",
+            user_id=str(user.pk),
+            email=user.email,
+            error=str(e),
+            exc_info=True,
+        )
 
 
 def generate_username_from_email(email):

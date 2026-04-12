@@ -1,5 +1,11 @@
 from pathlib import Path
 import structlog
+from opentelemetry.trace import get_current_span
+from opentelemetry import trace
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +58,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "EXCEPTION_HANDLER": "utils.drf_exception_handler.drf_structlog_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "backend.pagination.OptionalPageSizePagination",
     "PAGE_SIZE": 20,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -227,10 +234,32 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LOGIN_URL = "/api/auth/login/"
 LOGOUT_URL = "/api/auth/logout/"
 
+resource = Resource(attributes={SERVICE_NAME: "trip-nest-backend"})
+
+provider = TracerProvider(resource=resource)
+trace.set_tracer_provider(provider)
+
+otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
+
+span_processor = BatchSpanProcessor(otlp_exporter)
+provider.add_span_processor(span_processor)
+
+
+def add_trace_context(logger, method_name, event_dict):
+    span = get_current_span()
+    if span:
+        ctx = span.get_span_context()
+        if ctx.trace_id:
+            event_dict["trace_id"] = format(ctx.trace_id, "032x")
+            event_dict["span_id"] = format(ctx.span_id, "016x")
+    return event_dict
+
+
 # Structlog settings
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
+        add_trace_context,
         structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.dict_tracebacks,
@@ -244,23 +273,54 @@ structlog.configure(
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
     "formatters": {
         "json_formatter": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": [
+                structlog.contextvars.merge_contextvars,
+                add_trace_context,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.ExtraAdder(),
+            ],
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "json_formatter",
         },
     },
-
     "root": {
         "handlers": ["console"],
         "level": "INFO",
+    },
+    "loggers": {
+        "django_structlog": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django_structlog.middlewares": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "tripnest": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }

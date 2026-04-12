@@ -7,10 +7,13 @@ import random
 from decimal import Decimal
 import time
 
+import structlog
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 
 from core.models import City, Country
+
+logger = structlog.get_logger(__name__)
 from facilities.models import Category, Facility
 from hotels.models import Hotel, HotelImage, HotelType, HotelChain
 from rooms.models import BedType, Room, RoomAmenity, RoomBedType, RoomImage
@@ -141,15 +144,26 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        self._require_countries_and_cities()
-        hosts, guests = self._create_users()
-        categories = self._create_categories()
-        facilities = self._create_facilities(categories)
-        hotel_types = self._create_hotel_types()
-        chains = self._create_hotel_chains()
-        room_amenities = self._create_room_amenities()
-        bed_types = self._create_bed_types()
-        self._create_hotels(hosts, facilities, hotel_types, chains, room_amenities, bed_types)
+        logger.info("seed_data_started")
+        try:
+            self._require_countries_and_cities()
+            hosts, guests = self._create_users()
+            categories = self._create_categories()
+            facilities = self._create_facilities(categories)
+            hotel_types = self._create_hotel_types()
+            chains = self._create_hotel_chains()
+            room_amenities = self._create_room_amenities()
+            bed_types = self._create_bed_types()
+            self._create_hotels(
+                hosts, facilities, hotel_types, chains, room_amenities, bed_types
+            )
+        except CommandError as exc:
+            logger.warning("seed_data_command_error", error=str(exc))
+            raise
+        except Exception:
+            logger.error("seed_data_failed", exc_info=True)
+            raise
+        logger.info("seed_data_completed")
 
     def _require_countries_and_cities(self):
         country_count = Country.objects.count()

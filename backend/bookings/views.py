@@ -16,6 +16,9 @@ from .serializers import (
 from users.permissions import IsGuestOrHost, IsSuperAdmin
 from .permissions import IsBookingGuestOrHotelOwnerOrSuperAdmin
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @extend_schema_view(
@@ -85,6 +88,23 @@ class BookingViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+        booking = serializer.instance
+        logger.info(
+            "booking_created",
+            booking_id=str(booking.pk),
+            user_id=str(booking.user_id),
+            hotel_id=str(booking.hotel_id),
+            room_id=str(booking.room_id),
+        )
+
+    def perform_destroy(self, instance):
+        booking_id = str(instance.pk)
+        super().perform_destroy(instance)
+        logger.info(
+            "booking_deleted",
+            booking_id=booking_id,
+            actor_id=str(self.request.user.pk),
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -111,6 +131,11 @@ class BookingViewSet(ModelViewSet):
         booking.cancelled_at = timezone.now()
         booking.cancellation_reason = reason
         booking.save()
+        logger.info(
+            "booking_cancelled",
+            booking_id=str(booking.pk),
+            actor_id=str(request.user.pk),
+        )
         serializer = BookingDetailSerializer(booking, context={"request": request})
         return api_response(success=True, data=serializer.data)
 
@@ -137,5 +162,10 @@ class BookingViewSet(ModelViewSet):
             )
         booking.payment_status = Booking.PAYMENT_PAID
         booking.save()
+        logger.info(
+            "booking_payment_completed",
+            booking_id=str(booking.pk),
+            actor_id=str(request.user.pk),
+        )
         serializer = BookingDetailSerializer(booking, context={"request": request})
         return api_response(success=True, data=serializer.data)

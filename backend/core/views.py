@@ -10,6 +10,10 @@ from .serializers import (
 )
 from users.permissions import IsSuperAdmin
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -83,6 +87,12 @@ class AdminCountryViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         country = serializer.save()
+        logger.info(
+            "country_created",
+            country_id=str(country.pk),
+            code=country.code,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data=CountrySerializer(country).data,
@@ -101,7 +111,13 @@ class AdminCountryViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """Delete country and return in api_response format."""
         instance = self.get_object()
+        country_id = str(instance.pk)
         instance.delete()
+        logger.info(
+            "country_deleted",
+            country_id=country_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data={},

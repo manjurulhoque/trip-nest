@@ -3,9 +3,12 @@ from typing import Any, Dict, List, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+import structlog
 from django.core.management.base import BaseCommand, CommandError
 
 from core.models import City, Country
+
+logger = structlog.get_logger(__name__)
 
 
 COUNTRIES_CITIES_URL = "https://countriesnow.space/api/v0.1/countries"
@@ -19,6 +22,7 @@ class Command(BaseCommand):
     help = "Import countries and cities from public APIs into Country and City models."
 
     def handle(self, *args: Any, **options: Any) -> None:
+        logger.info("import_cities_started")
         self.stdout.write(self.style.MIGRATE_HEADING("Fetching country metadata (currencies, phone codes)..."))
         meta_by_iso2 = self._fetch_country_metadata()
         self.stdout.write(self.style.SUCCESS(f"Fetched metadata for {len(meta_by_iso2)} countries."))
@@ -100,6 +104,14 @@ class Command(BaseCommand):
             f"Countries: {created_countries} created, {updated_countries} updated."
         )
         self.stdout.write(f"Cities: {created_cities} created, {updated_cities} updated.")
+
+        logger.info(
+            "import_cities_completed",
+            created_countries=created_countries,
+            updated_countries=updated_countries,
+            created_cities=created_cities,
+            updated_cities=updated_cities,
+        )
 
     def _fetch_json(self, url: str) -> Any:
         request = Request(

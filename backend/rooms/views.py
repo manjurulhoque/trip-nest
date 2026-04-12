@@ -15,6 +15,9 @@ from .serializers import (
 )
 from users.permissions import IsHostOrReadOnly, IsSuperAdmin, IsVerifiedHost
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @extend_schema_view(
@@ -105,7 +108,28 @@ class RoomViewSet(ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         
         return [permission() for permission in permission_classes]
-    
+
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        room = serializer.instance
+        logger.info(
+            "room_created",
+            room_id=str(room.pk),
+            hotel_id=str(room.hotel_id),
+            actor_id=str(self.request.user.pk),
+        )
+
+    def perform_destroy(self, instance):
+        room_id = str(instance.pk)
+        hotel_id = str(instance.hotel_id)
+        super().perform_destroy(instance)
+        logger.info(
+            "room_soft_deleted",
+            room_id=room_id,
+            hotel_id=hotel_id,
+            actor_id=str(self.request.user.pk),
+        )
+
     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def search(self, request):
         """Advanced room search with filters"""
@@ -214,7 +238,14 @@ class RoomViewSet(ModelViewSet):
         
         room.is_active = not room.is_active
         room.save()
-        
+
+        logger.info(
+            "room_toggle_active",
+            room_id=str(room.pk),
+            is_active=room.is_active,
+            actor_id=str(request.user.pk),
+        )
+
         return api_response(
             success=True,
             data={
@@ -430,6 +461,11 @@ class AdminRoomViewSet(ModelViewSet):
         try:
             room = Room.all_objects.get(pk=pk, is_deleted=True)
             room.restore()
+            logger.info(
+                "admin_room_restored",
+                room_id=str(room.pk),
+                actor_id=str(request.user.pk),
+            )
             return api_response(
                 success=True,
                 data={
@@ -447,7 +483,13 @@ class AdminRoomViewSet(ModelViewSet):
     def hard_delete(self, request, pk=None):
         """Permanently delete a room"""
         room = self.get_object()
+        room_id = str(room.pk)
         room.hard_delete()
+        logger.warning(
+            "admin_room_hard_deleted",
+            room_id=room_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data={},

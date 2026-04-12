@@ -24,6 +24,9 @@ from users.permissions import IsHostOrReadOnly, IsSuperAdmin, IsVerifiedHost
 from facilities.models import Facility
 from core.models import City
 from utils.response import api_response
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @extend_schema_view(
@@ -146,6 +149,12 @@ class HotelViewSet(ModelViewSet):
     def perform_create(self, serializer):
         """Set owner when creating hotel"""
         serializer.save(owner=self.request.user)
+        hotel = serializer.instance
+        logger.info(
+            "hotel_created",
+            hotel_id=str(hotel.pk),
+            owner_id=str(self.request.user.pk),
+        )
 
     def retrieve(self, request, *args, **kwargs):
         """Return single hotel in api_response format."""
@@ -190,7 +199,15 @@ class HotelViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """Soft delete hotel and return in api_response format."""
         instance = self.get_object()
+        hotel_id = str(instance.pk)
+        owner_id = str(instance.owner_id) if instance.owner_id else None
         instance.delete()
+        logger.info(
+            "hotel_soft_deleted",
+            hotel_id=hotel_id,
+            owner_id=owner_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
         )
@@ -448,6 +465,13 @@ class HotelViewSet(ModelViewSet):
         hotel.is_active = not hotel.is_active
         hotel.save()
 
+        logger.info(
+            "hotel_toggle_active",
+            hotel_id=str(hotel.pk),
+            is_active=hotel.is_active,
+            actor_id=str(request.user.pk),
+        )
+
         return api_response(
             success=True,
             data={
@@ -655,7 +679,13 @@ class AdminHotelViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """Delete hotel and return in api_response format."""
         instance = self.get_object()
+        hotel_id = str(instance.pk)
         instance.delete()
+        logger.info(
+            "admin_hotel_soft_deleted",
+            hotel_id=hotel_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
         )
@@ -671,6 +701,13 @@ class AdminHotelViewSet(ModelViewSet):
         hotel = self.get_object()
         hotel.is_active = not hotel.is_active
         hotel.save()
+
+        logger.info(
+            "admin_hotel_toggle_active",
+            hotel_id=str(hotel.pk),
+            is_active=hotel.is_active,
+            actor_id=str(request.user.pk),
+        )
 
         return api_response(
             success=True,
@@ -739,6 +776,11 @@ class AdminHotelViewSet(ModelViewSet):
         try:
             hotel = Hotel.all_objects.get(pk=pk, is_deleted=True)
             hotel.restore()
+            logger.info(
+                "admin_hotel_restored",
+                hotel_id=str(hotel.pk),
+                actor_id=str(request.user.pk),
+            )
             return api_response(
                 success=True,
                 data={
@@ -758,7 +800,13 @@ class AdminHotelViewSet(ModelViewSet):
     def hard_delete(self, request, pk=None):
         """Permanently delete a hotel"""
         hotel = self.get_object()
+        hotel_id = str(hotel.pk)
         hotel.hard_delete()
+        logger.warning(
+            "admin_hotel_hard_deleted",
+            hotel_id=hotel_id,
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True,
             data={},
@@ -894,6 +942,11 @@ class HotelChainViewSet(ModelViewSet):
             )
 
         instance.delete()  # This will use soft delete from SoftDeleteModel
+        logger.info(
+            "hotel_chain_deleted",
+            chain_id=str(instance.pk),
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True, data={}, status_code=status.HTTP_204_NO_CONTENT
         )
@@ -1043,6 +1096,11 @@ class HotelTypeViewSet(ModelViewSet):
             )
 
         instance.delete()  # This will use soft delete from SoftDeleteModel
+        logger.info(
+            "hotel_type_deleted",
+            type_id=str(instance.pk),
+            actor_id=str(request.user.pk),
+        )
         return api_response(
             success=True, data={}, status_code=status.HTTP_204_NO_CONTENT
         )
