@@ -38,6 +38,7 @@ urlpatterns = [
     # Role-based endpoints
     path('role/info/', views.user_role_info, name='role-info'),
     path('role/switch-to-host/', views.SwitchToHostView.as_view(), name='switch-to-host'),
+    path('switch-to-host/', views.SwitchToHostView.as_view(), name='switch-to-host-legacy'),
     
     # Host endpoints
     path('host/dashboard/', views.host_dashboard_stats, name='host-dashboard'),

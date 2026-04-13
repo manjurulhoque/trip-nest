@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.utils import timezone
 
 from .models import Booking, GuestDetail
 from users.serializers import UserSerializer
@@ -16,6 +15,7 @@ class BookingHotelSerializer(serializers.Serializer):
     address = serializers.CharField(read_only=True)
     stars = serializers.IntegerField(read_only=True)
     city = serializers.SerializerMethodField()
+    owner = UserSerializer(read_only=True)
 
     def get_city(self, obj):
         if not obj.city_id:

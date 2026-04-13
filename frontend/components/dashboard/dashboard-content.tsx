@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { Calendar, CreditCard, Heart, MapPin, Star, Users, AlertCircle } from "lucide-react";
+import { Calendar, CreditCard, Heart, MapPin, Star, Users, AlertCircle, Mail, Phone } from "lucide-react";
 import {
     useGetBookingsQuery,
     useCancelBookingMutation,
@@ -17,73 +17,16 @@ import { useGetWishlistQuery } from "@/store/api/wishlistApi";
 import { useAuth } from "@/hooks/useAuth";
 import CenterLoader from "@/components/loaders/center-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { Booking, BookingStatus, PaymentStatus } from "@/lib/types/booking";
-
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    });
-}
-
-function getStatusBadgeVariant(status: BookingStatus): "default" | "secondary" | "destructive" | "outline" {
-    switch (status) {
-        case "confirmed":
-        case "checked_in":
-            return "default";
-        case "pending":
-            return "secondary";
-        case "cancelled":
-        case "no_show":
-            return "destructive";
-        case "checked_out":
-        default:
-            return "outline";
-    }
-}
-
-function getPaymentBadgeVariant(
-    paymentStatus: PaymentStatus
-): "default" | "secondary" | "destructive" | "outline" {
-    switch (paymentStatus) {
-        case "paid":
-            return "default";
-        case "pending":
-        case "partially_paid":
-            return "secondary";
-        case "failed":
-        case "refunded":
-            return "destructive";
-        default:
-            return "outline";
-    }
-}
-
-function getHotelName(booking: Booking): string {
-    const hotel = booking.hotel;
-    if (typeof hotel === "object" && hotel !== null && "name" in hotel) {
-        return (hotel as { name: string }).name;
-    }
-    return "Hotel";
-}
-
-function getHotelLocation(booking: Booking): string {
-    const hotel = booking.hotel;
-    if (typeof hotel === "object" && hotel !== null && "address" in hotel) {
-        return (hotel as { address?: string }).address ?? "—";
-    }
-    return "—";
-}
-
-function getHotelImage(booking: Booking): string | null {
-    const hotel = booking.hotel;
-    if (typeof hotel === "object" && hotel !== null) {
-        const h = hotel as { mainPhoto?: string; thumbnail?: string };
-        return h.mainPhoto ?? h.thumbnail ?? null;
-    }
-    return null;
-}
+import type { Booking } from "@/lib/types/booking";
+import {
+    formatBookingDate,
+    getBookingHotelImage,
+    getBookingHotelLocation,
+    getBookingHotelName,
+    getBookingOwnerContact,
+    getBookingPaymentBadgeVariant,
+    getBookingStatusBadgeVariant,
+} from "@/lib/utils/booking-utils";
 
 function BookingCard({
     booking,
@@ -98,9 +41,10 @@ function BookingCard({
     onCompletePayment: (id: string) => void;
     isCompletingPayment: boolean;
 }) {
-    const hotelName = getHotelName(booking);
-    const location = getHotelLocation(booking);
-    const imageUrl = getHotelImage(booking) ?? "/placeholder.svg?height=100&width=150";
+    const hotelName = getBookingHotelName(booking);
+    const location = getBookingHotelLocation(booking);
+    const imageUrl = getBookingHotelImage(booking) ?? "/placeholder.svg?height=100&width=150";
+    const ownerContact = getBookingOwnerContact(booking);
     const isCancelled = booking.status === "cancelled";
     const canCancel =
         !isCancelled &&
@@ -133,24 +77,51 @@ function BookingCard({
                                 </p>
                                 <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                                     <Calendar className="h-4 w-4 shrink-0" aria-hidden />
-                                    {formatDate(booking.checkInDate)} –{" "}
-                                    {formatDate(booking.checkOutDate)}
+                                    {formatBookingDate(booking.checkInDate)} –{" "}
+                                    {formatBookingDate(booking.checkOutDate)}
                                 </p>
                                 <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                                     <Users className="h-4 w-4 shrink-0" aria-hidden />
                                     {booking.guestsCount} guest
                                     {booking.guestsCount !== 1 ? "s" : ""}
                                 </p>
+                                {ownerContact && (
+                                    <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                                        <p className="font-medium text-foreground">{ownerContact.name}</p>
+                                        {ownerContact.email && (
+                                            <p className="flex items-center gap-1">
+                                                <Mail className="h-4 w-4 shrink-0" aria-hidden />
+                                                <a
+                                                    href={`mailto:${ownerContact.email}`}
+                                                    className="hover:underline"
+                                                >
+                                                    {ownerContact.email}
+                                                </a>
+                                            </p>
+                                        )}
+                                        {ownerContact.phone && (
+                                            <p className="flex items-center gap-1">
+                                                <Phone className="h-4 w-4 shrink-0" aria-hidden />
+                                                <a
+                                                    href={`tel:${ownerContact.phone}`}
+                                                    className="hover:underline"
+                                                >
+                                                    {ownerContact.phone}
+                                                </a>
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div className="text-left sm:text-right shrink-0">
                                 <Badge
-                                    variant={getStatusBadgeVariant(booking.status)}
+                                    variant={getBookingStatusBadgeVariant(booking.status)}
                                     className="capitalize"
                                 >
                                     {booking.status.replace("_", " ")}
                                 </Badge>
                                 <Badge
-                                    variant={getPaymentBadgeVariant(paymentStatus)}
+                                    variant={getBookingPaymentBadgeVariant(paymentStatus)}
                                     className="capitalize mt-1"
                                 >
                                     Payment: {paymentStatus.replace("_", " ")}
@@ -221,8 +192,7 @@ export function DashboardContent() {
         { page: 1 },
         { skip: !user }
     );
-    const { data: wishlistResponse, isLoading: wishlistLoading } =
-        useGetWishlistQuery(undefined, { skip: !user });
+    const { data: wishlistResponse, isLoading: wishlistLoading } = useGetWishlistQuery(undefined, { skip: !user });
     const [cancelBooking, { isLoading: isCancelling }] = useCancelBookingMutation();
     const [completePayment, { isLoading: isCompletingPayment }] = useCompletePaymentMutation();
 
