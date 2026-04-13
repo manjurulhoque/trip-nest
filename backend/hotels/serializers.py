@@ -84,6 +84,7 @@ class BaseHotelSerializer(serializers.ModelSerializer):
         required=False,
         coerce_to_string=False,
     )
+    reviews_count = serializers.SerializerMethodField()
     starting_price = serializers.SerializerMethodField()
 
     class Meta:
@@ -124,6 +125,9 @@ class BaseHotelSerializer(serializers.ModelSerializer):
         if min_price is None:
             return 0
         return float(min_price)
+
+    def get_reviews_count(self, obj):
+        return obj.reviews.filter(is_active=True).count()
 
 
 class HotelListSerializer(BaseHotelSerializer):
