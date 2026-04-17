@@ -4,6 +4,7 @@ djangorestframework-simplejwt>=5.3.0
 djangorestframework-camel-case==1.4.2
 django-cors-headers>=4.3.1
 django-structlog==10.0.0
+django-redis==6.0.0
 Pillow>=10.0.0
 python-decouple>=3.8
 django-extensions>=3.2.3
@@ -15,3 +16,4 @@ opentelemetry-sdk==1.41.0
 opentelemetry-instrumentation-django==0.62b0
 opentelemetry-instrumentation-requests==0.62b0
 opentelemetry-exporter-otlp==1.41.0
+redis==7.4.0

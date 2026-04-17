@@ -1,3 +1,7 @@
+import hashlib
+import json
+from django.core.cache import cache
+
 from rest_framework import status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
@@ -211,10 +215,35 @@ class HotelViewSet(ModelViewSet):
         return api_response(
             success=True, data=None, status_code=status.HTTP_204_NO_CONTENT
         )
+        
+    def build_search_cache_key(self, request, base_key="hotel_search"):
+        user = request.user
+
+        params = request.query_params.dict()
+        # important: include list params properly
+        params["facilities"] = request.query_params.getlist("facilities[]")
+
+        key_payload = {
+            "user_id": user.id if user.is_authenticated else None,
+            "is_superuser": user.is_superuser,
+            "is_host": getattr(user, "is_host", lambda: False)(),
+            "params": params,
+        }
+
+        raw = json.dumps(key_payload, sort_keys=True)
+        digest = hashlib.md5(raw.encode()).hexdigest()
+
+        return f"{base_key}:{digest}"
 
     @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def search(self, request):
         """Advanced hotel search with filters"""
+        cache_key = self.build_search_cache_key(request)
+
+        cached = cache.get(cache_key)
+        if cached:
+            return api_response(success=True, data=cached)
+        
         queryset = self.get_queryset()
 
         # Apply filters
@@ -262,12 +291,16 @@ class HotelViewSet(ModelViewSet):
                 page, many=True, context={"request": request}
             )
             paginated = self.get_paginated_response(serializer.data)
-            return api_response(success=True, data=paginated.data)
+            response_data = paginated.data
+        else:
+            serializer = HotelListSerializer(
+                queryset, many=True, context={"request": request}
+            )
+            response_data = serializer.data
 
-        serializer = HotelListSerializer(
-            queryset, many=True, context={"request": request}
-        )
-        return api_response(success=True, data=serializer.data)
+        cache.set(cache_key, response_data, timeout=60 * 5)  # 5 minutes
+
+        return api_response(success=True, data=response_data)
 
     @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def featured(self, request):
